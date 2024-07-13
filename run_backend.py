@@ -32,16 +32,7 @@ def problem_file_upload(file: UploadFile = File(...)):
 
 @app.get("/api/", response_class=HTMLResponse)
 async def welcome():
-    return """
-    <html>
-        <body>
-            <h1>Welcome to shared exercise platform!</h1>
-        </body>
-        <body>
-            This is api page. Response is in HTML format.
-        </body>
-    </html>
-    """
+    return open("backend/api.html", encoding="UTF-8").read()
 
 
 @app.get("/items/{item_id}")
@@ -60,4 +51,4 @@ async def print_(info: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app='run_backend:app', host="0.0.0.0", port=8000, reload=True)
