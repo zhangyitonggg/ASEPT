@@ -1,6 +1,4 @@
 .vscode
 **/node_modules
-**/__pycache__
 uploads
-*.yml
-*.json
+**/__pycache__
