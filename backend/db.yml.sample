@@ -1,0 +1,7 @@
+image: mariadb:10.11.6
+environment:
+  MYSQL_PASSWORD: your_passwd
+  MYSQL_DATABASE: test
+  MYSQL_USER: root
+  MYSQL_ADDR: 0.0.0.0
+  MYSQL_PORT: 3306

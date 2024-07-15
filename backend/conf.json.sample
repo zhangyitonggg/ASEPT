@@ -1,0 +1,6 @@
+{
+    "UPLOAD_DIRECTORY": "",
+    "SECRET_KEY": "",
+    "ALGORITHM": "",
+    "EXPIRE_TIME_MINUTES": 0
+}
