@@ -1,6 +1,5 @@
 import yaml
 import pymysql
-from datetime import datetime, timedelta
 import hashlib
 
 MYSQL_CONFIG_FILE = 'backend/db.yml'
