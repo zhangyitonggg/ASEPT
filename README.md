@@ -12,7 +12,6 @@
 
 ```
 pip install pymysql
-pip install yaml
 pip install pyyaml
 pip install hashlib
 ```
@@ -21,7 +20,7 @@ pip install hashlib
 
 ```
 pip install redis
-pip install yaml
+pip install pyyaml
 pip install jwt
 pip install datetime
 ```
