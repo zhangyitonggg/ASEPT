@@ -8,18 +8,18 @@ class User:
 from enum import Enum
 
 class PermissionType(Enum):
-        IS_ADMIN = 0
-        BLOCK_USER = 1
-        REVIEW_TOPIC = 2
-        MANAGE_PLATFORM = 3
-        UPLOAD_FILE = 4
-        UPLOAD_PROBLEM = 5
-        SHARE_PROBLEM = 6
-        SEARCH_PROBLEM = 7
+    IS_ADMIN = 0
+    BLOCK_USER = 1
+    REVIEW_TOPIC = 2
+    MANAGE_PLATFORM = 3
+    UPLOAD_FILE = 4
+    UPLOAD_PROBLEM = 5
+    SHARE_PROBLEM = 6
+    SEARCH_PROBLEM = 7
 
-        @staticmethod
-        def is_permission(permission: str) -> bool:
-            return permission in PermissionType.__members__
+    @staticmethod
+    def is_permission(permission: str) -> bool:
+        return permission in PermissionType.__members__
 
 class Permissions:
     def __init__(self, uid: int, permissions: list):

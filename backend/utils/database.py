@@ -109,6 +109,7 @@ def get_admin_permissions(uid: str):
     db.close()
     return permissions
 
+
 def set_permission(db, target_user_name: str, permission: str):
     target_user = get_user(db, target_user_name)
     if not target_user:
@@ -123,4 +124,41 @@ def set_permission(db, target_user_name: str, permission: str):
         )
     cursor = db.cursor()
     cursor.execute("UPDATE Permissions SET %s = NOT %s WHERE uid = %s", (permission, permission, target_user[1]))
+    db.commit()
+
+
+def join_group(db, group_name: str, uid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
+    group = cursor.fetchone()
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Group not found.",
+        )
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+    res = cursor.fetchone()
+    if res:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User already in group.",
+        )
+    cursor.execute("INSERT INTO UserGroupMembers (rid, uid, gid) VALUES (UUID(), %s, %s)", (group[0], uid))
+    db.commit()
+
+
+def create_group(db, group_name: str, uid: str, discription: str | None = None):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
+    group = cursor.fetchone()
+    if group:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Group already exists.",
+        )
+    cursor.execute("INSERT INTO UserGroups (gid, name, description, owner) VALUES (UUID(), %s, %s, %s)", (group_name, discription, uid))
+    db.commit()
+    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
+    group = cursor.fetchone()
+    cursor.execute("INSERT INTO UserGroupMembers (rid, gid, uid, is_admin) VALUES (UUID(), %s, %s, 'True')", (group[0], uid))
     db.commit()

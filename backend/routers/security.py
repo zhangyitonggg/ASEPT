@@ -4,7 +4,7 @@ import pymysql
 
 from backend.utils import database, redis
 from backend import conf
-from backend.data.User import Permissions
+from backend.data.User import User
 
 router = APIRouter(
     prefix='/security',
@@ -37,17 +37,17 @@ async def login(
     return {"access_token": token, "token_type": "bearer"}
 
 
-async def get_user_permissions(
+async def get_user(
     token: str = Depends(oauth2_scheme),
     authorized_user_name: str = Query(min_length=1, max_length=256)
-) -> Permissions:
-    permissions = redis.get_user_permissions(token, authorized_user_name)
-    return permissions
+) -> User:
+    user = redis.get_user(token, authorized_user_name)
+    return user
 
 
-async def get_admin_permissions(
+async def get_admin(
     token: str = Depends(oauth2_scheme),
     authorized_user_name: str = Query(min_length=1, max_length=256)
-) -> Permissions:
-    permissions = redis.get_admin_permissions(token, authorized_user_name)
-    return permissions
+) -> User:
+    user = redis.get_admin(token, authorized_user_name)
+    return user
