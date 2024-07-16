@@ -13,6 +13,7 @@
 ```
 pip install pymysql
 pip install yaml
+pip install pyyaml
 pip install hashlib
 ```
 
