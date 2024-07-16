@@ -11,7 +11,8 @@ router = APIRouter(
 async def create_user(
     username: str = Query(min_length=1, max_length=256),
     password: str = Query(min_length=1, max_length=256),
-    db: pymysql.connections.Connection = Depends(database.connect)):
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
     if database.add_user(db, username, database.md5_passwd(password)):
         return {"username": username}
     else:

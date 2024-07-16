@@ -2,8 +2,11 @@ import redis
 import yaml
 import jwt
 import datetime
+from fastapi import HTTPException
 
 from backend import conf
+from backend.data.User import Permissions
+from backend.utils import database
 
 
 REDIS_CONFIG_FILE = 'backend/redis.yml'
@@ -23,7 +26,7 @@ def read_redis_config():
         print("Error reading database config: ", e)
         exit(1)
     try:
-        REDIS = redis.Redis(host=REDIS_ADDR, port=REDIS_PORT, password=REDIS_PASSWORD)
+        REDIS = redis.StrictRedis(host=REDIS_ADDR, port=REDIS_PORT, password=REDIS_PASSWORD)
     except Exception as e:
         print("Error connecting to redis: ", e)
 
@@ -36,29 +39,53 @@ def create_token(data: dict, expire: int, key: str, algorithm: str):
     return token
 
 
-def get_user_permissions(db, user_id: int):
-    cursor = db.cursor()
-    cursor.execute("SELECT permission FROM Permissions WHERE uid=%s", (user_id,))
-    permissions = cursor.fetchall()
-    return [permission['permission'] for permission in permissions]
-
-
-def cache_user_permissions(user_id: int, permissions: list):
+def cache_user_permissions(uid: str, permissions: Permissions):
     global REDIS
-    REDIS.set(f"user_permissions:{user_id}", ','.join(permissions))
+    REDIS.set(
+        f"user_permissions:{uid}",
+        ','.join(permissions.to_list()),
+        ex=conf.EXPIRE_TIME_MINUTES * 60,
+        nx=True
+    )
 
 
-def get_user(token: str, user_name: str):
+def get_user_permissions(token: str, user_name: str) -> Permissions:
     payload = jwt.decode(token, conf.SECRET_KEY, algorithms=[conf.ALGORITHM], audience=user_name)
-    username: str = payload.get("aud")
-    if username is None:
-        raise credentials_exception
-    return username
+    uid: str = payload.get("sub")
+    return get_user_permissions_from_cache(uid)
 
-def get_user_permissions_from_cache(user_id: int):
+
+def get_user_permissions_from_cache(uid: str):
     global REDIS
-    permissions = REDIS.get(f"user_permissions:{user_id}")
+    permissions = REDIS.get(f"user_permissions:{uid}").decode()
     if permissions:
-        return permissions.decode('utf-8').split(',')
-    return []
+        return Permissions(uid, permissions.split(','))
+    cache_user_permissions(uid, database.get_user_permissions(uid))
+    permissions = REDIS.get(f"user_permissions:{uid}").decode()
+    if permissions:
+        return Permissions(uid, permissions.split(','))
+    raise HTTPException(
+        status_code=401,
+        detail="Permission denied. We can't get your permissions as a user."
+    )
 
+
+def get_admin_permissions(token: str, user_name: str) -> Permissions:
+    payload = jwt.decode(token, conf.SECRET_KEY, algorithms=[conf.ALGORITHM], audience=user_name)
+    uid: str = payload.get("sub")
+    return get_admin_permissions_from_cache(uid)
+
+
+def get_admin_permissions_from_cache(uid: str):
+    global REDIS
+    permissions = REDIS.get(f"user_permissions:{uid}")
+    if permissions:
+        return Permissions(uid, permissions.decode().split(','))
+    cache_user_permissions(uid, database.get_admin_permissions(uid))
+    permissions = REDIS.get(f"user_permissions:{uid}")
+    if permissions:
+        return Permissions(uid, permissions.decode().split(','))
+    raise HTTPException(
+        status_code=401,
+        detail="Permission denied. We can't get your permissions as an admin."
+    )

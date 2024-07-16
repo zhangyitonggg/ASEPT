@@ -4,6 +4,7 @@ import pymysql
 
 from backend.utils import database, redis
 from backend import conf
+from backend.data.User import Permissions
 
 router = APIRouter(
     prefix='/security',
@@ -12,7 +13,10 @@ router = APIRouter(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/security/token")
 
 @router.post("/token")
-async def login(message: OAuth2PasswordRequestForm = Depends(), db: pymysql.connections.Connection = Depends(database.connect)):
+async def login(
+    message: OAuth2PasswordRequestForm = Depends(),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
     user = database.varify_user(db, message.username, message.password)
     if not user:
         raise HTTPException(
@@ -21,22 +25,29 @@ async def login(message: OAuth2PasswordRequestForm = Depends(), db: pymysql.conn
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = redis.create_token(
-        data = {"sub":message.scopes, "aud": message.username},
+        data = {
+            "sub": user.uid,
+            "aud": message.username,
+        },
         expire = conf.EXPIRE_TIME_MINUTES,
         key = conf.SECRET_KEY,
         algorithm = conf.ALGORITHM
     )
-    # uid = user["id"]
-    # permissions = redis.get_user_permissions(db, uid)
-    # redis.cache_user_permissions(uid, permissions)
+    redis.cache_user_permissions(user.uid, user.permissions)
     return {"access_token": token, "token_type": "bearer"}
 
-async def get_current_user(token: str = Depends(oauth2_scheme), user_name: str = Query(min_length=1, max_length=256)):
-    user = redis.get_user(token, user_name)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
+
+async def get_user_permissions(
+    token: str = Depends(oauth2_scheme),
+    authorized_user_name: str = Query(min_length=1, max_length=256)
+) -> Permissions:
+    permissions = redis.get_user_permissions(token, authorized_user_name)
+    return permissions
+
+
+async def get_admin_permissions(
+    token: str = Depends(oauth2_scheme),
+    authorized_user_name: str = Query(min_length=1, max_length=256)
+) -> Permissions:
+    permissions = redis.get_admin_permissions(token, authorized_user_name)
+    return permissions
