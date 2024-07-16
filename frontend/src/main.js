@@ -10,6 +10,8 @@ import VueRouter from 'vue-router'
 import router from './router'
 //引入ElementUI全部样式
 import 'element-ui/lib/theme-chalk/index.css';
+import axios from 'axios'
+Vue.prototype.$axios = axios
 //关闭Vue的生产提示
 Vue.config.productionTip = false
 

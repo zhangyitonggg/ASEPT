@@ -38,6 +38,10 @@
   </template>
   
   <script>
+  import qs from 'qs'
+  import axios from 'axios'
+  import { setToken } from '@/utils/auth'
+  
   export default {
     data() {
       return {
@@ -59,20 +63,33 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => { // 根据上面的rules进行检验合法性
           if (valid) {
-            axios.post('/api/login', { // todo
+            // http://localhost:8080/login/security/token
+            axios({
+              url:'http://localhost:8080/login/security/token',
+              method:'post',
+              data: qs.stringify({
                 username: this.ruleForm.uname,
                 password: this.ruleForm.password
+              }),
             })
-            .then(response => {
+            .then(
+              response => {
+                // response.setHeader("Access-Control-Allow-Origin",'*')
                 alert("submit!");
                 const { token } = response.data;
                 setToken(token);
+                console.log(token);
                 this.$router.push({ path: '/home' });
-            })
-            .catch(error => {
+              },
+              error => {
                 alert("登录失败，请检查用户名和密码");
                 return false;
-            });
+              }
+            )
+            // .catch(error => {
+            //     alert("登录失败，请检查用户名和密码");
+            //     return false;
+            // });
           } else {
             console.log("error submit!!");
             return false;

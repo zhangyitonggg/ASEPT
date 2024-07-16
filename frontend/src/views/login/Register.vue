@@ -43,6 +43,9 @@
   </template>
   
   <script>
+  import axios from 'axios'
+  import qs from 'qs'
+
   export default {
     data() {
       var validatePass = (rule, value, callback) => {
@@ -85,20 +88,26 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            axios.post('/api/register', { // todo
+            axios({
+              url:'http://localhost:8080/register/create_user',
+              method:'post',
+              params: {
                 username: this.ruleForm.uname,
                 password: this.ruleForm.password
+              },
             })
-            .then(response => {
+            .then(
+              response => {
                 alert("submit! please login again!");
-                // const { token } = response.data;
-                // setToken(token);
                 this.$router.push({ path: '/login' });
-            })
-            .catch(error => {
-                alert("登录失败，请检查用户名和密码");
+              },
+              error => {
+                console.log('@',error);
+                console.log('error.response',error.response);
+                alert("注册失败，请检查用户名是否重合");
                 return false;
-            });
+              }
+            )
           } else {
             console.log("error submit!!");
             return false;
