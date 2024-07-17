@@ -212,12 +212,17 @@ def set_permission(db, target_user_name: str, perm: str):
     db.commit()
 
 
-def join_group(db, group_name: str, uid: str):
+def join_group(db, group_name: str, uid: str, password: str | None = None):
     group = get_group(db, group_name)
     if not group:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Group not found.",
+        )
+    if group[5] != "NULL" and group[5] != password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password incorrect.",
         )
     cursor = db.cursor()
     cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
@@ -266,7 +271,13 @@ def leave_group(db, group_name: str, name: str, acter: User):
         )
 
 
-def create_group(db, group_name: str, uid: str, discription: str | None = None):
+def create_group(
+    db, 
+    group_name: str, 
+    uid: str,
+    discription: str | None = None, 
+    password: str | None = None
+):
     group = get_group(db, group_name)
     if group:
         raise HTTPException(
@@ -274,13 +285,48 @@ def create_group(db, group_name: str, uid: str, discription: str | None = None):
             detail="Group already exists.",
         )
     cursor = db.cursor()
-    cursor.execute("INSERT INTO UserGroups (gid, name, description, owner, is_open) VALUES (UUID(), %s, %s, %s, 'False')", (group_name, discription, uid))
+    cursor.execute("INSERT INTO UserGroups (gid, name, description, owner, is_open, password) VALUES (UUID(), %s, %s, %s, 'False', %s)", (group_name, discription, uid, password if password else "NULL"))
     db.commit()
     cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
     group = cursor.fetchone()
     cursor.execute("INSERT INTO UserGroupMembers (gid, uid, is_admin) VALUES (%s, %s, 'True')", (group[0], uid))
     db.commit()
-    
+
+
+def delete_group(db, group_name: str, uid: str):
+    group = get_group(db, group_name)
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Group not found.",
+        )
+    if group[3] != uid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permission denied. You are not the owner of this group.",
+        )
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM UserGroups WHERE name = %s", (group_name))
+    cursor.execute("DELETE FROM UserGroupMembers WHERE gid = %s", (group[0]))
+    db.commit()
+
+
+def set_group_password(db, group_name: str, uid: str, password: str):
+    group = get_group(db, group_name)
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Group not found.",
+        )
+    if group[3] != uid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permission denied. You are not the owner of this group.",
+        )
+    cursor = db.cursor()
+    cursor.execute("UPDATE UserGroups SET password = %s WHERE name = %s", (password, group_name))
+    db.commit()
+
 
 def set_group_perm(db, group_name: str, user: User):
     group = get_group(db, group_name)
