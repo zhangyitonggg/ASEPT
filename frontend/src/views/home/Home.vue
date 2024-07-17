@@ -1,8 +1,7 @@
 <template>
-    <div>
+    <div class="container">
       <Header></Header>
-      <h1>welcome,别急</h1>
-      <News></News>
+      <News class="news"></News>
     </div>
   </template>
   
@@ -19,4 +18,16 @@
   </script>
   
   <style scoped>
-</style>
+  .container {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* 你可以根据需要调整高度 */
+  }
+  
+  .news {
+    position: absolute;
+    right: 5%;
+    top: 15%; /* 你可以根据需要调整top值 */
+  }
+
+  </style>

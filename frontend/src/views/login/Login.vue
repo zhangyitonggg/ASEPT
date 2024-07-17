@@ -62,6 +62,7 @@
     methods: {
       submitForm(formName) {
         this.$refs[formName].validate((valid) => { // 根据上面的rules进行检验合法性
+          this.$store.dispatch('storeUname', this.ruleForm.uname)
           if (valid) {
             // http://localhost:8080/login/security/token
             axios({
