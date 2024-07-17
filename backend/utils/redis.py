@@ -48,6 +48,7 @@ def cache_user_permissions(uid: str, permissions: Permissions):
         nx=True
     )
 
+
 def delete_user_permissions_from_cache(uid: str):
     global REDIS
     REDIS.delete(f"user_permissions:{uid}")
@@ -90,11 +91,11 @@ def get_permission_from_cache(uid: str) -> Permissions:
     global REDIS
     permissions = REDIS.get(f"user_permissions:{uid}")
     if permissions:
-        return Permissions(uid, permissions.decode().split(','))
-    cache_user_permissions(uid, database.get_user_permissions(uid))
+        return Permissions(permissions.decode().split(','))
+    cache_user_permissions(uid, Permissions(database.get_user_permissions(uid)))
     permissions = REDIS.get(f"user_permissions:{uid}")
     if permissions:
-        return Permissions(uid, permissions.decode().split(','))
+        return Permissions(permissions.decode().split(','))
     raise HTTPException(
         status_code=401,
         detail="Permission denied. We can't get your permissions as a user."
@@ -133,11 +134,11 @@ def get_admin_permissions_from_cache(uid: str) -> Permissions:
     global REDIS
     permissions = REDIS.get(f"user_permissions:{uid}")
     if permissions:
-        return Permissions(uid, permissions.decode().split(','))
-    cache_user_permissions(uid, database.get_admin_permissions(uid))
+        return Permissions(permissions.decode().split(','))
+    cache_user_permissions(uid, Permissions(database.get_admin_permissions(uid)))
     permissions = REDIS.get(f"user_permissions:{uid}")
     if permissions:
-        return Permissions(uid, permissions.decode().split(','))
+        return Permissions(permissions.decode().split(','))
     raise HTTPException(
         status_code=401,
         detail="Permission denied. We can't get your permissions as an admin."

@@ -3,7 +3,7 @@ class User:
         self.name = name
         self.uid = uid
         self.is_admin = is_admin
-        self.permissions = Permissions(uid, permissions)
+        self.permissions = Permissions(permissions)
 
 from enum import Enum
 
@@ -22,8 +22,7 @@ class PermissionType(Enum):
         return permission in PermissionType.__members__
 
 class Permissions:
-    def __init__(self, uid: int, permissions: list):
-        self.uid = uid
+    def __init__(self, permissions: list):
         self.permissions = []
         for i in range(0, len(PermissionType)):
             if permissions[i] == 'True':

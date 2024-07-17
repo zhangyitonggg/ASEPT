@@ -4,6 +4,7 @@ import hashlib
 from fastapi import HTTPException, Depends, status
 
 from backend.data.User import User, PermissionType
+from backend.data.Announcement import Announcement
 
 MYSQL_CONFIG_FILE = 'backend/db.yml'
 MYSQL_PASSWORD = ''
@@ -164,8 +165,8 @@ def get_admin_permissions(uid: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Users WHERE uid = %s", (uid))
     user_status = cursor.fetchone()
-    print(str(user_status[3] == True))
-    if user_status[4] == b'\x01' or user_status[3] != True:
+    print(user_status[3] == 'True')
+    if user_status[4] == b'\x01' or user_status[3] != 'True':
         raise HTTPException(
             status_code=401,
             detail="Permission denied. You are not an admin."
@@ -295,3 +296,26 @@ def set_admin(db, user_name):
     db.commit()
     cursor.execute("UPDATE Permissions SET is_admin = 'True', block_user = 'True', review_topic = 'True', manage_platform = 'True' WHERE uid = %s", (user[1]))
     db.commit()
+    return user[1]
+
+
+def open_announcement(db, announcement:Announcement, user: User):
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO Announcements (aid, title, content, author) VALUES (UUID(), %s, %s, %s)", (announcement.title, announcement.content, user.uid))
+    db.commit()
+
+
+def get_announcements(db, max_announcements: int):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Announcements ORDER BY update_at DESC LIMIT %s", (max_announcements))
+    announcements = cursor.fetchall()
+    res = []
+    for announcement in announcements:
+        res.append({
+            "title": announcement[1],
+            "content": announcement[2],
+            "update_at": announcement[3],
+            "is_active": announcement[4],
+            "author": get_user_by_uid(db, announcement[5])[0],
+        })
+    return {"announcements": res}

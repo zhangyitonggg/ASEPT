@@ -14,13 +14,14 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-from backend.routers import problem_file_upload, create_user, security, admin, user_group
+from backend.routers import problem_file_upload, create_user, security, admin, user_group, news
 
 app.include_router(problem_file_upload.router)
 app.include_router(create_user.router)
 app.include_router(security.router)
 app.include_router(admin.router)
 app.include_router(user_group.router)
+app.include_router(news.router)
 
 @app.get("/print/{info}")
 async def print_(info: str):
