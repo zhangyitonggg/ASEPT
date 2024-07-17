@@ -38,7 +38,6 @@ UserGroupMembers:
 | is_admin | enum('True','False') | NO   |     | False   |       |
 +----------+----------------------+------+-----+---------+-------+
 
-UserGroups:
 +-------------+----------------------+------+-----+---------+-------+
 | Field       | Type                 | Null | Key | Default | Extra |
 +-------------+----------------------+------+-----+---------+-------+
@@ -47,6 +46,7 @@ UserGroups:
 | description | varchar(255)         | YES  |     | NULL    |       |
 | owner       | uuid                 | NO   |     | NULL    |       |
 | is_open     | enum('True','False') | NO   |     | False   |       |
+| password    | varchar(255)         | YES  |     | NULL    |       |
 +-------------+----------------------+------+-----+---------+-------+
 
 Users:
