@@ -2,10 +2,12 @@
     <div class="container">
       <Header></Header>
       <News class="news"></News>
+      <h1 style="float: left;">TODO 能力形象化 + 前几次登录时间</h1>
     </div>
-  </template>
+    
+</template>
   
-  <script>
+<script>
   import Header from '../../components/Header.vue'
   import News from './News.vue'
 
@@ -15,9 +17,9 @@
       News
     }
   };
-  </script>
+</script>
   
-  <style scoped>
+<style scoped>
   .container {
     position: relative;
     width: 100%;
@@ -29,5 +31,4 @@
     right: 5%;
     top: 15%; /* 你可以根据需要调整top值 */
   }
-
-  </style>
+</style>
