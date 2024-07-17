@@ -1,10 +1,12 @@
 import yaml
 import pymysql
 import hashlib
-from fastapi import HTTPException, Depends, status
+from fastapi import HTTPException, status
+import uuid
 
 from backend.data.User import User, PermissionType
 from backend.data.Announcement import Announcement
+from backend.data.Problem import Problem, NewProblem
 
 MYSQL_CONFIG_FILE = 'backend/db.yml'
 MYSQL_PASSWORD = ''
@@ -108,6 +110,12 @@ def connect():
 def get_group(db, group_name: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
+    return cursor.fetchone()
+
+
+def get_problem_by_pid(db, pid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
     return cursor.fetchone()
 
 
@@ -435,3 +443,11 @@ def all_user_groups(db):
             "owner": get_user_by_uid(db, group[3])[0],
         })
     return {"groups": res}
+
+
+def add_problem(db, problem: NewProblem, user: User):
+    pid = str(uuid.uuid4())
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO Problems (pid, title, content, type, author) VALUES (%s, %s, %s, %s, %s)", (pid, problem.title, problem.content, problem.type.name, user.uid))
+    db.commit()
+    return pid

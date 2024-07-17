@@ -1,16 +1,29 @@
 from pydantic import BaseModel
-from enum import Enum
+from enum import Enum, auto
+import datetime
 
 class ProblemType(Enum):
-    CLASSIC = 0
-    INTERACTIVE = 1
-    OUTPUT_ONLY = 2
-    SPECIAL_JUDGE = 3
+    SINGLE_CHOICE = auto()
+    MULTI_CHOICE = auto()
+    BLANK_FILLING = auto()
+    PROGRAM = auto()
+
+
+class NewProblem(BaseModel):
+    title: str
+    type: ProblemType
+    content: str
+
 
 class Problem(BaseModel):
-    id: int
-    name: str
+    title: str
+    type: ProblemType
+    content: str
 
-    def __init(self, id: int, name: str):
-        self.id = id
-        self.name = name
+    def __init__(self, pid: int, title: str, type: ProblemType, content: str, author: str, update_time: datetime):
+        self.pid = pid
+        self.title = title
+        self.type = type
+        self.content = content
+        self.author = author
+        self.update_time = update_time
