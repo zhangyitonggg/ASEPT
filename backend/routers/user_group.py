@@ -51,7 +51,7 @@ async def create_group(
     return {"status": "success"}
 
 
-@router.post("/delete_group")
+@router.delete("/delete_group")
 async def delete_group(
     group_name: str,
     user: User = Depends(security.get_user),
