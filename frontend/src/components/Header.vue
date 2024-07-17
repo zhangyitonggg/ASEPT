@@ -1,7 +1,7 @@
 <template>
     <nav class="header">
       <div class="header-logo-text">
-        SEP欢迎你
+        SEP
       </div>
       <div class="header-menu">
         <div class="header-start">
@@ -28,12 +28,12 @@
         padding: 1rem;
     }
     .header-logo-text {
-        font-size: 3rem;
+        font-size: 2rem;
         color:#fff;
         font-family: 'Arial', sans-serif;
     }
     .header-item-first {
-        font-size: 2rem;
+        font-size: 1.5rem;
         color: #fff;
         margin-left: 2rem;
     }
