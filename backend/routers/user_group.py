@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 @router.post("/join_group")
-async def join_group(
+def join_group(
     group_name: str,
     user_name: str | None = None,
     user: User = Depends(security.get_user),
@@ -29,9 +29,7 @@ async def leave_group(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
-    if user_name is None:
-        user_name = user.name
-    database.leave_group(db, group_name, user_name)
+    database.leave_group(db, group_name, user_name if user_name else user.name)
     return {"status": "success"}
 
 
@@ -61,4 +59,4 @@ async def show_groups(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
-    return database.show_groups(db, user.name)
+    return database.show_groups(db, user.uid)
