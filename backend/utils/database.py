@@ -58,6 +58,18 @@ Users:
 | is_admin | enum('True','False') | NO   | MUL | False   |       |
 | blocked  | bit(1)               | NO   |     | b'0'    |       |
 +----------+----------------------+------+-----+---------+-------+
+
+Announcements:
++-----------+--------------+------+-----+---------------------+-------------------------------+
+| Field     | Type         | Null | Key | Default             | Extra                         |
++-----------+--------------+------+-----+---------------------+-------------------------------+
+| aid       | uuid         | NO   | PRI | NULL                |                               |
+| title     | varchar(255) | NO   |     | NULL                |                               |
+| content   | text         | NO   |     | NULL                |                               |
+| update_at | timestamp    | NO   |     | current_timestamp() | on update current_timestamp() |
+| is_active | tinyint(1)   | NO   |     | 1                   |                               |
+| author    | uuid         | NO   |     | NULL                |                               |
++-----------+--------------+------+-----+---------------------+-------------------------------+
 '''
 
 
@@ -177,20 +189,25 @@ def get_admin_permissions(uid: str):
     return permissions
 
 
-def set_permission(db, target_user_name: str, permission: str):
+def set_permission(db, target_user_name: str, perm: str):
     target_user = get_user(db, target_user_name)
     if not target_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User name not found.",
         )
-    if PermissionType.is_permission(permission) == False:
+    target_uid = target_user[1]
+    if PermissionType.is_permission(perm) == False:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission not found.",
         )
     cursor = db.cursor()
-    cursor.execute("UPDATE Permissions SET %s = NOT %s WHERE uid = %s", (permission, permission, target_user[1]))
+    cursor.execute("SELECT * FROM Permissions WHERE uid = %s", (target_uid))
+    perms = cursor.fetchone()
+    old_perm = perms[PermissionType[perm].value + 1]
+    cmd = f"UPDATE Permissions SET {perm.lower()} = %s WHERE uid = %s"
+    cursor.execute(cmd, ('True' if old_perm == 'False' else 'False', target_uid))
     db.commit()
 
 
