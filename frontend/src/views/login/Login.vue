@@ -77,8 +77,7 @@
               response => {
                 // response.setHeader("Access-Control-Allow-Origin",'*')
                 alert("submit!");
-                console.log(response) ;
-                var token = response.data.access_token;
+                const { token } = response.data;
                 setToken(token);
                 console.log(token);
                 this.$router.push({ path: '/home' });

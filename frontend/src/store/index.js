@@ -22,7 +22,9 @@ const mutations = {
 
 const state = {
     uname: '',
-    token: ''
+    token: '',
+    ulevel:0,
+    uquestionNum:0,
 }
 
 export default new Vuex.Store({
