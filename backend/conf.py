@@ -10,9 +10,10 @@ SECRET_KEY = ""
 ALGORITHM = ""
 EXPIRE_TIME_MINUTES = 998244353
 MAX_FILE_SIZE = 5 * 1024 * 1024
+ADMIN_KEY = "_"
 
 def init():
-    global UPLOAD_DIRECTORY, SECRET_KEY, ALGORITHM, EXPIRE_TIME_MINUTES
+    global UPLOAD_DIRECTORY, SECRET_KEY, ALGORITHM, EXPIRE_TIME_MINUTES, MAX_FILE_SIZE, ADMIN_KEY
     database.read_db_config()
     redis.read_redis_config()
     with open(CONF_FILE, "r") as f:
@@ -22,3 +23,4 @@ def init():
     SECRET_KEY = conf["SECRET_KEY"]
     ALGORITHM = conf["ALGORITHM"]
     EXPIRE_TIME_MINUTES = conf["EXPIRE_TIME_MINUTES"]
+    ADMIN_KEY = conf["ADMIN_KEY"]

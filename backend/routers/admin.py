@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Header
 import pymysql
 
 from backend.utils import database
 from backend.data.User import Permissions, User
 from backend.routers import security
+import backend.conf as conf
 
 router = APIRouter(
     prefix='/admin',
@@ -22,4 +23,22 @@ async def set_permission(
             detail="Permission denied. You are not an admin."
         )
     database.set_permission(db, target_user_name, permission)
+    return {"status": "success"}
+
+
+@router.post("/set_admin")
+async def set_platform_super_admin(
+    target_user_name: str,
+    key: str | None = Header(charset="UTF-8", min_length=1, max_length=256, errors='strict'),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    NOTICE: THIS API WILL GIVE THE TARGET USER **ALL** PERMISSIONS.
+    '''
+    if key != conf.ADMIN_KEY:
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. Invalid key."
+        )
+    database.set_admin(db, target_user_name)
     return {"status": "success"}
