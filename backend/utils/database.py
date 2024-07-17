@@ -319,3 +319,17 @@ def get_announcements(db, max_announcements: int):
             "author": get_user_by_uid(db, announcement[5])[0],
         })
     return {"announcements": res}
+
+
+def all_user_groups(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups")
+    groups = cursor.fetchall()
+    res = []
+    for group in groups:
+        res.append({
+            "name": group[1],
+            "description": group[2] if group[2] else "This group has no description.",
+            "owner": get_user_by_uid(db, group[3])[0],
+        })
+    return {"groups": res}
