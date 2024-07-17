@@ -40,6 +40,8 @@ pip install shutil
 
 运行后端后，可以通过访问 `http://0.0.0.0:8000/docs` 查看 API 说明文档。
 
+连接服务器后，使用`mysql -u pysummer_test -p`打开数据库。
+
 # 前端说明
 
 <font color="red">前端要是先写了 API 接口在 README 里写一下。</font>
