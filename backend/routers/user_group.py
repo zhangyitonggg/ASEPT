@@ -63,3 +63,11 @@ async def show_groups(
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
     return database.show_groups(db, user.uid)
+
+
+@router.get("/all_groups")
+async def all_groups(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    return database.all_user_groups(db)
