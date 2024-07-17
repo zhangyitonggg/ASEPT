@@ -281,3 +281,17 @@ def show_groups(db, uid: str):
             "is_admin": group[2]
         })
     return {"groups": res}
+
+
+def set_admin(db, user_name):
+    user = get_user(db, user_name)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User not found.",
+        )
+    cursor = db.cursor()
+    cursor.execute("UPDATE Users SET is_admin = 'True' WHERE uid = %s", (user[1]))
+    db.commit()
+    cursor.execute("UPDATE Permissions SET is_admin = 'True', block_user = 'True', review_topic = 'True', manage_platform = 'True' WHERE uid = %s", (user[1]))
+    db.commit()
