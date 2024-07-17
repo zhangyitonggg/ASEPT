@@ -31,4 +31,4 @@ async def print_(info: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app='run_backend:app', host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app='run_backend:app', host="localhost", port=8000, reload=True)
