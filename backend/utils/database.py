@@ -247,9 +247,15 @@ def show_groups(db, uid: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (uid))
     groups = cursor.fetchall()
-    # print("groups: ", groups)
+    print("groups: ", groups)
     res = []
     for group in groups:
         cursor.execute("SELECT * FROM UserGroups WHERE gid = %s", (group[2]))
-        res.append(cursor.fetchone())
+        group_info = cursor.fetchone()
+        res.append({
+            "name": group_info[1],
+            "description": group_info[2],
+            "owner": group_info[3],
+            "is_admin": group[3]
+        })
     return res
