@@ -88,13 +88,13 @@ def get_user(token: str, user_name: str) -> User:
 
 def get_permission_from_cache(uid: str) -> Permissions:
     global REDIS
-    permissions = REDIS.get(f"user_permissions:{uid}").decode()
+    permissions = REDIS.get(f"user_permissions:{uid}")
     if permissions:
-        return Permissions(uid, permissions.split(','))
+        return Permissions(uid, permissions.decode().split(','))
     cache_user_permissions(uid, database.get_user_permissions(uid))
-    permissions = REDIS.get(f"user_permissions:{uid}").decode()
+    permissions = REDIS.get(f"user_permissions:{uid}")
     if permissions:
-        return Permissions(uid, permissions.split(','))
+        return Permissions(uid, permissions.decode().split(','))
     raise HTTPException(
         status_code=401,
         detail="Permission denied. We can't get your permissions as a user."
