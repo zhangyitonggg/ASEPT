@@ -1,22 +1,15 @@
 <template>
     <div>
-      <h2>欢迎{{ user.uname }}！您的 id 为{{ user.uid }}</h2>
-      <router-link to="/login">
-        <el-button> 登出 </el-button>
-      </router-link>
+      <Header></Header>
     </div>
   </template>
   
   <script>
+  import Header from '../../components/Header.vue'
   export default {
-    data() {
-      return {
-        user: {
-          uname: "",
-          uid: null,
-        },
-      };
-    },
+    components: {
+      Header
+    }
   };
   </script>
   
