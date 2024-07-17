@@ -71,3 +71,19 @@ async def all_groups(
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
     return database.all_user_groups(db)
+
+@router.post("/set_group_perm")
+async def set_group_perm(
+    group_name: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    database.set_group_perm(db, group_name, user)
+    return {"status": "success"}
+
+@router.get("/find_open_groups")
+async def find_open_groups(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    return database.find_open_groups(db, user.uid)

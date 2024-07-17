@@ -39,14 +39,15 @@ UserGroupMembers:
 +----------+----------------------+------+-----+---------+-------+
 
 UserGroups:
-+-------------+--------------+------+-----+---------+-------+
-| Field       | Type         | Null | Key | Default | Extra |
-+-------------+--------------+------+-----+---------+-------+
-| gid         | uuid         | NO   | PRI | NULL    |       |
-| name        | varchar(255) | NO   |     | NULL    |       |
-| description | varchar(255) | YES  |     | NULL    |       |
-| owner       | uuid         | NO   |     | NULL    |       |
-+-------------+--------------+------+-----+---------+-------+
++-------------+----------------------+------+-----+---------+-------+
+| Field       | Type                 | Null | Key | Default | Extra |
++-------------+----------------------+------+-----+---------+-------+
+| gid         | uuid                 | NO   | PRI | NULL    |       |
+| name        | varchar(255)         | NO   |     | NULL    |       |
+| description | varchar(255)         | YES  |     | NULL    |       |
+| owner       | uuid                 | NO   |     | NULL    |       |
+| is_open     | enum('True','False') | NO   |     | False   |       |
++-------------+----------------------+------+-----+---------+-------+
 
 Users:
 +----------+----------------------+------+-----+---------+-------+
@@ -273,12 +274,49 @@ def create_group(db, group_name: str, uid: str, discription: str | None = None):
             detail="Group already exists.",
         )
     cursor = db.cursor()
-    cursor.execute("INSERT INTO UserGroups (gid, name, description, owner) VALUES (UUID(), %s, %s, %s)", (group_name, discription, uid))
+    cursor.execute("INSERT INTO UserGroups (gid, name, description, owner, is_open) VALUES (UUID(), %s, %s, %s, 'False')", (group_name, discription, uid))
     db.commit()
     cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
     group = cursor.fetchone()
     cursor.execute("INSERT INTO UserGroupMembers (gid, uid, is_admin) VALUES (%s, %s, 'True')", (group[0], uid))
     db.commit()
+    
+
+def set_group_perm(db, group_name: str, user: User):
+    group = get_group(db, group_name)
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Group not found.",
+        )
+    gid = group[0]
+    owner = group[3]
+    if owner != user.uid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permission denied. You are not the owner of this group.",
+        )
+    cursor = db.cursor()
+    cur_state = group[4]
+    cursor.execute("UPDATE UserGroups SET is_open = %s WHERE gid = %s", ('True' if cur_state == 'False' else 'False', gid))
+    db.commit()
+
+
+def find_open_groups(db, uid: str):
+    # find groups with is_open = True and uid is not in the group
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups WHERE is_open = 'True'")
+    groups = cursor.fetchall()
+    res = []
+    for group in groups:
+        cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+        if not cursor.fetchone():
+            res.append({
+                "name": group[1],
+                "description": group[2] if group[2] else "This group has no description.",
+                "owner": get_user_by_uid(db, group[3])[0],
+            })
+    return {"groups": res}
 
 
 def show_groups(db, uid: str):
