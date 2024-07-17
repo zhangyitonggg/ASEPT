@@ -3,8 +3,7 @@ from enum import Enum, auto
 import datetime
 
 class ProblemType(Enum):
-    SINGLE_CHOICE = auto()
-    MULTI_CHOICE = auto()
+    CHOICE = auto()
     BLANK_FILLING = auto()
     PROGRAM = auto()
 
@@ -13,6 +12,15 @@ class NewProblem(BaseModel):
     title: str
     type: ProblemType
     content: str
+
+
+class Choice_Problem(NewProblem):
+    choices: str
+    answer: str
+
+
+class Blank_Filling_Problem(NewProblem):
+    answer: str
 
 
 class Problem(BaseModel):
