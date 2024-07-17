@@ -12,6 +12,54 @@ MYSQL_USER = ''
 MYSQL_ADDR = ''
 MYSQL_PORT = ''
 
+'''
+Permissions:
++-----------------+----------------------+------+-----+---------+-------+
+| Field           | Type                 | Null | Key | Default | Extra |
++-----------------+----------------------+------+-----+---------+-------+
+| uid             | uuid                 | NO   | PRI | NULL    |       |
+| is_admin        | enum('True','False') | NO   | MUL | False   |       |
+| block_user      | enum('True','False') | NO   |     | False   |       |
+| review_topic    | enum('True','False') | NO   |     | False   |       |
+| manage_platform | enum('True','False') | NO   |     | False   |       |
+| upload_file     | enum('True','False') | NO   |     | True    |       |
+| upload_problem  | enum('True','False') | NO   |     | True    |       |
+| share_problem   | enum('True','False') | NO   |     | True    |       |
+| search_problem  | enum('True','False') | NO   |     | True    |       |
++-----------------+----------------------+------+-----+---------+-------+
+
+UserGroupMembers:
++----------+----------------------+------+-----+---------+-------+
+| Field    | Type                 | Null | Key | Default | Extra |
++----------+----------------------+------+-----+---------+-------+
+| rid      | uuid                 | NO   | PRI | NULL    |       |
+| uid      | uuid                 | NO   | MUL | NULL    |       |
+| gid      | uuid                 | NO   | MUL | NULL    |       |
+| is_admin | enum('True','False') | NO   |     | False   |       |
++----------+----------------------+------+-----+---------+-------+
+
+UserGroups:
++-------------+--------------+------+-----+---------+-------+
+| Field       | Type         | Null | Key | Default | Extra |
++-------------+--------------+------+-----+---------+-------+
+| gid         | uuid         | NO   | PRI | NULL    |       |
+| name        | varchar(255) | NO   |     | NULL    |       |
+| description | varchar(255) | YES  |     | NULL    |       |
+| owner       | uuid         | NO   |     | NULL    |       |
++-------------+--------------+------+-----+---------+-------+
+
+Users:
++----------+----------------------+------+-----+---------+-------+
+| Field    | Type                 | Null | Key | Default | Extra |
++----------+----------------------+------+-----+---------+-------+
+| name     | varchar(255)         | NO   | PRI | NULL    |       |
+| uid      | uuid                 | NO   | MUL | NULL    |       |
+| password | varchar(255)         | NO   |     | NULL    |       |
+| is_admin | enum('True','False') | NO   | MUL | False   |       |
+| blocked  | bit(1)               | NO   |     | b'0'    |       |
++----------+----------------------+------+-----+---------+-------+
+'''
+
 
 def read_db_config():
     global MYSQL_CONFIG_FILE, MYSQL_PASSWORD, MYSQL_DATABASE, MYSQL_USER, MYSQL_ADDR, MYSQL_PORT
@@ -109,6 +157,7 @@ def get_admin_permissions(uid: str):
     db.close()
     return permissions
 
+
 def set_permission(db, target_user_name: str, permission: str):
     target_user = get_user(db, target_user_name)
     if not target_user:
@@ -124,3 +173,89 @@ def set_permission(db, target_user_name: str, permission: str):
     cursor = db.cursor()
     cursor.execute("UPDATE Permissions SET %s = NOT %s WHERE uid = %s", (permission, permission, target_user[1]))
     db.commit()
+
+
+def join_group(db, group_name: str, uid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
+    group = cursor.fetchone()
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Group not found.",
+        )
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+    res = cursor.fetchone()
+    if res:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User already in group.",
+        )
+    cursor.execute("INSERT INTO UserGroupMembers (rid, gid, uid, is_admin) VALUES (UUID(), %s, %s, 'False')", (group[0], uid))
+    db.commit()
+
+
+def leave_group(db, group_name: str, name: str):
+    cursor = db.cursor()
+    # get uid of name
+    cursor.execute("SELECT * FROM Users WHERE name = %s", (name))
+    user = cursor.fetchone()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User not found.",
+        )
+    uid = user[1]
+    # get target group
+    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
+    group = cursor.fetchone()
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Group not found.",
+        )
+    # check if user is in group
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+    res = cursor.fetchone()
+    if not res:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User not in group.",
+        )
+    cursor.execute("DELETE FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+    db.commit()
+
+
+def create_group(db, group_name: str, uid: str, discription: str | None = None):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
+    group = cursor.fetchone()
+    if group:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Group already exists.",
+        )
+    cursor.execute("INSERT INTO UserGroups (gid, name, description, owner) VALUES (UUID(), %s, %s, %s)", (group_name, discription, uid))
+    db.commit()
+    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
+    group = cursor.fetchone()
+    cursor.execute("INSERT INTO UserGroupMembers (rid, gid, uid, is_admin) VALUES (UUID(), %s, %s, 'True')", (group[0], uid))
+    db.commit()
+
+
+def show_groups(db, uid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (uid))
+    groups = cursor.fetchall()
+    print("groups: ", groups)
+    res = []
+    for group in groups:
+        cursor.execute("SELECT * FROM UserGroups WHERE gid = %s", (group[2]))
+        group_info = cursor.fetchone()
+        res.append({
+            "name": group_info[1],
+            "description": group_info[2],
+            "owner": group_info[3],
+            "is_admin": group[3]
+        })
+    return res
