@@ -16,6 +16,9 @@ def join_group(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
+    '''
+    NOTICE: params "user_name" is invalid. Maybe we will use it in the future.
+    '''
     if user_name is None:
         user_name = user.name
     database.join_group(db, group_name, user.uid)
@@ -29,7 +32,7 @@ async def leave_group(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
-    database.leave_group(db, group_name, user_name if user_name else user.name)
+    database.leave_group(db, group_name, user_name if user_name else user.name, user)
     return {"status": "success"}
 
 

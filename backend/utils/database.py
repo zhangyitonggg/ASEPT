@@ -32,7 +32,6 @@ UserGroupMembers:
 +----------+----------------------+------+-----+---------+-------+
 | Field    | Type                 | Null | Key | Default | Extra |
 +----------+----------------------+------+-----+---------+-------+
-| rid      | uuid                 | NO   | PRI | NULL    |       |
 | uid      | uuid                 | NO   | MUL | NULL    |       |
 | gid      | uuid                 | NO   | MUL | NULL    |       |
 | is_admin | enum('True','False') | NO   |     | False   |       |
@@ -91,6 +90,12 @@ def connect():
         db.close()
 
 
+def get_group(db, group_name: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
+    return cursor.fetchone()
+
+
 def new_db():
     return pymysql.connect(
         host=MYSQL_ADDR,
@@ -104,6 +109,12 @@ def new_db():
 def get_user(db, username: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Users WHERE name = %s", (username))
+    return cursor.fetchone()
+
+
+def get_user_by_uid(db, uid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Users WHERE uid = %s", (uid))
     return cursor.fetchone()
 
 
@@ -136,8 +147,15 @@ def get_user_permissions(uid: str):
     db = new_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Permissions WHERE uid = %s", (uid))
-    permissions = cursor.fetchone()[1::]
+    permissions = cursor.fetchone()
     db.close()
+    if permissions:
+        permissions = permissions[1::]
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found."
+        )
     return permissions
 
 
@@ -176,14 +194,13 @@ def set_permission(db, target_user_name: str, permission: str):
 
 
 def join_group(db, group_name: str, uid: str):
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
-    group = cursor.fetchone()
+    group = get_group(db, group_name)
     if not group:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Group not found.",
         )
+    cursor = db.cursor()
     cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
     res = cursor.fetchone()
     if res:
@@ -191,55 +208,58 @@ def join_group(db, group_name: str, uid: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User already in group.",
         )
-    cursor.execute("INSERT INTO UserGroupMembers (rid, gid, uid, is_admin) VALUES (UUID(), %s, %s, 'False')", (group[0], uid))
+    cursor.execute("INSERT INTO UserGroupMembers (gid, uid) VALUES (%s, %s)", (group[0], uid))
     db.commit()
 
 
-def leave_group(db, group_name: str, name: str):
-    cursor = db.cursor()
-    # get uid of name
-    cursor.execute("SELECT * FROM Users WHERE name = %s", (name))
-    user = cursor.fetchone()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User not found.",
-        )
-    uid = user[1]
-    # get target group
-    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
-    group = cursor.fetchone()
+def leave_group(db, group_name: str, name: str, acter: User):
+    if name == acter.name:
+        uid = acter.uid
+    else:
+        user_left = get_user(db, name)
+        if not user_left:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User not found.",
+            )
+        uid = user_left[1]
+    group = get_group(db, group_name)
     if not group:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Group not found.",
         )
-    # check if user is in group
-    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
-    res = cursor.fetchone()
-    if not res:
+    if group[3] == uid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User not in group.",
+            detail="Owner cannot leave group.",
         )
-    cursor.execute("DELETE FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
-    db.commit()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+        db.commit()
+    except Exception as e:
+        print("Error leaving group: ", e)
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error leaving group.",
+        )
 
 
 def create_group(db, group_name: str, uid: str, discription: str | None = None):
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
-    group = cursor.fetchone()
+    group = get_group(db, group_name)
     if group:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Group already exists.",
         )
+    cursor = db.cursor()
     cursor.execute("INSERT INTO UserGroups (gid, name, description, owner) VALUES (UUID(), %s, %s, %s)", (group_name, discription, uid))
     db.commit()
     cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
     group = cursor.fetchone()
-    cursor.execute("INSERT INTO UserGroupMembers (rid, gid, uid, is_admin) VALUES (UUID(), %s, %s, 'True')", (group[0], uid))
+    cursor.execute("INSERT INTO UserGroupMembers (gid, uid, is_admin) VALUES (%s, %s, 'True')", (group[0], uid))
     db.commit()
 
 
@@ -247,15 +267,17 @@ def show_groups(db, uid: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (uid))
     groups = cursor.fetchall()
-    print("groups: ", groups)
     res = []
     for group in groups:
-        cursor.execute("SELECT * FROM UserGroups WHERE gid = %s", (group[2]))
+        cursor.execute("SELECT * FROM UserGroups WHERE gid = %s", (group[1]))
         group_info = cursor.fetchone()
+        owner_uid = group_info[3]
+        user = get_user_by_uid(db, owner_uid)
+        user_name = "ThisAccountHasBeenDeleted" if not user else user[0]
         res.append({
             "name": group_info[1],
-            "description": group_info[2],
-            "owner": group_info[3],
-            "is_admin": group[3]
+            "description": group_info[2] if group_info[2] else "This group has no description.",
+            "owner": user_name,
+            "is_admin": group[2]
         })
-    return res
+    return {"groups": res}
