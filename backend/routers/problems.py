@@ -53,6 +53,25 @@ async def add_problem(
     return {'status': 'success', 'pid': pid}
 
 
+@router.post('/add_problem_tag')
+async def add_problem_tag(
+    problem: Problem,
+    tag: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    database.add_problem_tag(db, problem.pid, tag, user)
+    return {'status': 'success'}
+
+
+@router.get('/search_problem_by_tag')
+async def search_problem_by_tag(
+    tag: str,
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    return database.search_problem_by_tag(db, tag)
+
+
 @router.get('/my_problems')
 async def get_my_problems(
     user: User = Depends(security.get_user),
