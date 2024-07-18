@@ -21,7 +21,7 @@ Vue.use(ElementUI);
 Vue.use(VueRouter);
 
 //创建vm
-new Vue({
+const vm = new Vue({
 	el:'#app',
 	render: h => h(App),
 	router,
