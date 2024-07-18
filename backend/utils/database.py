@@ -485,13 +485,17 @@ def get_my_problems(db, user: User):
     problems = cursor.fetchall()
     res = []
     for problem in problems:
-        res.append({
-            "pid": problem[0],
-            "title": problem[1],
-            "content": problem[2],
-            "type": problem[3],
-            "update_time": problem[5],
-        })
+        res.append(Problem(
+            pid=problem[0],
+            title=problem[1],
+            content=problem[2],
+            type=ProblemType[problem[3].upper()],
+            author=problem[4],
+            update_time=str(problem[5]),
+            choices=problem[6],
+            answers=problem[7],
+            is_published=bool(problem[8])
+        ))
     return {"problems": res}
 
 
@@ -517,3 +521,26 @@ def problem_accessible(db, user: User, pid: str):
         if uid_in_group(db, user.uid, gid):
             return True
     return False
+
+
+def get_problem(db, pid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if problem == None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    problem = Problem(
+        pid=problem[0],
+        title=problem[1],
+        content=problem[2],
+        type=ProblemType[problem[3].upper()],
+        author=problem[4],
+        update_time=str(problem[5]),
+        choices=problem[6],
+        answers=problem[7],
+        is_published=bool(problem[8])
+    )
+    return problem

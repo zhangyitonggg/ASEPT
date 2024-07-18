@@ -18,8 +18,65 @@ async def add_problem(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
+    '''
+    The choices should be like this:
+    ```
+    {
+        "A": "Choice A",
+        "B": "Choice B",
+        "C": "Choice C",
+        "D": "Choice D"
+    }
+    ```
+    and the answer should be like this:
+    ```
+    {
+        "A": "Choice A",
+        "B": "Choice B"
+    }
+    ```
+    for blank filling problem, the answer should be like this:
+    ```
+    {
+        "1": "answer1",
+        "2": [
+            "answer2",
+            "answer3"
+        ]
+    }
+    ```
+    '''
     if not user.permissions.get("UPLOAD_PROBLEM"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
+    check_problem_format(problem)
+    pid = database.add_problem(db, problem, user)
+    return {'status': 'success', 'pid': pid}
+
+
+@router.get('/my_problems')
+async def get_my_problems(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    return database.get_my_problems(db, user)
+
+
+@router.get('/{problem_id}', response_model=Problem)
+async def get_problem(
+    problem_id: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    NOTICE: This function is not complete and will not work as expected.
+            This function must be placed at the end of the file to avoid conflict with other routers.
+    '''
+    if database.problem_accessible(db, user, problem_id):
+        return database.get_problem(db, problem_id)
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
+
+
+def check_problem_format(problem: Choice_Problem | Blank_Filling_Problem):
     try:
         json.loads(problem.answer)
     except json.JSONDecodeError:
@@ -33,26 +90,3 @@ async def add_problem(
     elif isinstance(problem, Blank_Filling_Problem):
         problem.type = ProblemType.BLANK_FILLING
         pass
-    pid = database.add_problem(db, problem, user)
-    return {'status': 'success', 'pid': pid}
-
-@router.get('/my_problems')
-async def get_my_problems(
-    user: User = Depends(security.get_user),
-    db: pymysql.connections.Connection = Depends(database.connect)
-):
-    return database.get_my_problems(db, user)
-
-
-@router.get('/{problem_id}', response_model=Problem)
-async def get_problem(
-    problem_id: str,
-    user: User = Depends(security.get_user)
-):
-    '''
-    NOTICE: This function is not complete and will not work as expected.
-            This function must be placed at the end of the file to avoid conflict with other routers.
-    '''
-    if not user.has_permission(Permissions.VIEW_PROBLEM):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
-    return {"status": "success"}
