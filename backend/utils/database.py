@@ -127,6 +127,18 @@ def get_group(db, group_name: str):
     return cursor.fetchone()
 
 
+def get_group_by_gid(db, gid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups WHERE gid = %s", (gid))
+    return cursor.fetchone()
+
+
+def uid_in_group(db, uid: str, gid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE (uid, gid) = (%s, %s)", (uid, gid))
+    return cursor.fetchone() != None
+
+
 def get_problem_by_pid(db, pid: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
@@ -173,6 +185,7 @@ def add_user(db, username: str, password: str):
     uid = cursor.fetchone()[0]
     cursor.execute("INSERT INTO Permissions (uid) VALUES (%s)", (uid))
     db.commit()
+    join_group(db, "__default__", uid)
     return True
 
 
@@ -242,19 +255,17 @@ def join_group(db, group_name: str, uid: str, password: str | None = None):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Group not found.",
         )
-    if group[5] != "NULL" and group[5] != password:
+    if group[5] != None and group[5] != password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Password incorrect.",
         )
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
-    res = cursor.fetchone()
-    if res:
+    if uid_in_group(db, uid, group[0]):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User already in group.",
         )
+    cursor = db.cursor()
     cursor.execute("INSERT INTO UserGroupMembers (gid, uid) VALUES (%s, %s)", (group[0], uid))
     db.commit()
 
@@ -295,10 +306,10 @@ def leave_group(db, group_name: str, name: str, acter: User):
 
 
 def create_group(
-    db, 
-    group_name: str, 
+    db,
+    group_name: str,
     uid: str,
-    discription: str | None = None, 
+    discription: str | None = None,
     password: str | None = None
 ):
     group = get_group(db, group_name)
@@ -482,3 +493,27 @@ def get_my_problems(db, user: User):
             "update_time": problem[5],
         })
     return {"problems": res}
+
+
+def problem_accessible(db, user: User, pid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if problem == None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    if user.permissions.get("REVIEW_TOPIC"):
+        return True
+    if problem[4] == user.uid:
+        return True
+    if problem[8] == 0:
+        return False
+    cursor.execute("SELECT * FROM ProblemAccessibleGroups WHERE pid = %s", (pid))
+    groups = cursor.fetchall()
+    for group in groups:
+        gid = group[1]
+        if uid_in_group(db, user.uid, gid):
+            return True
+    return False
