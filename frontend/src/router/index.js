@@ -4,7 +4,7 @@ import Login from '../views/login/Login'
 import Register from "../views/login/Register";
 import Home from "../views/home/Home";
 import Mine from "../mine/Mine.vue";
-
+import Group from "../views/group/Group.vue";
 
 export default new VueRouter({
     mode: 'history',
@@ -28,6 +28,10 @@ export default new VueRouter({
         {
             path: '/mine',
             component: Mine
+        },
+        {
+            path: '/Groups',
+            component: Group
         }
     ]
 })

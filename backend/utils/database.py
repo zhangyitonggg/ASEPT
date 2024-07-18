@@ -6,7 +6,7 @@ import uuid
 
 from backend.data.User import User, PermissionType
 from backend.data.Announcement import Announcement
-from backend.data.Problem import Problem, NewProblem
+from backend.data.Problem import *
 
 MYSQL_CONFIG_FILE = 'backend/db.yml'
 MYSQL_PASSWORD = ''
@@ -459,10 +459,11 @@ def all_user_groups(db):
     return {"groups": res}
 
 
-def add_problem(db, problem: NewProblem, user: User):
+def add_problem(db, problem: Choice_Problem | Blank_Filling_Problem, user: User):
     pid = str(uuid.uuid4())
     cursor = db.cursor()
-    cursor.execute("INSERT INTO Problems (pid, title, content, type, author) VALUES (%s, %s, %s, %s, %s)", (pid, problem.title, problem.content, problem.type.name, user.uid))
+    cursor.execute("INSERT INTO Problems (pid, title, content, type, author, choices, answers) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                   (pid, problem.title, problem.content, problem.type.name, user.uid, None if isinstance(problem, Blank_Filling_Problem) else problem.choices, problem.answer))
     db.commit()
     return pid
 
