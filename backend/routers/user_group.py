@@ -81,6 +81,11 @@ async def delete_group(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
+    '''
+    删除用户组。
+    
+    group_name: str，用户组名称
+    '''
     database.delete_group(db, group_name, user.uid)
     return {"status": "success"}
 
@@ -158,6 +163,11 @@ async def set_group_perm(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
+    '''
+    设置用户组权限。
+    
+    group_name: str，用户组名称
+    '''
     database.set_group_perm(db, group_name, user)
     return {"status": "success"}
 
@@ -166,6 +176,26 @@ async def find_open_groups(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
+    '''
+    查找公开的用户组。
+    
+    返回格式如下：
+    ```
+    {
+        "groups": [
+            {
+                "name": "group1",
+                "description": "description1",
+                "owner": "owner1"
+            },
+            {
+                "name": "group2",
+                "description": "description2",
+                "owner": "owner2"
+            }
+        ]
+    }
+    '''
     return database.find_open_groups(db, user.uid)
 
 @router.post("/set_group_password")
@@ -175,7 +205,14 @@ async def set_group_password(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
-    if not password or len(password) <= 5:
+    '''
+    设置用户组密码。
+    
+    group_name: str，用户组名称
+    
+    password: str，用户组密码（至少 5 位），或者为空，表示取消密码
+    '''
+    if not password and len(password) <= 5:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password too short")
     database.set_group_password(db, group_name, password, user)
     return {"status": "success"}

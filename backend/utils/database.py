@@ -343,6 +343,8 @@ def set_group_password(db, group_name: str, uid: str, password: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied. You are not the owner of this group.",
         )
+    if not password:
+        password = "NULL"
     cursor = db.cursor()
     cursor.execute("UPDATE UserGroups SET password = %s WHERE name = %s", (password, group_name))
     db.commit()
