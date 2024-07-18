@@ -212,7 +212,7 @@ def get_admin_permissions(uid: str):
     return permissions
 
 
-def set_permission(db, target_user_name: str, perm: str):
+def set_permission(db, target_user_name: str, perm: PermissionType):
     target_user = get_user(db, target_user_name)
     if not target_user:
         raise HTTPException(

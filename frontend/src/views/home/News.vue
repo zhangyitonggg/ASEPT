@@ -3,10 +3,9 @@
       <h1>近期新闻</h1>
       <div v-for="article in articles" :key="article.id" class="news-item">
         <h2>{{ article.title }}</h2>
-          <p>{{article.content}}</p>
-          <p class="author">author: {{article.author}}</p>
-        
-        <a :href="article.url" target="_blank" class="read-more">阅读更多</a>
+          <p>{{article.description}}</p>
+          <!-- <p class="author">author: {{article.author}}</p> -->
+          <a :href="article.url" target="_blank" class="read-more">阅读更多</a>
       </div>
     </div>
   </template>
@@ -19,30 +18,30 @@
       return {
         names: 'News',
         articles: [
-          // {
-          //   id: 1,
-          //   title: '魏佬为什么不睡觉',
-          //   description: '据yt日报报道，魏佬已经很久没睡觉了，原因竟是他在学Vue',
-          //   url: 'https://weixinvcci.github.io/'
-          // },
-          // {
-          //   id: 2,
-          //   title: '我爱北航',
-          //   description: '北航也是一个好学校————xxx',
-          //   url: 'https://www.tsinghua.edu.cn/'
-          // },
-          // {
-          //   id: 3,
-          //   title: '大家都很喜欢python',
-          //   description: '据说有很多人喜欢python',
-          //   url: 'https://course.educg.net/indexcs/simple.jsp?loginErr=0'
-          // }
-          // // 可以添加更多新闻条目
+          {
+            id: 1,
+            title: '魏佬为什么不睡觉',
+            description: '据yt日报报道，魏佬已经很久没睡觉了，原因竟是他在学Vue',
+            url: 'https://weixinvcci.github.io/'
+          },
+          {
+            id: 2,
+            title: '我爱北航',
+            description: '北航也是一个好学校————xxx',
+            url: 'https://www.tsinghua.edu.cn/'
+          },
+          {
+            id: 3,
+            title: '大家都很喜欢python',
+            description: '据说有很多人喜欢python',
+            url: 'https://course.educg.net/indexcs/simple.jsp?loginErr=0'
+          }
+          // 可以添加更多新闻条目
         ]
       };
     },
     mounted() {
-      this.getAnnouncement();
+      // this.getAnnouncement();
     },
     methods: {
         getAnnouncement() {
