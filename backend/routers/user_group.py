@@ -11,7 +11,7 @@ router = APIRouter(
 
 @router.post("/join_group")
 def join_group(
-    group_name: str,
+    gid: str,
     user_name: str | None = None,
     user: User = Depends(security.get_user),
     password: str | None = None,
@@ -19,21 +19,38 @@ def join_group(
 ):
     '''
     NOTICE: params "user_name" is invalid. Maybe we will use it in the future.
+
+    gid: str，要加入的用户组 id
+
+    ~~user_name: str | None = None，要加入的用户名称~~ 没有用
+
+    一定是当前登录的用户加入用户组
+
+    password: str | None = None，用户组密码，如果用户组有密码的话
+
+    **暂时不要使用这个接口，后端在调整**
     '''
     if user_name is None:
         user_name = user.name
-    database.join_group(db, group_name, user.uid, password)
+    database.join_group(db, gid, user.uid, password)
     return {"status": "success"}
 
 
 @router.post("/leave_group")
 async def leave_group(
-    group_name: str,
+    gid: str,
     user_name: str | None = None,
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
-    database.leave_group(db, group_name, user_name if user_name else user.name, user)
+    '''
+    gid: str，要离开的用户组 id
+
+    user_name: str | None = None，要离开的用户名称
+
+    **先别用**
+    '''
+    database.leave_group(db, gid, user_name if user_name else user.name, user)
     return {"status": "success"}
 
 
@@ -45,6 +62,13 @@ async def create_group(
     password: str | None = None,
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
+    '''
+    group_name: str，用户组名称
+
+    description: str | None = None，用户组描述，可以为空
+
+    password: str | None = None，用户组密码，可以为空
+    '''
     if password is not None and len(password) <= 5:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password too short")
     database.create_group(db, group_name, user.uid, description, password)
@@ -66,6 +90,32 @@ async def show_groups(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
+    '''
+    返回当前用户所在的用户组。
+
+    格式如下：
+
+    ```
+    {
+        "groups": [
+            {
+                "group_name": "group1",
+                "description": "description1",
+                "owner": "owner1",
+                "is_admin": true,
+                "gid": "xxxx-xxxx-xxxx"
+            },
+            {
+                "group_name": "group2",
+                "description": "description2",
+                "owner": "owner2",
+                "is_admin": true,
+                "gid": "xxxx-xxxx-xxxx"
+            }
+        ]
+    }
+    ```
+    '''
     return database.show_groups(db, user.uid)
 
 
@@ -74,6 +124,32 @@ async def all_groups(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
+    '''
+    返回所有用户组。
+
+    格式如下：
+
+    ```
+    {
+        "groups": [
+            {
+                "group_name": "group1",
+                "description": "description1",
+                "owner": "owner1",
+                "is_admin": true,
+                "gid": "xxxx-xxxx-xxxx"
+            },
+            {
+                "group_name": "group2",
+                "description": "description2",
+                "owner": "owner2",
+                "is_admin": true,
+                "gid": "xxxx-xxxx-xxxx"
+            }
+        ]
+    }
+    ```
+    '''
     return database.all_user_groups(db)
 
 @router.post("/set_group_perm")
