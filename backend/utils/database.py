@@ -309,21 +309,14 @@ def create_group(
     db,
     group_name: str,
     uid: str,
-    discription: str | None = None,
+    description: str | None = None,
     password: str | None = None
 ):
-    group = get_group(db, group_name)
-    if group:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Group already exists.",
-        )
+    gid = str(uuid.uuid4())
     cursor = db.cursor()
-    cursor.execute("INSERT INTO UserGroups (gid, name, description, owner, is_open, password) VALUES (UUID(), %s, %s, %s, 'False', %s)", (group_name, discription, uid, password if password else "NULL"))
-    db.commit()
-    cursor.execute("SELECT * FROM UserGroups WHERE name = %s", (group_name))
-    group = cursor.fetchone()
-    cursor.execute("INSERT INTO UserGroupMembers (gid, uid, is_admin) VALUES (%s, %s, 'True')", (group[0], uid))
+    cursor.execute("INSERT INTO UserGroups (gid, name, description, owner, is_open, password) VALUES (%s, %s, %s, %s, 'False', %s)",
+                   (gid, group_name, description if description else "NULL", uid, md5_passwd(password) if password else "NULL"))
+    cursor.execute("INSERT INTO UserGroupMembers (gid, uid, is_admin) VALUES (%s, %s, 'True')", (gid, uid))
     db.commit()
 
 
@@ -399,24 +392,88 @@ def find_open_groups(db, uid: str):
     return {"groups": res}
 
 
-def show_groups(db, uid: str):
+def show_unentered_groups(db, uid: str, search_key: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups WHERE uid != %s AND MATCH(name) AGAINST(%s IN NATURAL LANGUAGE MODE)", (uid, search_key))
+    groups = cursor.fetchall()
+    res = []
+    for group in groups:
+        cursor.execute("SELECT * FROM UserGroupMembers WHERE gid = %s AND uid = %s", (group[1], uid))
+        relation = cursor.fetchone()
+        if relation == None:
+            res.append({
+                "group_name": relation[2],
+                "need_password": get_group_by_gid(relation[1])[5] != None,
+                "gid": relation[1],
+                "description": relation[3] if relation[3] else "This group has no description."
+            })
+    return {"groups": res}
+
+
+def show_created_groups(db, uid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups WHERE owner = %s", (uid))
+    groups = cursor.fetchall()
+    res = []
+    for group in groups:
+        res.append({
+            "group_name": group[1],
+            "need_password": group[5] != None,
+            "gid": group[0],
+            "description": group[2] if group[2] else "This group has no description."
+        })
+    return {"groups": res}
+
+
+def show_joined_groups(db, uid: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (uid))
     groups = cursor.fetchall()
     res = []
     for group in groups:
-        cursor.execute("SELECT * FROM UserGroups WHERE gid = %s", (group[1]))
-        group_info = cursor.fetchone()
-        owner_uid = group_info[3]
-        user = get_user_by_uid(db, owner_uid)
-        user_name = "ThisAccountHasBeenDeleted" if not user else user[0]
+        group_info = get_group_by_gid(db, group[1])
         res.append({
-            "name": group_info[1],
-            "description": group_info[2] if group_info[2] else "This group has no description.",
-            "owner": user_name,
-            "is_admin": group[2]
+            "group_name": group_info[1],
+            "need_password": group_info[5] != None,
+            "gid": group_info[0],
+            "description": group_info[2] if group_info[2] else "This group has no description."
         })
     return {"groups": res}
+
+
+def modify_group(db, uid: str, gid: str, group_name: str | None = None, password: str | None = None, description: str | None = None):
+    group = get_group_by_gid(db, gid)
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Group not found.",
+        )
+    cursor = db.cursor()
+    cursor.excute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+    relation = cursor.fetchone()
+    if not relation:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permission denied. You are not in this group.",
+        )
+    if relation[2] != 'True':
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permission denied. You are not the admin of this group.",
+        )
+    if group_name:
+        cursor.execute("UPDATE UserGroups SET name = %s WHERE gid = %s", (group_name, gid))
+    if description:
+        if description == "":
+            cursor.execute("UPDATE UserGroups SET description = NULL WHERE gid = %s", (gid))
+        else:
+            cursor.execute("UPDATE UserGroups SET description = %s WHERE gid = %s", (description, gid))
+    if password:
+        if password == "":
+            cursor.execute("UPDATE UserGroups SET password = NULL WHERE gid = %s", (gid))
+        else:
+            cursor.execute("UPDATE UserGroups SET password = %s WHERE gid = %s", (md5_passwd(password), gid))
+    db.commit()
 
 
 def set_admin(db, user_name):
