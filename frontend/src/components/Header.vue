@@ -34,7 +34,7 @@ export default {
     return {
         navList:[
             {name:'/home', navItem:'首页'},
-            {name:'/exercise',navItem:'我的班级'},
+            {name:'/exercise',navItem:'训练'},
             {name:'/resources',navItem:'资源'},
             {name:'/groups',navItem:'群组'},
             {name:'/mine',navItem:'个人中心'},
