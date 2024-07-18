@@ -74,6 +74,20 @@ Announcements:
 | is_active | tinyint(1)   | NO   |     | 1                   |                               |
 | author    | uuid         | NO   |     | NULL                |                               |
 +-----------+--------------+------+-----+---------------------+-------------------------------+
+
+Problems:
++-------------+------------------------------------------+------+-----+---------------------+-------------------------------+
+| Field       | Type                                     | Null | Key | Default             | Extra                         |
++-------------+------------------------------------------+------+-----+---------------------+-------------------------------+
+| pid         | uuid                                     | NO   | PRI | NULL                |                               |
+| title       | varchar(255)                             | NO   |     | NULL                |                               |
+| content     | longtext                                 | NO   |     | NULL                |                               |
+| type        | enum('choice','blank_filling','program') | NO   |     | NULL                |                               |
+| author      | uuid                                     | NO   |     | NULL                |                               |
+| update_time | timestamp                                | NO   |     | current_timestamp() | on update current_timestamp() |
+| choices     | longtext                                 | YES  |     | NULL                |                               |
+| answers     | longtext                                 | YES  |     | NULL                |                               |
++-------------+------------------------------------------+------+-----+---------------------+-------------------------------+
 '''
 
 
@@ -451,3 +465,19 @@ def add_problem(db, problem: NewProblem, user: User):
     cursor.execute("INSERT INTO Problems (pid, title, content, type, author) VALUES (%s, %s, %s, %s, %s)", (pid, problem.title, problem.content, problem.type.name, user.uid))
     db.commit()
     return pid
+
+
+def get_my_problems(db, user: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE author = %s", (user.uid))
+    problems = cursor.fetchall()
+    res = []
+    for problem in problems:
+        res.append({
+            "pid": problem[0],
+            "title": problem[1],
+            "content": problem[2],
+            "type": problem[3],
+            "update_time": problem[5],
+        })
+    return {"problems": res}

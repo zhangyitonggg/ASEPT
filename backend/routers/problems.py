@@ -11,19 +11,6 @@ router = APIRouter(
 )
 
 
-@router.get('/{problem_id}', response_model=Problem)
-async def get_problem(
-    problem_id: str,
-    user: User = Depends(security.get_user)
-):
-    '''
-    NOTICE: This function is not complete and will not work as expected.
-    '''
-    if not user.has_permission(Permissions.VIEW_PROBLEM):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
-    return {"status": "success"}
-
-
 @router.post('/upload_problem')
 async def add_problem(
     problem: NewProblem,
@@ -34,3 +21,24 @@ async def add_problem(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
     pid = database.add_problem(db, problem, user)
     return {'status': 'success', 'pid': pid}
+
+@router.get('/my_problems')
+async def get_my_problems(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    return database.get_my_problems(db, user)
+
+
+@router.get('/{problem_id}', response_model=Problem)
+async def get_problem(
+    problem_id: str,
+    user: User = Depends(security.get_user)
+):
+    '''
+    NOTICE: This function is not complete and will not work as expected.
+            This function must be placed at the end of the file to avoid conflict with other routers.
+    '''
+    if not user.has_permission(Permissions.VIEW_PROBLEM):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
+    return {"status": "success"}
