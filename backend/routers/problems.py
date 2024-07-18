@@ -58,6 +58,66 @@ async def get_my_problems(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
+    '''
+    获取当前用户上传的题目。
+
+    返回格式：
+    ```
+    {
+        "problems": [
+            {
+                "pid": 1,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 0,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "A": "Choice A",
+                    "B": "Choice B"
+                },
+                "is_public": 0
+            },
+            {
+                "pid": 2,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 1,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "B": "Choice B"
+                },
+                "is_published": 1
+            },
+            {
+                "pid": 2,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 1,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": null,
+                "answers": {
+                    "B": "Choice B"
+                },
+                "is_published": 1
+            }
+        ]
+    }
+    '''
     return database.get_my_problems(db, user)
 
 
