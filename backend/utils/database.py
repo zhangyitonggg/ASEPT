@@ -16,78 +16,64 @@ MYSQL_ADDR = ''
 MYSQL_PORT = ''
 
 '''
-Permissions:
-+-----------------+----------------------+------+-----+---------+-------+
-| Field           | Type                 | Null | Key | Default | Extra |
-+-----------------+----------------------+------+-----+---------+-------+
-| uid             | uuid                 | NO   | PRI | NULL    |       |
-| is_admin        | enum('True','False') | NO   | MUL | False   |       |
-| block_user      | enum('True','False') | NO   |     | False   |       |
-| review_topic    | enum('True','False') | NO   |     | False   |       |
-| manage_platform | enum('True','False') | NO   |     | False   |       |
-| upload_file     | enum('True','False') | NO   |     | True    |       |
-| upload_problem  | enum('True','False') | NO   |     | True    |       |
-| share_problem   | enum('True','False') | NO   |     | True    |       |
-| search_problem  | enum('True','False') | NO   |     | True    |       |
-+-----------------+----------------------+------+-----+---------+-------+
+SELECT
+    TABLE_NAME,
+    COLUMN_NAME,
+    DATA_TYPE,
+    IS_NULLABLE,
+    COLUMN_DEFAULT,
+    COLUMN_KEY
+FROM
+    information_schema.COLUMNS
+WHERE
+    TABLE_SCHEMA = 'test'; -- 替换为你的数据库名
 
-UserGroupMembers:
-+----------+----------------------+------+-----+---------+-------+
-| Field    | Type                 | Null | Key | Default | Extra |
-+----------+----------------------+------+-----+---------+-------+
-| uid      | uuid                 | NO   | MUL | NULL    |       |
-| gid      | uuid                 | NO   | MUL | NULL    |       |
-| is_admin | enum('True','False') | NO   |     | False   |       |
-+----------+----------------------+------+-----+---------+-------+
-
-UserGroups:
-+-------------+----------------------+------+-----+---------+-------+
-| Field       | Type                 | Null | Key | Default | Extra |
-+-------------+----------------------+------+-----+---------+-------+
-| gid         | uuid                 | NO   | PRI | NULL    |       |
-| name        | varchar(255)         | NO   |     | NULL    |       |
-| description | varchar(255)         | YES  |     | NULL    |       |
-| owner       | uuid                 | NO   |     | NULL    |       |
-| is_open     | enum('True','False') | NO   |     | False   |       |
-| password    | varchar(255)         | YES  |     | NULL    |       |
-+-------------+----------------------+------+-----+---------+-------+
-
-Users:
-+----------+----------------------+------+-----+---------+-------+
-| Field    | Type                 | Null | Key | Default | Extra |
-+----------+----------------------+------+-----+---------+-------+
-| name     | varchar(255)         | NO   | PRI | NULL    |       |
-| uid      | uuid                 | NO   | MUL | NULL    |       |
-| password | varchar(255)         | NO   |     | NULL    |       |
-| is_admin | enum('True','False') | NO   | MUL | False   |       |
-| blocked  | bit(1)               | NO   |     | b'0'    |       |
-+----------+----------------------+------+-----+---------+-------+
-
-Announcements:
-+-----------+--------------+------+-----+---------------------+-------------------------------+
-| Field     | Type         | Null | Key | Default             | Extra                         |
-+-----------+--------------+------+-----+---------------------+-------------------------------+
-| aid       | uuid         | NO   | PRI | NULL                |                               |
-| title     | varchar(255) | NO   |     | NULL                |                               |
-| content   | text         | NO   |     | NULL                |                               |
-| update_at | timestamp    | NO   |     | current_timestamp() | on update current_timestamp() |
-| is_active | tinyint(1)   | NO   |     | 1                   |                               |
-| author    | uuid         | NO   |     | NULL                |                               |
-+-----------+--------------+------+-----+---------------------+-------------------------------+
-
-Problems:
-+-------------+------------------------------------------+------+-----+---------------------+-------------------------------+
-| Field       | Type                                     | Null | Key | Default             | Extra                         |
-+-------------+------------------------------------------+------+-----+---------------------+-------------------------------+
-| pid         | uuid                                     | NO   | PRI | NULL                |                               |
-| title       | varchar(255)                             | NO   |     | NULL                |                               |
-| content     | longtext                                 | NO   |     | NULL                |                               |
-| type        | enum('choice','blank_filling','program') | NO   |     | NULL                |                               |
-| author      | uuid                                     | NO   |     | NULL                |                               |
-| update_time | timestamp                                | NO   |     | current_timestamp() | on update current_timestamp() |
-| choices     | longtext                                 | YES  |     | NULL                |                               |
-| answers     | longtext                                 | YES  |     | NULL                |                               |
-+-------------+------------------------------------------+------+-----+---------------------+-------------------------------+
++-------------------------+-----------------+-----------+-------------+---------------------+------------+
+| TABLE_NAME              | COLUMN_NAME     | DATA_TYPE | IS_NULLABLE | COLUMN_DEFAULT      | COLUMN_KEY |
++-------------------------+-----------------+-----------+-------------+---------------------+------------+
+| Users                   | name            | varchar   | NO          | NULL                | PRI        |
+| Users                   | uid             | uuid      | NO          | NULL                | PRI        |
+| Users                   | password        | varchar   | NO          | NULL                |            |
+| Users                   | is_admin        | enum      | NO          | 'False'             | MUL        |
+| Users                   | blocked         | bit       | NO          | b'0'                |            |
+| ProblemAccessibleGroups | pid             | uuid      | NO          | NULL                | MUL        |
+| ProblemAccessibleGroups | gid             | uuid      | NO          | NULL                | MUL        |
+| Permissions             | uid             | uuid      | NO          | NULL                | PRI        |
+| Permissions             | is_admin        | enum      | NO          | 'False'             | MUL        |
+| Permissions             | block_user      | enum      | NO          | 'False'             |            |
+| Permissions             | review_topic    | enum      | NO          | 'False'             |            |
+| Permissions             | manage_platform | enum      | NO          | 'False'             |            |
+| Permissions             | upload_file     | enum      | NO          | 'True'              |            |
+| Permissions             | upload_problem  | enum      | NO          | 'True'              |            |
+| Permissions             | share_problem   | enum      | NO          | 'True'              |            |
+| Permissions             | search_problem  | enum      | NO          | 'True'              |            |
+| ProblemTags             | pid             | uuid      | NO          | NULL                | MUL        |
+| ProblemTags             | tag             | varchar   | NO          | NULL                |            |
+| Announcements           | aid             | uuid      | NO          | NULL                | PRI        |
+| Announcements           | title           | varchar   | NO          | NULL                |            |
+| Announcements           | content         | text      | NO          | NULL                |            |
+| Announcements           | update_at       | timestamp | NO          | current_timestamp() |            |
+| Announcements           | is_active       | tinyint   | NO          | 1                   |            |
+| Announcements           | author          | uuid      | NO          | NULL                |            |
+| UserGroups              | gid             | uuid      | NO          | NULL                | PRI        |
+| UserGroups              | name            | varchar   | NO          | NULL                |            |
+| UserGroups              | description     | varchar   | YES         | NULL                |            |
+| UserGroups              | owner           | uuid      | NO          | NULL                |            |
+| UserGroups              | is_open         | enum      | NO          | 'False'             |            |
+| UserGroups              | password        | varchar   | YES         | NULL                |            |
+| Problems                | pid             | uuid      | NO          | NULL                | PRI        |
+| Problems                | title           | varchar   | NO          | NULL                |            |
+| Problems                | content         | longtext  | NO          | NULL                |            |
+| Problems                | type            | enum      | NO          | NULL                |            |
+| Problems                | author          | uuid      | NO          | NULL                |            |
+| Problems                | update_time     | timestamp | NO          | current_timestamp() |            |
+| Problems                | choices         | longtext  | YES         | NULL                |            |
+| Problems                | answers         | longtext  | YES         | NULL                |            |
+| Problems                | is_public       | tinyint   | YES         | 0                   |            |
+| UserGroupMembers        | uid             | uuid      | NO          | NULL                | MUL        |
+| UserGroupMembers        | gid             | uuid      | NO          | NULL                | MUL        |
+| UserGroupMembers        | is_admin        | enum      | NO          | 'False'             |            |
++-------------------------+-----------------+-----------+-------------+---------------------+------------+
 '''
 
 
@@ -350,6 +336,8 @@ def set_group_password(db, group_name: str, uid: str, password: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied. You are not the owner of this group.",
         )
+    if not password:
+        password = "NULL"
     cursor = db.cursor()
     cursor.execute("UPDATE UserGroups SET password = %s WHERE name = %s", (password, group_name))
     db.commit()
@@ -535,6 +523,45 @@ def add_problem(db, problem: Choice_Problem | Blank_Filling_Problem, user: User)
     db.commit()
     return pid
 
+
+def add_problem_tag(db, pid: str, tag: str, user: User):
+    # check if user is the author of the problem
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if not problem:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    if problem[4] != user.uid:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied."
+        )
+    cursor.execute("INSERT INTO ProblemTags (pid, tag) VALUES (%s, %s)", (pid, tag))
+    db.commit()
+
+def search_problem_by_tag(db, tag: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemTags WHERE tag = %s", (tag))
+    problems = cursor.fetchall()
+    res = []
+    for problem in problems:
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (problem[0]))
+        problem_info = cursor.fetchone()
+        res.append({
+            "pid": problem_info[0],
+            "title": problem_info[1],
+            "content": problem_info[2],
+            "type": problem_info[3],
+            "author": get_user_by_uid(db, problem_info[4])[0],
+            "update_time": problem_info[5],
+            "choices": problem_info[6],
+            "answers": problem_info[7],
+            "is_published": problem_info[8]
+        })
+    return {"problems": res}
 
 def get_my_problems(db, user: User):
     cursor = db.cursor()

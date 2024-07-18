@@ -53,6 +53,81 @@ async def add_problem(
     return {'status': 'success', 'pid': pid}
 
 
+@router.post('/add_problem_tag')
+async def add_problem_tag(
+    pid: str,
+    tag: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    为题目添加标签。
+    
+    pid: str，题目 id
+    
+    tag: str，标签名称
+    '''
+    database.add_problem_tag(db, pid, tag, user)
+    return {'status': 'success'}
+
+
+@router.get('/search_problem_by_tag')
+async def search_problem_by_tag(
+    tag: str,
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    根据标签搜索题目。
+    
+    tag: str，标签名称
+    
+    返回格式：
+    ```
+    {
+        "problems": [
+            {
+                "pid": 1,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 0,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "A": "Choice A",
+                    "B": "Choice B"
+                },
+                "is_public": 0
+            },
+            {
+                "pid": 2,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 1,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "B": "Choice B"
+                },
+                "is_published": 1
+            }
+        ]
+    }   
+    '''
+    return database.search_problem_by_tag(db, tag)
+
+
 @router.get('/my_problems')
 async def get_my_problems(
     user: User = Depends(security.get_user),
