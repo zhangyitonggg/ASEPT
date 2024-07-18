@@ -13,7 +13,22 @@
       </div>
     </nav>
 </template>
-  
+
+
+<script>
+  export default {
+    data() {
+      return {
+        activeName: 'second'
+      };
+    },
+    methods: {
+      handleClick(tab, event) {
+        console.log(tab, event);
+      }
+    }
+  };
+</script>
 <script>
     export default {
     name: 'Header',
