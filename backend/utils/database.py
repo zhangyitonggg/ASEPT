@@ -234,8 +234,8 @@ def set_permission(db, target_user_name: str, perm: PermissionType):
     db.commit()
 
 
-def join_group(db, group_name: str, uid: str, password: str | None = None):
-    group = get_group(db, group_name)
+def join_group(db, gid: str, uid: str, password: str | None = None):
+    group = get_group_by_gid(db, gid)
     if not group:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -252,7 +252,7 @@ def join_group(db, group_name: str, uid: str, password: str | None = None):
             detail="User already in group.",
         )
     cursor = db.cursor()
-    cursor.execute("INSERT INTO UserGroupMembers (gid, uid) VALUES (%s, %s)", (group[0], uid))
+    cursor.execute("INSERT INTO UserGroupMembers (gid, uid) VALUES (%s, %s)", (gid, uid))
     db.commit()
 
 
@@ -301,7 +301,7 @@ def create_group(
     gid = str(uuid.uuid4())
     cursor = db.cursor()
     cursor.execute("INSERT INTO UserGroups (gid, name, description, owner, is_open, password) VALUES (%s, %s, %s, %s, 'False', %s)",
-                   (gid, group_name, description if description else "NULL", uid, md5_passwd(password) if password else "NULL"))
+                   (gid, group_name, description if description else None, uid, md5_passwd(password) if password else None))
     cursor.execute("INSERT INTO UserGroupMembers (gid, uid, is_admin) VALUES (%s, %s, 'True')", (gid, uid))
     db.commit()
 

@@ -19,34 +19,31 @@ class group_infomation(BaseModel):
     group_name: str | None
 
 
+class join_group_request(BaseModel):
+    gid: str
+    password: str | None
+
+
 router = APIRouter(
     prefix='/user_group',
 )
 
 @router.post("/join_group")
 def join_group(
-    gid: str,
-    user_name: str | None = None,
+    request: join_group_request,
     user: User = Depends(security.get_user),
-    password: str | None = None,
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
     '''
-    NOTICE: params "user_name" is invalid. Maybe we will use it in the future.
-
     gid: str，要加入的用户组 id
-
-    ~~user_name: str | None = None，要加入的用户名称~~ 没有用
 
     一定是当前登录的用户加入用户组
 
-    password: str | None = None，用户组密码，如果用户组有密码的话
+    password: str | None = None，用户组密码，如果用户组有密码的话。如果没有密码的话这个参数会被忽略。
 
-    **暂时不要使用这个接口，后端在调整**
+    参数都在 **body** 里。
     '''
-    if user_name is None:
-        user_name = user.name
-    database.join_group(db, gid, user.uid, password)
+    database.join_group(db, request.gid, user.uid, request.password)
     return {"status": "success"}
 
 
