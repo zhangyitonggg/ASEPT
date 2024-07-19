@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-      <el-scrollbar class="scroll-box">
+      <el-scrollbar class="scroll-box" wrap-style="overflow-x:hidden;">
         <el-card
           v-for="group in groupCreated"
           :key="group.gid"
@@ -26,6 +26,9 @@
               <el-form :model="editForm" label-position="top" ref="editForm">
                 <el-form-item label="Group Name" prop="group_name">
                   <el-input v-model="editForm.group_name"></el-input>
+                </el-form-item>
+                <el-form-item label="Group description" prop="group_description">
+                  <el-input v-model="editForm.description"></el-input>
                 </el-form-item>
                 <el-form-item label="Password" prop="password">
                   <el-input v-model="editForm.password"></el-input>
@@ -75,6 +78,7 @@
         editDialogVisible: false, // 控制编辑对话框的显示
         editForm: {
           group_name: "",
+          description: "",
           password: ""
         },
         editingGroup: null // 保存当前编辑的组信息
@@ -86,6 +90,8 @@
         this.editingGroup = group;
         // 将组信息填充到编辑表单中
         this.editForm.group_name = group.group_name;
+        this.editForm.description = group.description;
+      
         this.editForm.password = group.password;
         // 显示编辑对话框
         this.editDialogVisible = true;
@@ -95,6 +101,7 @@
         if (this.editingGroup) {
           this.editingGroup.group_name = this.editForm.group_name;
           this.editingGroup.password = this.editForm.password;
+          this.editingGroup.description = this.editForm.description;
         }
         // 关闭编辑对话框
         this.editDialogVisible = false;

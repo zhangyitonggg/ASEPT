@@ -1,33 +1,26 @@
-<!-- <template>
-    <div class="container">
-      <el-scrollbar class="scroll-box">
-        <el-card
-          v-for="group in groupAdded"
-          :key="group.gid"
-          class="item"
-          shadow="hover"
-        >
-          <div class="card-content">
-            <div class="group-info">
-              <div class="group-details">
-                <div class="group-name">{{ group.group_name }}</div>
-                <div class="group-description">{{ group.description }}</div>
-              </div>
-              <div class="edit-button-container">
-                <el-button type="text" class="edit-button" @click="leaveGroup(group)">退出</el-button>
-              </div>
-            </div>
-          </div>
-        </el-card>
-      </el-scrollbar>
-    </div>
-  </template>
-  
-  <script>
+<template>
+  <div class="container">
+    <el-collapse v-model="activeName" accordion class="custom-collapse">
+      <el-collapse-item
+        v-for="group in groupAdded"
+        :key="group.gid"
+        :title="group.group_name"
+        :name="group.gid"
+        class="custom-collapse-item"
+      >
+        <div class="description">{{ group.description }}</div>
+        <div class="password">密码: {{ group.password }}</div>
+      </el-collapse-item>
+    </el-collapse>
+  </div>
+</template>
+
+<script>
   export default {
     data() {
       return {
-        groupCreated: [
+        activeName: '0',
+        groupAdded: [
           {
             group_name: "计组学习小组",
             password: "password1",
@@ -52,78 +45,65 @@
             gid: "xxx4",
             description: "Description of group4"
           },
-        ],
+        ]
       };
-    },
-    methods: {
-
-    },
-    mounted() {
-      this.$bus.$on("updateGroupCreated", this.queryGroupCreated);
-      this.queryGroupCreated();
     }
-  };
-  </script>
-  
-  <style>
+  }
+</script>
+
+<style>
   .container {
     width: 90%;
     margin: 0 auto;
   }
   
-  .scroll-box {
+  .custom-collapse {
     height: 300px;
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* 添加垂直滚动条 */
     overflow-x: hidden; /* 确保内容不溢出产生横向滚动条 */
+    background: linear-gradient(135deg, #f3f4f7, #fff);
   }
-  
-  .item {
-    margin-bottom: 9px;
+
+  .custom-collapse-item {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    background: #fff;
+    transition: transform 0.3s, box-shadow 0.3s;
   }
-  
-  .el-card {
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .custom-collapse-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
-  
-  .card-content {
-    padding: 1.5px;
+
+  .custom-collapse-item .el-collapse-item__header {
+    background: linear-gradient(135deg, #42b983, #2c8e7d);
+    color: #fff;
+    border-radius: 8px 8px 0 0;
+    padding: 10px;
   }
-  
-  .group-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+  .custom-collapse-item .el-collapse-item__header:hover {
+    background: linear-gradient(135deg, #2c8e7d, #42b983);
   }
-  
-  .group-details {
-    /* 让群组详情占据剩余空间 */
-    flex: 1; 
+
+  .custom-collapse-item .el-collapse-item__wrap {
+    border-radius: 0 0 8px 8px;
+    padding: 10px;
+    background: #fafafa;
   }
-  
-  .group-name {
-    font-size: 18px;
+
+  .description {
+    margin-bottom: 5px;
+  }
+
+  .password {
     font-weight: bold;
-    margin-bottom: 1px; /* 调整群组名称和描述的间距 */
+    color: #ff6f61;
   }
-  
-  .group-description {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 0px; /* 调整群组描述和编辑按钮的间距 */
-  }
-  
-  .edit-button-container {
-    margin-left: auto; /* 将编辑按钮推到最右边 */
-  }
-  
-  .el-button.edit-button {
-    color: #409eff;
-    padding: 0;
-  }
-  </style>
-   -->
+</style>
