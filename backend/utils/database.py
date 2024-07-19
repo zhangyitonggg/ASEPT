@@ -47,6 +47,8 @@ WHERE
 | Permissions             | upload_problem  | enum      | NO          | 'True'              |            |
 | Permissions             | share_problem   | enum      | NO          | 'True'              |            |
 | Permissions             | search_problem  | enum      | NO          | 'True'              |            |
+| ProblemGroupPerm        | pgid            | uuid      | NO          | NULL                | PRI        |
+| ProblemGroupPerm        | gid             | uuid      | NO          | NULL                | PRI        |
 | ProblemTags             | pid             | uuid      | NO          | NULL                | MUL        |
 | ProblemTags             | tag             | varchar   | NO          | NULL                |            |
 | Announcements           | aid             | uuid      | NO          | NULL                | PRI        |
@@ -55,8 +57,14 @@ WHERE
 | Announcements           | update_at       | timestamp | NO          | current_timestamp() |            |
 | Announcements           | is_active       | tinyint   | NO          | 1                   |            |
 | Announcements           | author          | uuid      | NO          | NULL                |            |
+| ProblemGroupMembers     | pgid            | uuid      | NO          | NULL                | PRI        |
+| ProblemGroupMembers     | pid             | uuid      | NO          | NULL                | PRI        |
+| ProblemGroups           | pgid            | uuid      | NO          | NULL                | PRI        |
+| ProblemGroups           | name            | varchar   | NO          | NULL                |            |
+| ProblemGroups           | description     | text      | YES         | NULL                |            |
+| ProblemGroups           | owner           | uuid      | NO          | NULL                | MUL        |
 | UserGroups              | gid             | uuid      | NO          | NULL                | PRI        |
-| UserGroups              | name            | varchar   | NO          | NULL                |            |
+| UserGroups              | name            | varchar   | NO          | NULL                | MUL        |
 | UserGroups              | description     | varchar   | YES         | NULL                |            |
 | UserGroups              | owner           | uuid      | NO          | NULL                |            |
 | UserGroups              | is_open         | enum      | NO          | 'False'             |            |
@@ -515,6 +523,11 @@ def all_user_groups(db):
     return {"groups": res}
 
 
+################################################
+#                   Problems                   #
+################################################
+
+
 def add_problem(db, problem: Choice_Problem | Blank_Filling_Problem, user: User):
     pid = str(uuid.uuid4())
     cursor = db.cursor()
@@ -522,6 +535,98 @@ def add_problem(db, problem: Choice_Problem | Blank_Filling_Problem, user: User)
                    (pid, problem.title, problem.content, problem.type.name, user.uid, None if isinstance(problem, Blank_Filling_Problem) else problem.choices, problem.answer))
     db.commit()
     return pid
+
+
+def create_problem_group(db, group_name: str, description: str, owner: User):
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO ProblemGroups (pgid, name, description, owner) VALUES (UUID(), %s, %s, %s)", (group_name, description, owner.uid))
+    db.commit()
+
+
+def change_problem_group_info(db, pgid: str, group_name: str, description: str, owner: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemGroups WHERE pgid = %s", (pgid))
+    group = cursor.fetchone()
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Group not found."
+        )
+    if group[3] != owner.uid:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied. You are not the owner of this group."
+        )
+    cursor.execute("UPDATE ProblemGroups SET name = %s, description = %s WHERE pgid = %s", (group_name, description, pgid))
+    db.commit()
+
+
+def add_problem_to_group(db, pid: str, pgid: str, user: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemGroups WHERE pgid = %s", (pgid))
+    group = cursor.fetchone()
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Group not found."
+        )
+    if group[3] != user.uid:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied. You are not the owner of this group."
+        )
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if not problem:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    cursor.execute("SELECT * FROM ProblemGroupMembers WHERE (pgid, pid) = (%s, %s)", (pgid, pid))
+    if cursor.fetchone():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Problem already in the group."
+        )
+    cursor.execute("INSERT INTO ProblemGroupMembers (pgid, pid) VALUES (%s, %s)", (pgid, pid))
+    db.commit()
+
+
+def share_problem_group_to_user_group(db, pgid: str, gid: str, user: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemGroups WHERE pgid = %s", (pgid))
+    group = cursor.fetchone()
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Group not found."
+        )
+    if group[3] != user.uid:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied. You are not the owner of this group."
+        )
+    cursor.execute("SELECT * FROM UserGroups WHERE gid = %s", (gid))
+    user_group = cursor.fetchone()
+    if not user_group:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User group not found."
+        )
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (gid, user.uid))
+    if not cursor.fetchone():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permission denied. User not in the group."
+        )
+    cursor.execute("SELECT * FROM ProblemGroupAccessibleGroups WHERE (pgid, gid) = (%s, %s)", (pgid, gid))
+    if cursor.fetchone():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User group already has access to the problem group."
+        )
+    cursor.execute("INSERT INTO ProblemGroupAccessibleGroups (pgid, gid) VALUES (%s, %s)", (pgid, gid))
+    db.commit()
 
 
 def add_problem_tag(db, pid: str, tag: str, user: User):
@@ -539,27 +644,66 @@ def add_problem_tag(db, pid: str, tag: str, user: User):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permission denied."
         )
+    # check if problem already has the tag
+    cursor.execute("SELECT * FROM ProblemTags WHERE (pid, tag) = (%s, %s)", (pid, tag))
+    if cursor.fetchone():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Tag already exists."
+        )
     cursor.execute("INSERT INTO ProblemTags (pid, tag) VALUES (%s, %s)", (pid, tag))
     db.commit()
 
-def search_problem_by_tag(db, tag: str):
+def search_problem_by_tag(db, tag: str, user: User):
+    # get problems that user has access to
+    # get the problems owned by the user
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM ProblemTags WHERE tag = %s", (tag))
+    cursor.execute("SELECT * FROM Problems WHERE author = %s", (user.uid))
+    all_pids = cursor.fetchall()
+    all_pids = [pid[0] for pid in all_pids]
+    # get all the groups that the user is in
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
+    groups = cursor.fetchall()
+    # for each group, get problems the group has access to
+    # get all the pgids
+    all_pgids = []
+    for group in groups:
+        cursor.execute("SELECT * FROM ProblemGroupPerm WHERE gid = %s", (group[1]))
+        pgids = cursor.fetchall()
+        all_pgids.extend(pgids)
+    all_pgids = list(set(all_pgids))
+    # get all the pids
+    for pgid in all_pgids:
+        cursor.execute("SELECT * FROM ProblemGroupMembers WHERE pgid = %s", (pgid))
+        pids = cursor.fetchall()
+        all_pids.extend(pids)
+    all_pids = list(set(all_pids))
+    # get all the problems that the user has access to
+    problems_with_access = []
+    for pid in all_pids:
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+        problem = cursor.fetchone()
+        problems_with_access.append(problem)
+    # get problems whose tag contains the input tag
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemTags")
     problems = cursor.fetchall()
+    problems = [problem for problem in problems if tag in problem[1]]
+    # union the two lists
+    final_problems = list(set(problems) & set(problems_with_access))
+    # return the final list
     res = []
-    for problem in problems:
-        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (problem[0]))
-        problem_info = cursor.fetchone()
+    for problem in final_problems:
         res.append({
-            "pid": problem_info[0],
-            "title": problem_info[1],
-            "content": problem_info[2],
-            "type": problem_info[3],
-            "author": get_user_by_uid(db, problem_info[4])[0],
-            "update_time": problem_info[5],
-            "choices": problem_info[6],
-            "answers": problem_info[7],
-            "is_published": problem_info[8]
+            "pid": problem[0],
+            "title": problem[1],
+            "content": problem[2],
+            "type": problem[3],
+            "author": get_user_by_uid(db, problem[4])[0],
+            "update_time": problem[5],
+            "choices": problem[6],
+            "answers": problem[7],
+            "is_published": problem[8],
         })
     return {"problems": res}
 

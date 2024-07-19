@@ -11,6 +11,16 @@ router = APIRouter(
     prefix='/problems',
 )
 
+'''
+- 上传题目（pdf，文字）   题目创建时只有自己有访问权限，将其加入题目组后其他人才可能有访问权限
+- 添加tag，*删除tag*
+- 根据tag搜索题目，搜索范围为 自己有权限能看到的题目（自己创建的+分享的）
+- 题目组创建，加入题目，*从题目组中删除题目*，分享给用户组
+- tag & 题目组 & 题目名称
+- 题目信息（总提交次数，总通过次数，错误答案）
+- 个性化题目推荐
+- 题目敏感词
+'''
 
 @router.post('/upload_problem')
 async def add_problem(
@@ -53,6 +63,83 @@ async def add_problem(
     return {'status': 'success', 'pid': pid}
 
 
+@router.post('/create_problem_group')
+async def create_problem_group(
+    name: str,
+    description: str = '',
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    创建题目组。
+    
+    name: str，题目组名称
+    
+    description: str = ''，题目组描述，可选
+    '''
+    database.create_problem_group(db, name, description, user)
+    return {'status': 'success'}
+
+
+@router.post('/change_problem_group_info')
+async def change_problem_group_info(
+    pgid: str,
+    name: str,
+    description: str = '',
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    修改题目组信息。
+    
+    pgid: str，题目组 id
+    
+    name: str，题目组名称
+    
+    description: str = ''，题目组描述，可选
+    '''
+    database.change_problem_group_info(db, pgid, name, description, user)
+    return {'status': 'success'}
+
+
+@router.post('/add_problem_to_group')
+async def add_problem_to_group(
+    pid: str,
+    pgid: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    将题目加入题目组。
+    
+    pid: str，题目 id
+    
+    pgid: str，题目组 id
+    '''
+    database.add_problem_to_group(db, pid, pgid, user)
+    return {'status': 'success'}
+
+
+@router.post('/share_problem_group_to_user_group')
+async def share_problem_group_to_user_group(
+    pgid: str,
+    gid: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    将题目组分享给用户组。
+    
+    当且仅当用户是题目组创建者 且 用户在用户组中才能分享
+    
+    pgid: str，题目组 id
+    
+    gid: str，用户组 id
+    '''
+    database.share_problem_group_to_user_group(db, pgid, gid, user)
+    return {'status': 'success'}
+
+
 @router.post('/add_problem_tag')
 async def add_problem_tag(
     pid: str,
@@ -74,6 +161,7 @@ async def add_problem_tag(
 @router.get('/search_problem_by_tag')
 async def search_problem_by_tag(
     tag: str,
+    user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
     '''
@@ -125,7 +213,7 @@ async def search_problem_by_tag(
         ]
     }   
     '''
-    return database.search_problem_by_tag(db, tag)
+    return database.search_problem_by_tag(db, tag, user)
 
 
 @router.get('/my_problems')
