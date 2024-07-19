@@ -4,9 +4,20 @@
             <Header></Header>
         </div>
         <div class="group-container">
-        <!-- 左半边：我的群组和退出群组 -->
+        <!-- 左半边：我创建的群组和我的群组 -->
         <div class="left-pane">
-            <h2>我的群组</h2>
+            <h2>我创建的群组</h2>
+            <div v-if="userGroups.length > 0">
+            <ul>
+                <li v-for="group in userGroups" :key="group.name">
+                <span>{{ group.name }}</span>
+                <button @click="leaveGroup(group.name)">退出</button>
+                </li>
+            </ul>
+            </div>
+            <GroupCreated></GroupCreated>
+            <h2>我加入的群组</h2>
+            <GroupAdded></GroupAdded>
             <div v-if="userGroups.length > 0">
             <ul>
                 <li v-for="group in userGroups" :key="group.name">
@@ -47,7 +58,9 @@
 <script>
   import axios from 'axios';
   import Header from '../../components/Header.vue'
-  
+  import GroupCreated from './GroupCreated.vue'
+  import GroupAdded from './GroupAdded.vue'
+
   export default {
     name: 'Group',
     data() {
@@ -59,7 +72,9 @@
       };
     },
     components: {
-      Header
+      Header,
+      GroupCreated,
+      GroupAdded
     },
     methods: {
       searchGroups() {
