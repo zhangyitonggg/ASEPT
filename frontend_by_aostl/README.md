@@ -1,0 +1,1 @@
+`npm install` 安装依赖库，然后 `npm run serve`

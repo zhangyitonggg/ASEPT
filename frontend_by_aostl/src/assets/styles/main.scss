@@ -1,0 +1,100 @@
+@import '~vuetify/src/styles/styles.sass';
+@import './font.scss';
+
+$navigation-drawer-border-width: 0;
+
+.theme--dark.v-stepper {
+    background-color: #1e1e1e !important;
+}
+
+.theme--dark.v-application code {
+    background-color: #454545;
+}
+
+.v-application code {
+    color: unset !important;
+    box-shadow: unset !important;
+    font-weight: unset !important;
+}
+
+.markdown-body table tr {
+    background: transparent !important;
+}
+
+.markdown-body pre {
+    background: #182026 !important;
+    color: white;
+    border: 1px rgba(255, 255, 255, 0.2) solid;
+    border-radius: 5px 5px 5px 5px;
+}
+
+.markdown-body pre>code {
+    font-size: 16px !important;
+    font-family: $sans-fonts;
+}
+
+.theme--dark.markdown-body pre>code {
+    background-color: transparent;
+}
+
+.markdown-body code::before {
+    content: "" !important;
+}
+
+.markdown-body code::after {
+    content: "" !important;
+}
+
+span .mord .accent {
+    background-color: transparent !important;
+}
+
+code, pre {
+    font-family: "Menlo", "Consolas", monospace !important;
+}
+
+.roundCard {
+    border: 1px #cccccc solid !important;
+    border-radius: 10px 10px 10px 10px !important;
+    padding: 25px 40px 20px 40px !important;
+    overflow: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+
+.roundCard--nop {
+    border: 1px #cccccc solid !important;
+    border-radius: 10px 10px 10px 10px !important;
+    overflow: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+
+.roundCard::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
+}
+
+.roundAlert {
+    border-radius: 6px 6px 6px 6px !important;
+}
+
+html {
+    overflow: scroll;
+    overflow-x: hidden;
+    -webkit-font-smoothing: unset !important;
+}
+
+::-webkit-scrollbar {
+    //width: 0px;  /* remove scrollbar space */
+    //background: transparent;  /* optional: just make scrollbar invisible */
+}
+
+.roleIdentity {
+    border: 1px #999999 solid;
+    padding: 0 5px 0 5px;
+    color: #999999;
+    font-size: 10px;
+    border-radius: 3px 3px 3px 3px;
+    margin: 0 5px 0 0;
+}
