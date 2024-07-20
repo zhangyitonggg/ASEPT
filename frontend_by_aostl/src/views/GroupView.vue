@@ -1,8 +1,8 @@
 <template>
-  <v-container
-    class="spacing-playground pa-6"
-    fluid
-  >
+  <v-container>
+    <v-main>
+      <component :is="currentComponent"></component>
+    </v-main>
     <v-footer height="0">
       <v-bottom-navigation
         app
@@ -30,14 +30,14 @@
 
 <script>
 import EnterGroup from '@/components/EnterGroup.vue';
-import GroupAdded from '@/components/GroupAdded.vue';
+import MyGroups from '@/components/MyGroups.vue';
 import GroupCreated from '@/components/GroupCreated.vue';
 
 export default {
   name: 'GroupView',
   components: {
     EnterGroup,
-    GroupAdded,
+    MyGroups,
     GroupCreated
   },
   data() {
@@ -54,59 +54,21 @@ export default {
   },
   mounted() {
     this.$store.commit("setAppTitle", '我的团队');
-  }
+  },
+  computed: {
+    currentComponent() {
+      switch (this.activeBtn) {
+        case 'join':
+          return 'EnterGroup';
+        case 'manage':
+          return 'GroupCreated';
+        default:
+          return 'MyGroups';
+      }
+    }
+  },
 }
 </script>
 
 <style scoped>
-.group-container {
-display: flex;
-justify-content: center; /* 将子项在主轴上居中对齐 */
-align-items: center; /* 将子项在交叉轴上居中对齐 */
-height: 100vh; /* 使容器高度为视口高度 */
-}
-
-.left-pane, .right-pane {
-width: 48%;
-height:90%;
-margin-left: 0.5%;
-margin-right: 0.5%;
-}
-
-h1, h2 {
-color: #333;
-}
-
-input {
-display: block;
-margin-bottom: 20px;
-padding: 10px;
-width: 100%;
-box-sizing: border-box;
-}
-
-button {
-margin-left: 10px;
-padding: 5px 10px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-}
-
-button:hover {
-background-color: #007bff;
-color: white;
-}
-
-ul {
-list-style: none;
-padding: 0;
-}
-
-li {
-margin-bottom: 10px;
-padding: 10px;
-background-color: #f0f0f0;
-border-radius: 5px;
-}
 </style>

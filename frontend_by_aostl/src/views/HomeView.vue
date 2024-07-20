@@ -1,9 +1,9 @@
 <template>
   <v-container
-    class="spacing-playground pa-6"
+    class="spacing-playground pa-16"
     fluid
   >
-    <news></news>
+    <component :is="currentComponent" />
     <v-footer height="0">
       <v-bottom-navigation
         app
@@ -21,7 +21,7 @@
           <v-icon>mdi-hand-clap</v-icon>
         </v-btn>
         <v-btn value="feedback">
-          <span>意见</span>
+          <span>反馈</span>
           <v-icon>mdi-invoice</v-icon>
         </v-btn>
       </v-bottom-navigation>
@@ -40,6 +40,20 @@ export default {
   data() {
     return {
       activeBtn: 'news',
+      loading: true,
+    }
+  },
+  computed: {
+    currentComponent() {
+      // switch (this.activeBtn) {
+      //   case 'waterbar':
+      //     return 'Waterbar';
+      //   case 'feedback':
+      //     return 'Feedback';
+      //   default:
+      //     return 'News';
+      // }
+      return 'news'
     }
   },
   methods: {

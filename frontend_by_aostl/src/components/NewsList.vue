@@ -1,7 +1,14 @@
 <template>
   <div>
-    <v-expansion-panels inset>
-      <v-expansion-panel v-for="(item, index) in news" :key="index">
+    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
+    </v-container>
+    <v-expansion-panels v-else inset>
+      <v-expansion-panel v-if="news.length > 0" v-for="(item, index) in news" :key="index" :value="index === 0">
         <v-expansion-panel-header :disable-icon-rotate="!item.is_active">
           <div style="display: flex; justify-content: space-between; width: 100%;">
             <div>{{ item.title }}</div>
@@ -23,20 +30,22 @@
           </div>
         </v-expansion-panel-content>
       </v-expansion-panel>
+      <v-banner v-if="news.length === 0">
+        好吧，看起来现在还没有公告。
+      </v-banner>
     </v-expansion-panels>
   </div>
 </template>
 
 <script>
-import { onMounted } from 'vue';
-import { vuetify } from 'vuetify';
 import { format } from 'date-fns';
 
 export default {
   name: "NewsList",
   data() {
     return {
-      news: null
+      news: null,
+      loading: true,
     }
   },
   mounted() {
@@ -45,10 +54,13 @@ export default {
       .then(res => {
         this.news = res.announcements;
       })
-      .catch(errpr => {
-        console.log(errpr);
+      .catch(_ => {
+        this.news = [];
         this.$store.commit("setAlert", {type: "error", message: "无法获取公告。请检查你的网络设置。"})
       })
+      .finally(() => {
+        this.loading = false;
+      });
   },
   methods: {
     formatDate(dateString) {
@@ -61,5 +73,12 @@ export default {
 <style scoped>
 .v-expansion-panel-header {
   font-size: large;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 </style>
