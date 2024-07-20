@@ -7,7 +7,7 @@
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <div>别卷了，{{ $store.state._user_name_ }}</div>
+        <div>别卷了，{{ $store.getters.username }}</div>
       </v-app-bar>
       <v-navigation-drawer
         v-model="drawer"
@@ -55,7 +55,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import store from '@/store'
 
 const App = Vue.extend({
   name: 'App',

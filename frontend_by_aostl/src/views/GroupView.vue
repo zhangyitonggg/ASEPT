@@ -1,41 +1,61 @@
 <template>
-  <div>
-      <div class="group-container">
-        <!-- 左半边：我创建的群组和我的群组 -->
-        <div class="left-pane">
-          <GroupCreated />
-          <GroupAdded />
-          <!-- 你的群组内容 -->
-        </div>
-        
-        <!-- 右半边：创建群组和搜索群组 -->
-        <div class="right-pane">
-          <EnterGroup />
-        </div>
-      </div>
-  </div>
+  <v-container
+    class="spacing-playground pa-6"
+    fluid
+  >
+    <v-footer height="0">
+      <v-bottom-navigation
+        app
+        fixed
+        color="primary"
+        v-model="activeBtn"
+        @change="handleNavigateClick"
+      >
+        <v-btn value="mygroups">
+          <span>我的团队</span>
+          <v-icon>mdi-account-group-outline</v-icon>
+        </v-btn>
+        <v-btn value="join">
+          <span>加入团队</span>
+          <v-icon>mdi-account-multiple-plus</v-icon>
+        </v-btn>
+        <v-btn value="manage">
+          <span>管理团队</span>
+          <v-icon>mdi-account-supervisor-circle</v-icon>
+        </v-btn>
+      </v-bottom-navigation>
+    </v-footer>
+  </v-container>
 </template>
 
 <script>
-import axios from 'axios';
 import EnterGroup from '@/components/EnterGroup.vue';
 import GroupAdded from '@/components/GroupAdded.vue';
 import GroupCreated from '@/components/GroupCreated.vue';
+
 export default {
-  name: 'GroupView',    
-  data() {
-    return {
-    };
-  },
+  name: 'GroupView',
   components: {
     EnterGroup,
     GroupAdded,
     GroupCreated
   },
+  data() {
+    return {
+      activeBtn: 'mygroups',
+    }
+  },
   methods: {
-
+    handleNavigateClick(newValue) {
+      this.$store.commit("setAppTitle", newValue === 'mygroups' ? '我的团队' : newValue === 'join' ? '加入团队' : '管理团队');
+    },
+  },
+  watch: {
+  },
+  mounted() {
+    this.$store.commit("setAppTitle", '我的团队');
   }
-};
+}
 </script>
 
 <style scoped>

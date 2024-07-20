@@ -39,7 +39,7 @@ export default {
   },
   data() {
     return {
-      activeBtn: 'news', // 初始值
+      activeBtn: 'news',
     }
   },
   methods: {
@@ -58,7 +58,6 @@ export default {
 </script>
 
 <style>
-/* 添加一些基础样式，确保底部导航固定在底部 */
 .v-bottom-navigation {
   bottom: 0;
 }
