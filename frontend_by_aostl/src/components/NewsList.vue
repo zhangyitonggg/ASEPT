@@ -7,8 +7,8 @@
         size="64"
       ></v-progress-circular>
     </v-container>
-    <v-expansion-panels v-else inset>
-      <v-expansion-panel v-if="news.length > 0" v-for="(item, index) in news" :key="index" :value="index === 0">
+    <v-expansion-panels v-else inset v-model="activePanel" focusable>
+      <v-expansion-panel v-if="news.length > 0" v-for="(item, index) in news" :key="index" :value="index === 0" :readonly="!item.is_active">
         <v-expansion-panel-header :disable-icon-rotate="!item.is_active">
           <div style="display: flex; justify-content: space-between; width: 100%;">
             <div>{{ item.title }}</div>
@@ -25,7 +25,7 @@
           </template>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <div>
+          <div class="panel-content">
             <p>{{ item.content }}</p>
           </div>
         </v-expansion-panel-content>
@@ -46,6 +46,7 @@ export default {
     return {
       news: null,
       loading: true,
+      activePanel: 0,
     }
   },
   mounted() {
@@ -80,5 +81,9 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
+}
+
+.panel-content {
+  margin-top: 30px;
 }
 </style>

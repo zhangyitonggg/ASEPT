@@ -21,8 +21,8 @@
           <v-icon>mdi-hand-clap</v-icon>
         </v-btn>
         <v-btn value="feedback">
-          <span>反馈</span>
-          <v-icon>mdi-invoice</v-icon>
+          <span>支持我们</span>
+          <v-icon>mdi-hand-coin</v-icon>
         </v-btn>
       </v-bottom-navigation>
     </v-footer>
@@ -71,7 +71,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .v-bottom-navigation {
   bottom: 0;
 }
