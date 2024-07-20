@@ -5,7 +5,7 @@
         v-if="$store.state._show_platform_frame_"
       >
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-        <v-app-bar-title>Application</v-app-bar-title>
+        <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <div>别卷了，{{ $store.state._user_name_ }}</div>
       </v-app-bar>
@@ -46,10 +46,10 @@
       </v-main>
       <v-alert
         elevation="11"
-        :type="this.$store.state._alert_.type"
-        v-show="this.$store.state._alert_.show"
+        :type="$store.state._alert_.type"
+        v-show="$store.state._alert_.show"
         transition="scroll-y-transition"
-      >{{ this.$store.state._alert_.message }}</v-alert>
+      >{{ $store.state._alert_.message }}</v-alert>
     </v-app>
   </template>
 
