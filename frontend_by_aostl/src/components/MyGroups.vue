@@ -1,111 +1,272 @@
 <template>
-  <v-container class="no-shadow">
-    <v-row>
-      <v-col cols="12">
-        <v-card class="custom-card">
-          <v-card-title class="fixed-header"><span style="margin-bottom: 5px;">我加入的群组</span></v-card-title>
-          <v-card-subtitle class="custom-card-subtitle">
-            <v-expansion-panels v-model="activePanel" class="custom-collapse">
-              <v-expansion-panel
-                v-for="group in groupAdded"
-                :key="group.gid"
-                class="custom-collapse-item"
-              >
-                <v-expansion-panel-header class="custom-collapse-item__header">
-                  {{ group.group_name }}
-                </v-expansion-panel-header>
-                <v-expansion-panel-content class="custom-collapse-item__content">
-                  <div class="description">{{ group.description }}</div>
-                  <div class="password">密码: {{ group.password }}</div>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </v-card-subtitle>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+    <div class="scrollable-container">
+    <v-container fluid>
+      <v-data-iterator
+        :items="items"
+        :items-per-page.sync="itemsPerPage"
+        :page.sync="page"
+        :search="search"
+        :sort-by="sortBy.toLowerCase()"
+        :sort-desc="sortDesc"
+        hide-default-footer
+      >
+        <template v-slot:header>
+          <v-toolbar
+            dark
+            color="#667"
+            class="mb-1"
+          >
+            <v-icon>mdi-account-group-outline</v-icon>
+            
+            <span class="header-title">&nbsp&nbsp挑选你喜欢的群聊吧</span>
+            <v-text-field
+              v-model="search"
+              clearable
+              flat
+              solo-inverted
+              hide-details
+              prepend-inner-icon="mdi-magnify"
+              label="Search"
+            ></v-text-field>
+            <template v-if="$vuetify.breakpoint.mdAndUp">
+              <v-spacer></v-spacer>
+              <v-select
+                v-model="sortBy"
+                flat
+                solo-inverted
+                hide-details
+                :items="keys"
+                prepend-inner-icon="mdi-magnify"
+                label="Sort by"
+              ></v-select>
+              <v-spacer></v-spacer>
+            </template>
+          </v-toolbar>
+        </template>
+
+        <template v-slot:default="props">
+          <v-row>
+            <v-col
+              v-for="item in props.items"
+              :key="item.gid"
+              cols="12"
+              sm="12"
+              md="12"
+              lg="12  "
+            >
+              <v-card class="item-card">
+                <v-card-title class="subheading font-weight-bold">
+                  {{ item.name }}
+                  <v-spacer></v-spacer>
+                  <v-btn small color="#779" class="apply-button" @click="applyJoin(item)">
+                    申请加入
+                  </v-btn>
+                </v-card-title>
+  
+                <v-divider></v-divider>
+  
+                <v-list dense>
+                  <v-list-item
+                    v-for="(key, index) in filteredKeys"
+                    :key="index"
+                  >
+                    <v-list-item-content :class="{ 'blue--text': sortBy === key }">
+                      {{ key }}:
+                    </v-list-item-content>
+                    <v-list-item-content
+                      class="align-end"
+                      :class="{ 'blue--text': sortBy === key }"
+                    >
+                      <span class="description-text">
+                        {{ item[key.toLowerCase()] }}
+                      </span>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </v-col>
+          </v-row>
+        </template>
+
+        <template v-slot:footer>
+          <v-row
+            class="mt-2"
+            align="center"
+            justify="center"
+          >
+            <span class="pagination-info mr-4 grey--text">Page {{ page }} of {{ numberOfPages }}</span>
+
+            <v-spacer></v-spacer>
+
+            <v-btn
+              fab
+              dark  
+              color="#889"
+              class="mr-1 elevation-0"
+              @click="formerPage"
+            >
+              <v-icon>mdi-chevron-left</v-icon>
+            </v-btn>
+            <v-btn
+              fab
+              dark
+              color="#889"
+              class="ml-1 elevation-0"
+              @click="nextPage"
+            >
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-btn>
+          </v-row>
+        </template>
+      </v-data-iterator>
+    </v-container>
+  </div>
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      activePanel: [0],
-      mygroups: null,
-    };
+  export default {
+    data () {
+      return {
+        itemsPerPageArray: [4, 8, 12],
+        search: '',
+        filter: {},
+        sortDesc: false,
+        page: 1,
+        itemsPerPage: 4,
+        sortBy: 'name',
+        keys: [
+          'Name',
+          'description',
+        ],
+        items: [
+          {
+            name: 'Group1',
+            founder: 'User1',
+            description: 'Descrlines.',
+            gid: 'xxx1',
+          },
+          {
+            name: 'Group2',
+            founder: 'User2',
+            description: 'Descrlines.',
+            gid: 'xxx2',
+          },
+          {
+            name: 'Group3',
+            founder: 'User3',
+            description: 'Descrlines.',
+            gid: 'xxx3',
+          },
+          {
+            name: 'Group4',
+            founder: 'User4',
+            description: 'Descrlines.',
+            gid: 'xxx4',
+          },
+          {
+            name: 'Group5',
+            founder: 'User5',
+            description: 'Descrlines.',
+            gid: 'xxx5',
+          },
+          {
+            name: 'Group6',
+            founder: 'User6',
+            description: 'Descrlines.',
+            gid: 'xxx6',
+          },
+          {
+            name: 'Group7',
+            founder: 'User7',
+            description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
+            gid: 'xxx7',
+          },
+          {
+            name: 'Group8',
+            founder: 'User8',
+            description: 'Descrlines.',
+            gid: 'xxx8',
+          },
+          {
+            name: 'Group9',
+            founder: 'User9',
+            description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
+            gid: 'xxx9',
+          },
+          {
+            name: 'Group10',
+            founder: 'User10',
+            description: 'Another description that should also wrap onto multiple lines.',
+            gid: 'xxx10',
+          }
+        ],
+      }
+    },
+    computed: {
+      numberOfPages () {
+        return Math.ceil(this.items.length / this.itemsPerPage)
+      },
+      filteredKeys () {
+        return this.keys.filter(key => key !== 'Name')
+      },
+    },
+    methods: {
+      nextPage () {
+        if (this.page + 1 <= this.numberOfPages) this.page += 1
+      },
+      formerPage () {
+        if (this.page - 1 >= 1) this.page -= 1
+      },
+      updateItemsPerPage (number) {
+        this.itemsPerPage = number
+      },
+      applyJoin(item) {
+        // 在这里添加处理申请加入逻辑的代码
+        alert(`申请加入 ${item.name}`);
+      },
+    },
   }
-}
 </script>
 
 <style scoped>
-.container {
-  width: 100%;
-  height: 45%
-}
+  .scrollable-container {
+    position: relative;
+    top: -10%;
+    height: 100%;
+    overflow: auto;
+  }
 
-.fixed-header {
-  background-color: #36a492;
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-}
+  .header-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #ffffff;
+    margin-right: 30%;
+  }
 
-.custom-card {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+  .pagination-info {
+    font-size: 16px;
+    font-weight: bold;
+    margin-left: 2%; /* Adjust as needed to move it slightly to the right */
+  }
 
-.custom-card-subtitle {
-  padding: 7px;
-  background: linear-gradient(135deg, #f3f4f7, #fff);
-}
+  .item-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+  }
 
-.custom-collapse {
-  border: 1px solid #ccc;
-  overflow-y: auto;
-  max-height: 275px;
-  background: #fafafa;
-}
+  .description-text {
+    display: block;
+    white-space: normal; /* Allow text to wrap onto multiple lines */
+  }
 
-.custom-collapse-item {
-  overflow: hidden;
-  margin-bottom: 10px;
-  background: none;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.custom-collapse-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.custom-collapse-item__header {
-  background: linear-gradient(135deg, #57d59c, #36a492);
-  color: #fff;
-  border-radius: 8px 8px 0 0;
-  padding: 10px;
-}
-
-.custom-collapse-item__header:hover {
-  background: linear-gradient(135deg, #2c8e7d, #42b983);
-}
-
-.custom-collapse-item__content {
-  border-radius: 0 0 8px 8px;
-  padding: 10px;
-  background: linear-gradient(135deg, #2c8e7d, #42b983);
-}
-
-.description {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.password {
-  font-size: 17px;
-  font-weight: bold;
-  color: #ff6f61;
-}
+  .apply-button {
+    font-size: 14px;
+    position: absolute;
+    color: white;
+    font-weight:900;
+    top: 15px;
+    right: 20px;
+  }
 </style>
