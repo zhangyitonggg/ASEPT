@@ -5,7 +5,11 @@
         v-if="$store.state._show_platform_frame_"
       >
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+<<<<<<< HEAD
         <v-app-bar-title>Python大作业</v-app-bar-title>
+=======
+        <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
+>>>>>>> 0be9b713c0cabe64e6af378413e6e7703d5b3b69
         <v-spacer></v-spacer>
         <div>别卷了，{{ $store.state._user_name_ }}</div>
       </v-app-bar>
@@ -46,10 +50,10 @@
       </v-main>
       <v-alert
         elevation="11"
-        :type="this.$store.state._alert_.type"
-        v-show="this.$store.state._alert_.show"
+        :type="$store.state._alert_.type"
+        v-show="$store.state._alert_.show"
         transition="scroll-y-transition"
-      >{{ this.$store.state._alert_.message }}</v-alert>
+      >{{ $store.state._alert_.message }}</v-alert>
     </v-app>
   </template>
 
@@ -108,7 +112,7 @@ export default App;
 <style lang="scss">
 @import './assets/styles/main.scss';
 
-#appSnackbar {
+.v-alert {
   z-index: 1001;
 }
 
@@ -118,11 +122,5 @@ export default App;
 .slide-y-enter, .slide-y-leave-to {
   transform: translateY(100%);
   opacity: 0;
-}
-
-.app-bar-title {
-  white-space: nowrap; /* 保持文本在一行，不换行 */
-  overflow: visible; /* 允许文本溢出容器 */
-  text-overflow: ellipsis; /* 可选，如果想要文本溢出时显示省略号 */
 }
 </style>

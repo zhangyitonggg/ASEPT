@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "date-fns": "^3.6.0",
     "qs": "^6.12.3",
     "querystring": "^0.2.1",
     "vue": "^2.6.14",

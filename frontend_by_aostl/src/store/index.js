@@ -14,6 +14,7 @@ export default new Vuex.Store({
       type: "success"
     },
     _token_: null,
+    _app_title_: "Test",
   },
   getters: {
     username: state => state._user_name_ == null ? "UnauthorizedUser" : state._user_name_,
@@ -53,6 +54,9 @@ export default new Vuex.Store({
       if (!user_name) {
         user_name = sessionStorage.getItem('__user_name__');
       } state._user_name_ = user_name;
+    },
+    setAppTitle(state, title) {
+      state._app_title_ = title;
     }
   },
   actions: {
@@ -75,6 +79,17 @@ export default new Vuex.Store({
         throw "用户名或密码错误。";
       }
     },
+    getNews(context) {
+      return new Promise((resolve, reject) => {
+        api.getnews()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    }
   },
   modules: {
   }
