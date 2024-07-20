@@ -37,7 +37,7 @@ const routes: Array<RouteConfig> = [
     component: HomeView // todo
   },
   {
-    path: 'mine',
+    path: '/mine',
     name: 'mine',
     component: HomeView // todo
   }
