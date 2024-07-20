@@ -1,11 +1,11 @@
-<template>
+<!-- <template>
     <div class="scrollable-container">
     <v-container fluid>
       <v-data-iterator
         :items="items"
         :items-per-page.sync="itemsPerPage"
         :page.sync="page"
-        :search="search"
+        :search="search"  
         :sort-by="sortBy.toLowerCase()"
         :sort-desc="sortDesc"
         hide-default-footer
@@ -269,4 +269,4 @@
     top: 15px;
     right: 20px;
   }
-</style>
+</style> -->

@@ -16,9 +16,9 @@
           color="#667"
           class="mb-1"
         >
-          <v-icon>mdi-account-group-outline</v-icon>
+          <v-icon class="pr-3">mdi-account-group-outline</v-icon>
           
-          <span class="header-title">&nbsp&nbsp挑选你喜欢的群聊吧</span>
+          <span class="header-title">挑选你喜欢的群聊吧</span>
           <v-text-field
             v-model="search"
             clearable
@@ -56,6 +56,8 @@
           >
             <v-card class="item-card">
               <v-card-title class="subheading font-weight-bold">
+              <v-icon class="pr-1">mdi-account-multiple-check</v-icon>
+                
                 {{ item.name }}
                 <v-spacer></v-spacer>
                 <v-btn small color="#779" class="apply-button" @click="applyJoin(item)">
@@ -70,6 +72,7 @@
                   v-for="(key, index) in filteredKeys"
                   :key="index"
                 >
+
                   <v-list-item-content :class="{ 'blue--text': sortBy === key }">
                     {{ key }}:
                   </v-list-item-content>
