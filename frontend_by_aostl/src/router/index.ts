@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import store from '../store'
 import NotFound from '../views/NotFound.vue'
+import PersonalCenter from '../views/PersonalCenter.vue'
 
 Vue.use(VueRouter)
 
@@ -48,9 +49,9 @@ const routes: Array<RouteConfig> = [
     component: HomeView // todo
   },
   {
-    path: '/mine',
-    name: 'mine',
-    component: HomeView // todo
+    path: '/me',
+    name: 'me',
+    component: PersonalCenter // todo
   },
   {
     path: '*',
