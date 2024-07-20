@@ -4,28 +4,26 @@
     fluid
   >
     <component :is="currentComponent" />
-    <v-footer height="0">
-      <v-bottom-navigation
-        app
-        fixed
-        color="primary"
-        v-model="activeBtn"
-        @change="handleNavigateClick"
-      >
-        <v-btn value="news">
-          <span>公告</span>
-          <v-icon>mdi-message-alert-outline</v-icon>
-        </v-btn>
-        <v-btn value="waterbar">
-          <span>水吧</span>
-          <v-icon>mdi-hand-clap</v-icon>
-        </v-btn>
-        <v-btn value="feedback">
-          <span>支持我们</span>
-          <v-icon>mdi-hand-coin</v-icon>
-        </v-btn>
-      </v-bottom-navigation>
-    </v-footer>
+    <v-bottom-navigation
+      app
+      fixed
+      color="primary"
+      v-model="activeBtn"
+      @change="handleNavigateClick"
+    >
+      <v-btn value="news">
+        <span>公告</span>
+        <v-icon>mdi-message-alert-outline</v-icon>
+      </v-btn>
+      <v-btn value="waterbar">
+        <span>水吧</span>
+        <v-icon>mdi-hand-clap</v-icon>
+      </v-btn>
+      <v-btn value="feedback">
+        <span>支持我们</span>
+        <v-icon>mdi-hand-coin</v-icon>
+      </v-btn>
+    </v-bottom-navigation>
   </v-container>
 </template>
 
