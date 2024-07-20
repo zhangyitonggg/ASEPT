@@ -5,11 +5,7 @@
         v-if="$store.state._show_platform_frame_"
       >
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-<<<<<<< HEAD
-        <v-app-bar-title>Python大作业</v-app-bar-title>
-=======
         <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
->>>>>>> 0be9b713c0cabe64e6af378413e6e7703d5b3b69
         <v-spacer></v-spacer>
         <div>别卷了，{{ $store.state._user_name_ }}</div>
       </v-app-bar>
