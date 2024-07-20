@@ -108,7 +108,7 @@ export default App;
 <style lang="scss">
 @import './assets/styles/main.scss';
 
-#appSnackbar {
+.v-alert {
   z-index: 1001;
 }
 
@@ -118,11 +118,5 @@ export default App;
 .slide-y-enter, .slide-y-leave-to {
   transform: translateY(100%);
   opacity: 0;
-}
-
-.app-bar-title {
-  white-space: nowrap; /* 保持文本在一行，不换行 */
-  overflow: visible; /* 允许文本溢出容器 */
-  text-overflow: ellipsis; /* 可选，如果想要文本溢出时显示省略号 */
 }
 </style>
