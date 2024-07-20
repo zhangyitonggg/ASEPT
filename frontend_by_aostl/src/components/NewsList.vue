@@ -2,10 +2,10 @@
   <div>
     <v-expansion-panels inset>
       <v-expansion-panel v-for="(item, index) in news" :key="index">
-        <v-expansion-panel-header>
+        <v-expansion-panel-header :disable-icon-rotate="!item.is_active">
           <div style="display: flex; justify-content: space-between; width: 100%;">
             <div>{{ item.title }}</div>
-            <div style="font-size: 12px; color: grey; text-align: right;">
+            <div style="color: grey; text-align: right; margin-right: 16px;">
               <span>{{ item.author }}</span>
               <span> - </span>
               <span>{{ formatDate(item.update_at) }}</span>
@@ -57,3 +57,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.v-expansion-panel-header {
+  font-size: large;
+}
+</style>
