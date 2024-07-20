@@ -16,9 +16,10 @@
         <div class="d-flex flex-column" style="height: 100%;">
           <v-list class="flex-grow-1">
             <v-list-item
-              v-for="[icon, text] in links"
+              v-for="[icon, text, route] in links"
               :key="icon"
-              link>
+              link
+              @click="navigateTo(route)">
               <v-list-item-icon>
                 <v-icon>{{ icon }}</v-icon>
               </v-list-item-icon>
@@ -63,11 +64,11 @@ const App = Vue.extend({
     return {
       drawer: null,
       links: [
-        ['mdi-home', '首页'],
-        ['mdi-book-open-variant-outline', '题库'],
-        ['mdi-account-group', '我的团队'],
-        ['mdi-head-lightbulb-outline', '精心安排'],
-        ['mdi-account', '个人中心'],
+        ['mdi-home', '首页', '/'],
+        ['mdi-book-open-variant-outline', '题库', '/exercises'],
+        ['mdi-account-group', '团队', '/groups'],
+        ['mdi-head-lightbulb-outline', '精心安排', '/arrange'],
+        ['mdi-account', '个人中心', '/mine'],
       ],
     };
   },
@@ -76,6 +77,16 @@ const App = Vue.extend({
   },
 
   methods: {
+    navigateTo(route) {
+      this.$router.push(route).catch(err => {
+      if (err.name !== 'NavigationDuplicated') {
+        throw err;
+      }
+    });
+    },
+    handleAboutClick() { // 处理关于按钮点击事件
+      this.navigateTo('/about');
+    }
   },
 
   components: {

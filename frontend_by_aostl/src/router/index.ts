@@ -25,6 +25,21 @@ const routes: Array<RouteConfig> = [
     name: 'login',
     component: () => import('../views/LoginPanel.vue'),
     meta: {requiresNotAuthed: true}
+  },
+  {
+    path: '/groups',
+    name: 'groups',
+    component: () => import('../views/GroupView.vue')
+  },
+  { 
+    path: '/exercises',
+    name: 'exercises',
+    component: HomeView // todo
+  },
+  {
+    path: 'mine',
+    name: 'mine',
+    component: HomeView // todo
   }
 ]
 
