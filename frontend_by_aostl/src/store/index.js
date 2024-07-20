@@ -31,6 +31,9 @@ export default new Vuex.Store({
     showPlatformFrame(state) {
       state._show_platform_frame_ = true;
     },
+    hidePlatformFrame(state) {
+      state._show_platform_frame_ = false;
+    },
     setAlert(state, alert) {
       state._alert_.message= alert.message;
       if (alert.type) {

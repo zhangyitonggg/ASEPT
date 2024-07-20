@@ -31,7 +31,7 @@
                 outlined
                 label="原密码"
                 type="password"
-                prepend-inner-icon="mdi-fingerprint"
+                prepend-inner-icon="mdi-fingerprint-off"
                 required
                 v-model="original_password"
                 :disabled="loading"
@@ -51,7 +51,7 @@
                     }
                 ]"
                 type="password"
-                prepend-inner-icon="mdi-fingerprint"
+                prepend-inner-icon="mdi-account-key"
                 v-model="password"
                 :disabled="loading"
               />
@@ -61,7 +61,7 @@
                 label="确认密码"
                 :rules="[v => v == password || '两次密码不一致']"
                 type="password"
-                prepend-inner-icon="mdi-fingerprint"
+                prepend-inner-icon="mdi-account-key-outline"
                 required
                 v-model="confirm_password"
                 :disabled="loading"

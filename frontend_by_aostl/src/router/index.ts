@@ -25,7 +25,6 @@ const routes: Array<RouteConfig> = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue'),
     meta: {
-      requiresAuth: false,
       title: '关于'
     }
   },
@@ -41,17 +40,29 @@ const routes: Array<RouteConfig> = [
   {
     path: '/groups',
     name: 'groups',
-    component: () => import('../views/GroupView.vue')
+    component: () => import('../views/GroupView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: '我的团队'
+    }
   },
-  { 
+  {
     path: '/exercises',
     name: 'exercises',
-    component: HomeView // todo
+    component: () => import('../views/ExercisesView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: '题库'
+    }
   },
   {
     path: '/me',
     name: 'me',
-    component: PersonalCenter // todo
+    component: PersonalCenter,
+    meta: {
+      requiresAuth: true,
+      title: '个人中心'
+    }
   },
   {
     path: '*',
@@ -59,7 +70,7 @@ const routes: Array<RouteConfig> = [
     component: NotFound,
     meta: {
       title: '404 Not Found',
-      requiresAuth: false
+      requiresAuth: true
     }
   }
 ]
@@ -74,13 +85,14 @@ router.beforeEach((to, from, next) => {
   store.commit("getToken");
   const name = store.state._user_name_;
   const token = store.state._token_;
-  const default_title = ' - ASEPT';
-  const title = to.meta == null ? " " : to.meta.title;
+  const default_title = 'ASEPT';
+  const title = to.meta == null ? "" : to.meta.title + " - ";
   if (name == null || token == null) {
     localStorage.removeItem('__token__');
     localStorage.removeItem('__user_name__');
     sessionStorage.removeItem('__token__');
     sessionStorage.removeItem('__user_name__');
+    store.commit("hidePlatformFrame");
     if (to.matched.some(record => record.meta.requiresAuth)) {
         next({ name: 'login' });
     } else {
