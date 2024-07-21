@@ -167,13 +167,6 @@ export default {
       this.itemsPerPage = number
     },
     solveProblem(item){
-      // 在这里添加处理申请加入逻辑的代码
-      //alert(`申请加入 ${item.name}`);
-    //   console.log('hhhhhhhh');
-    //   this.$store.commit('setAlert',{
-    //     type: 'info',
-    //     message: '恭喜你答对了！'
-    //   })
       alert('恭喜你答对了！');
       this.$router.push('/exercise/solve');
     },
