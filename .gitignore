@@ -2,3 +2,4 @@
 **/node_modules
 uploads
 **/__pycache__
+frontend\src\components\GroupCreated.vue
