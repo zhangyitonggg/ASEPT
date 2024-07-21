@@ -41,7 +41,7 @@
                 </v-list-item-content>
                 <v-list-item-action>
                   <v-btn
-                    color="primary"
+                    color="warning"
                     @click="leave(item)"
                   > 离开 </v-btn>
                 </v-list-item-action>
