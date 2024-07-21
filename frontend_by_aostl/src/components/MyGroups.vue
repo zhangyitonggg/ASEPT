@@ -106,7 +106,7 @@ export default {
         'description',
       ],
       items: [
-        { header: '所有可以加入的团队' },
+        { header: '您加入的所有团队' },
         {
           name: 'Group1',
           founder: 'User1',
