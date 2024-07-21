@@ -1,7 +1,8 @@
 <template>
   <div class="expandable-search">
     <v-btn icon @click="toggleSearch" v-show="!showSearch">
-      <v-icon>mdi-magnify</v-icon>
+      <v-icon style="font-size: 32px;">mdi-magnify</v-icon>
+      <span style="font-size:16px;margin-bottom:3%;">&nbsp;搜索</span>
     </v-btn>
       <v-text-field
         v-if="showSearch"
@@ -48,4 +49,5 @@ export default {
 .search-input {
   width: 250px; /* Define your desired width */
 }
+
 </style>

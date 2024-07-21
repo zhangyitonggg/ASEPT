@@ -59,7 +59,7 @@ export default {
         case 'manage':
           return 'GroupCreated';
         default:
-          return 'EnterGroup';
+          return 'MyGroups';
       }
     }
   },
