@@ -3,7 +3,7 @@
     class="spacing-playground pa-16"
     fluid
   >
-    <div>
+    <!-- <div>
       <h1>Exercises</h1>
       <p>Here is a list of exercises</p>
       <ul>
@@ -11,8 +11,9 @@
           {{ exercise.name }}
         </li>
       </ul>
-    </div>
-    <!-- <component :is="currentComponent" /> -->
+    </div> -->
+    <component :is="currentComponent" />
+
     <v-bottom-navigation
       app
       fixed
@@ -41,10 +42,19 @@
 </template>
 
 <script>
-
+import SearchBar from '../components/SearchBar.vue'
+import Problem from '../components/exercises/Problem.vue'
+import ProblemList from '../components/exercises/ProblemList.vue'
+import ProblemManage from '../components/exercises/ProblemManage.vue'
+import ListManage from '../components/exercises/ListManage.vue'
 export default {
   name: 'HomeView',
   components: {
+    Problem,
+    ProblemList,
+    ListManage,
+    ProblemManage,
+    SearchBar
   },
   data() {
     return {
@@ -59,15 +69,16 @@ export default {
   },
   computed: {
     currentComponent() {
-      // switch (this.activeBtn) {
-      //   case 'waterbar':
-      //     return 'Waterbar';
-      //   case 'feedback':
-      //     return 'Feedback';
-      //   default:
-      //     return 'News';
-      // }
-      return 'problems'
+      switch (this.activeBtn) {
+        case 'problems':
+          return 'Problem';
+        case 'problemGroups':
+          return 'ProblemList';
+        case 'manageProblemGroups':
+          return 'ListManage';
+        default:
+          return 'ProblemManage';
+      }
     }
   },
   methods: {
