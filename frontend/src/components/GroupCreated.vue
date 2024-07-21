@@ -41,9 +41,9 @@
                 </v-list-item-content>
                 <v-list-item-action>
                   <v-btn
-                    color="warning"
-                    @click="leave(item)"
-                  > 离开 </v-btn>
+                    color="secondary"
+                    @click="manage(item)"
+                  > 管理 </v-btn>
                 </v-list-item-action>
 
               </v-list-item>
@@ -56,7 +56,7 @@
         v-model="dialog"
         max-width="290"
       >
-        <v-card>
+        <!-- <v-card>
           <v-card-title class="text-h7">
             确定要离开 {{curItem.name}} 吗？
           </v-card-title>
@@ -80,7 +80,83 @@
               确定
             </v-btn>
           </v-card-actions>
-        </v-card>
+        </v-card> -->
+        <template>
+          <v-row justify="center">
+            <v-dialog
+              v-model="dialog"
+              persistent
+              max-width="600px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="primary"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  Open Dialog
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title>
+                  <span class="text-h5">修改{{curItem.name}}信息</span>
+                </v-card-title>
+                <v-card-text>
+                  <v-container>
+                    <v-row>
+                      <v-col cols="12">
+                        <v-text-field
+                          label="Group Name*"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-text-field
+                          label="Password(可选)"
+                          type="password"
+                          required
+                        ></v-text-field>
+                      </v-col>
+           
+                      <template>
+                        <v-container fluid>
+                          <v-textarea
+                            name="description"
+                            filled
+                            label="Group Description*"
+                            auto-grow
+                            v-model="curItem.description"
+                          ></v-textarea>
+                        </v-container>
+                      </template>
+                    </v-row>
+                  </v-container>
+                  <small>*indicates required field</small>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="dialog = false"
+                  >
+                    Close
+                  </v-btn>
+                  <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="dialog = false"
+                  >
+                    Save
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-row>
+        </template>
+        <!--  -->
+
       </v-dialog>
     </v-row>
   </div>
@@ -198,7 +274,7 @@ export default {
     }
   },
   methods: {
-    leave(item) {
+    manage(item) {
       this.curItem = item;
       this.dialog = true;
     },

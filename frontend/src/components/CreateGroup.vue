@@ -1,6 +1,6 @@
 <template>
     <div>
-        niho
+        
     </div>
 </template>
   
