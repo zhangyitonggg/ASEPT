@@ -1,89 +1,55 @@
 <template>
-  <div>
-    <v-container fluid>
-        <v-col>
-          <searchbar />
-        </v-col>
-        <v-col>
-          <v-list three-line>
-            <template v-for="(item, index) in items">
-              <v-subheader
-                v-if="item.header"
-                :key="item.header"
-                v-text="item.header"
-              ></v-subheader>
-              <v-divider
-                v-else-if="item.divider"
-                :key="index"
-                :inset="item.inset"
-              ></v-divider>
-              <v-list-item
-                v-else-if="item.name"
-                :key="item.name"
-              >
-                <v-list-item-avatar>
-                  <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link"}}</v-icon>
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    <h4>
-                      {{ item.name }}
-                    </h4>
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    Founder: 
-                    <strong>
-                      {{ item.founder }}
-                    </strong>
-                    <br>
-                      {{ item.description }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-                <v-list-item-action>
-                  <v-btn
-                    color="warning"
-                    @click="leave(item)"
-                  > 离开 </v-btn>
-                </v-list-item-action>
-
-              </v-list-item>
-            </template>
-          </v-list>
-        </v-col>
-    </v-container>
-    <v-row justify="center">
-      <v-dialog
-        v-model="dialog"
-        max-width="290"
-      >
-        <v-card>
-          <v-card-title class="text-h7">
-            确定要离开 {{curItem.name}} 吗？
-          </v-card-title>
-
-           <v-card-actions>
-            <v-spacer></v-spacer>
-  
-            <v-btn
-              color="green darken-1"
-              text
-              @click="handleAboutClick(false)"
+  <v-container fluid>
+      <v-col>
+        <searchbar v-model="search"/>
+      </v-col>
+      <v-col>
+        <v-list three-line>
+          <template v-for="(item, index) in filteredItems">
+            <v-subheader
+              v-if="item.header"
+              :key="item.header"
+              v-text="item.header"
+            ></v-subheader>
+            <v-divider
+              v-else-if="item.divider"
+              :key="index"
+              :inset="item.inset"
+            ></v-divider>
+            <v-list-item
+              v-else-if="item.name"
+              :key="item.name"
             >
-              取消
-            </v-btn>
-  
-            <v-btn
-              color="red darken-1"
-              text
-              @click="handleAboutClick(true)"
-            >
-              确定
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-row>
-  </div>
+              <v-list-item-avatar>
+                <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>
+                  <h4>
+                    {{ item.name }}
+                  </h4>
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  Founder: 
+                  <strong>
+                    {{ item.founder }}
+                  </strong>
+                  <br>
+                    {{ item.description }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn
+                  color="primary"
+                  @click="applyJoin(item)"
+                > 加入 </v-btn>
+              </v-list-item-action>
+
+            </v-list-item>
+          </template>
+        </v-list>
+      </v-col>
+  </v-container>
 </template>
 
 <script>
@@ -93,8 +59,6 @@ export default {
   data () {
     return {
       itemsPerPageArray: [4, 8, 12],
-      dialog: false,
-      curItem: {},
       search: '',
       filter: {},
       sortDesc: false,
@@ -106,7 +70,7 @@ export default {
         'description',
       ],
       items: [
-        { header: '您加入的所有团队' },
+        { header: '所有可以加入的团队' },
         {
           name: 'Group1',
           founder: 'User1',
@@ -196,6 +160,13 @@ export default {
     filteredKeys () {
       return this.keys.filter(key => key !== 'Name')
     },
+    filteredItems() {
+      const filtered = this.items.filter(item =>
+        item.name && item.name.toLowerCase().includes(this.search.toLowerCase())
+      );
+      // console.log('Filtered Items:', filtered); // 调试输出
+      return filtered;
+    }
   },
   methods: {
     nextPage () {
@@ -207,21 +178,9 @@ export default {
     updateItemsPerPage (number) {
       this.itemsPerPage = number
     },
-    leave(item) {
-      this.curItem = item;
-      this.dialog = true;
-    },
-    handleAboutClick(flag) {
-      console.log(flag);  
-      this.dialog = false
-      if (flag) {
-        alert(`你选择了离开 ${this.curItem.name}`);
-        // 使用 splice 方法从 items 中移除 curItem
-        const index = this.items.findIndex(item => item.gid === this.curItem.gid);
-        if (index !== -1) {
-          this.items.splice(index, 1);
-        }
-      }
+    applyJoin(item) {
+      // 在这里添加处理申请加入逻辑的代码
+      alert(`申请加入 ${item.name}`);
     },
   },
   components: {

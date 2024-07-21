@@ -19,7 +19,7 @@
         <span>水吧</span>
         <v-icon>mdi-hand-clap</v-icon>
       </v-btn>
-      <v-btn value="feedback">
+      <v-btn value="money">
         <span>支持我们</span>
         <v-icon>mdi-hand-coin</v-icon>
       </v-btn>
@@ -29,11 +29,13 @@
 
 <script>
 import news from '../components/NewsList.vue'
+import money from '../components/GiveMeMoney.vue'
 
 export default {
   name: 'HomeView',
   components: {
-    news
+    news,
+    money
   },
   data() {
     return {
@@ -43,20 +45,17 @@ export default {
   },
   computed: {
     currentComponent() {
-      // switch (this.activeBtn) {
-      //   case 'waterbar':
-      //     return 'Waterbar';
-      //   case 'feedback':
-      //     return 'Feedback';
-      //   default:
-      //     return 'News';
-      // }
-      return 'news'
+      switch (this.activeBtn) {
+        case 'money':
+          return 'money';
+        default:
+          return 'news';
+      }
     }
   },
   methods: {
     handleNavigateClick(newValue) {
-      if (newValue !== 'news') {
+      if (newValue == 'waterbar') {
         this.$nextTick(() => {
           this.activeBtn = 'news';
           this.$store.commit("setAlert", {"type": "info", "message": "coming soon..."})
