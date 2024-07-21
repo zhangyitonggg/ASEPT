@@ -7,6 +7,7 @@
       <v-text-field
         v-if="showSearch"
         v-model="search"
+        @input="updateSearch"
         class="search-input"
         dense
         append-icon="mdi-close"
@@ -33,7 +34,11 @@ export default {
     },
     hideSearch() {
       this.search = '';
+      this.$emit('input', this.search);
       this.showSearch = false;
+    },
+    updateSearch() {
+      this.$emit('input', this.search);
     },
   },
 };

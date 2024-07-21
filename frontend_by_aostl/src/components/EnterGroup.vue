@@ -1,11 +1,11 @@
 <template>
   <v-container fluid>
       <v-col>
-        <searchbar />
+        <searchbar v-model="search"/>
       </v-col>
       <v-col>
         <v-list three-line>
-          <template v-for="(item, index) in items">
+          <template v-for="(item, index) in filteredItems">
             <v-subheader
               v-if="item.header"
               :key="item.header"
@@ -160,6 +160,13 @@ export default {
     filteredKeys () {
       return this.keys.filter(key => key !== 'Name')
     },
+    filteredItems() {
+      const filtered = this.items.filter(item =>
+        item.name && item.name.toLowerCase().includes(this.search.toLowerCase())
+      );
+      // console.log('Filtered Items:', filtered); // 调试输出
+      return filtered;
+    }
   },
   methods: {
     nextPage () {
