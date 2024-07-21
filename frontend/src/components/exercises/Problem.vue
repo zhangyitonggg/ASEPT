@@ -1,3 +1,5 @@
+
+
 <template>
   <v-container fluid>
       <v-col>
@@ -167,7 +169,6 @@ export default {
       this.itemsPerPage = number
     },
     solveProblem(item){
-      alert('恭喜你答对了！');
       this.$router.push('/exercise/solve');
     },
   },
@@ -219,5 +220,3 @@ export default {
   right: 20px;
 }
 </style>
-
-
