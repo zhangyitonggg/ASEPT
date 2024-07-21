@@ -1,8 +1,6 @@
 <template>
   <v-container>
-    <v-main>
-      <component :is="currentComponent"></component>
-    </v-main>
+    <component :is="currentComponent"></component>
     <v-bottom-navigation
       app
       fixed
@@ -61,7 +59,7 @@ export default {
         case 'manage':
           return 'GroupCreated';
         default:
-          return 'MyGroups';
+          return 'EnterGroup';
       }
     }
   },

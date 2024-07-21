@@ -1,132 +1,60 @@
 <template>
-  <div class="scrollable-container">
   <v-container fluid>
-    <v-data-iterator
-      :items="items"
-      :items-per-page.sync="itemsPerPage"
-      :page.sync="page"
-      :search="search"
-      :sort-by="sortBy.toLowerCase()"
-      :sort-desc="sortDesc"
-      hide-default-footer
-    >
-      <template v-slot:header>
-        <v-toolbar
-          dark
-          color="#667"
-          class="mb-1"
-        >
-          <v-icon class="pr-3">mdi-account-group-outline</v-icon>
-          
-          <span class="header-title">挑选你喜欢的群聊吧</span>
-          <v-text-field
-            v-model="search"
-            clearable
-            flat
-            solo-inverted
-            hide-details
-            prepend-inner-icon="mdi-magnify"
-            label="Search"
-          ></v-text-field>
-          <template v-if="$vuetify.breakpoint.mdAndUp">
-            <v-spacer></v-spacer>
-            <v-select
-              v-model="sortBy"
-              flat
-              solo-inverted
-              hide-details
-              :items="keys"
-              prepend-inner-icon="mdi-magnify"
-              label="Sort by"
-            ></v-select>
-            <v-spacer></v-spacer>
+      <v-col>
+        <searchbar />
+      </v-col>
+      <v-col>
+        <v-list three-line>
+          <template v-for="(item, index) in items">
+            <v-subheader
+              v-if="item.header"
+              :key="item.header"
+              v-text="item.header"
+            ></v-subheader>
+            <v-divider
+              v-else-if="item.divider"
+              :key="index"
+              :inset="item.inset"
+            ></v-divider>
+            <v-list-item
+              v-else-if="item.name"
+              :key="item.name"
+            >
+              <v-list-item-avatar>
+                <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>
+                  <h4>
+                    {{ item.name }}
+                  </h4>
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  Founder: 
+                  <strong>
+                    {{ item.founder }}
+                  </strong>
+                  <br>
+                    {{ item.description }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn
+                  color="primary"
+                  @click="applyJoin(item)"
+                > 加入 </v-btn>
+              </v-list-item-action>
+
+            </v-list-item>
           </template>
-        </v-toolbar>
-      </template>
-
-      <template v-slot:default="props">
-        <v-row>
-          <v-col
-            v-for="item in props.items"
-            :key="item.gid"
-            cols="12"
-            sm="12"
-            md="12"
-            lg="12  "
-          >
-            <v-card class="item-card">
-              <v-card-title class="subheading font-weight-bold">
-              <v-icon class="pr-1">mdi-account-multiple-check</v-icon>
-                
-                {{ item.name }}
-                <v-spacer></v-spacer>
-                <v-btn small color="#779" class="apply-button" @click="applyJoin(item)">
-                  申请加入
-                </v-btn>
-              </v-card-title>
-
-              <v-divider></v-divider>
-
-              <v-list dense>
-                <v-list-item
-                  v-for="(key, index) in filteredKeys"
-                  :key="index"
-                >
-
-                  <v-list-item-content :class="{ 'blue--text': sortBy === key }">
-                    {{ key }}:
-                  </v-list-item-content>
-                  <v-list-item-content
-                    class="align-end"
-                    :class="{ 'blue--text': sortBy === key }"
-                  >
-                    <span class="description-text">
-                      {{ item[key.toLowerCase()] }}
-                    </span>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-card>
-          </v-col>
-        </v-row>
-      </template>
-
-      <template v-slot:footer>
-        <v-row
-          class="mt-2"
-          align="center"
-          justify="center"
-        >
-          <span class="pagination-info mr-4 grey--text">Page {{ page }} of {{ numberOfPages }}</span>
-
-          <v-spacer></v-spacer>
-
-          <v-btn
-            fab
-            dark  
-            color="#889"
-            class="mr-1 elevation-0"
-            @click="formerPage"
-          >
-            <v-icon>mdi-chevron-left</v-icon>
-          </v-btn>
-          <v-btn
-            fab
-            dark
-            color="#889"
-            class="ml-1 elevation-0"
-            @click="nextPage"
-          >
-            <v-icon>mdi-chevron-right</v-icon>
-          </v-btn>
-        </v-row>
-      </template>
-    </v-data-iterator>
+        </v-list>
+      </v-col>
   </v-container>
-</div>
 </template>
 
 <script>
+import searchbar from './SearchBar.vue'
+
 export default {
   data () {
     return {
@@ -142,65 +70,85 @@ export default {
         'description',
       ],
       items: [
+        { header: '所有可以加入的团队' },
         {
           name: 'Group1',
           founder: 'User1',
           description: 'Descrlines.',
           gid: 'xxx1',
+          locked: true,
         },
+        { divider: true, inset: true },
         {
           name: 'Group2',
           founder: 'User2',
           description: 'Descrlines.',
           gid: 'xxx2',
+          locked: true,
         },
+        { divider: true, inset: true },
         {
           name: 'Group3',
           founder: 'User3',
           description: 'Descrlines.',
           gid: 'xxx3',
+          locked: false,
         },
+        { divider: true, inset: true },
         {
           name: 'Group4',
           founder: 'User4',
           description: 'Descrlines.',
           gid: 'xxx4',
+          locked: false,
         },
+        { divider: true, inset: true },
         {
           name: 'Group5',
           founder: 'User5',
           description: 'Descrlines.',
           gid: 'xxx5',
+          locked: false,
         },
+        { divider: true, inset: true },
         {
           name: 'Group6',
           founder: 'User6',
           description: 'Descrlines.',
           gid: 'xxx6',
+          locked: false,
         },
+        { divider: true, inset: true },
         {
           name: 'Group7',
           founder: 'User7',
           description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
           gid: 'xxx7',
+          locked: false,
         },
+        { divider: true, inset: true },
         {
           name: 'Group8',
           founder: 'User8',
           description: 'Descrlines.',
           gid: 'xxx8',
+          locked: false,
         },
+        { divider: true, inset: true },
         {
           name: 'Group9',
           founder: 'User9',
           description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
           gid: 'xxx9',
+          locked: false,
         },
+        { divider: true, inset: true },
         {
           name: 'Group10',
           founder: 'User10',
           description: 'Another description that should also wrap onto multiple lines.',
           gid: 'xxx10',
+          locked: false,
         }
       ],
     }
@@ -228,6 +176,9 @@ export default {
       alert(`申请加入 ${item.name}`);
     },
   },
+  components: {
+    searchbar
+  }
 }
 </script>
 
