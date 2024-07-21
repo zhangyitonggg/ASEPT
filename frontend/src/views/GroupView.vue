@@ -14,7 +14,7 @@
       </v-btn>
       <v-btn value="join">
         <span>加入团队</span>
-        <v-icon>mdi-account-plus</v-icon>
+        <v-icon>mdi-account-multiple-plus-outline</v-icon>
       </v-btn>
       <v-btn value="manage">
         <span>管理团队</span>
@@ -22,7 +22,7 @@
       </v-btn>
       <v-btn value="create">
         <span>创建团队</span>
-        <v-icon>mdi-account-multiple-plus-outline</v-icon>
+        <v-icon> mdi-vector-polyline-plus </v-icon>
       </v-btn>
     </v-bottom-navigation>
   </v-container>
