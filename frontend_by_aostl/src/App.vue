@@ -46,10 +46,11 @@
       </v-main>
       <v-alert
         elevation="11"
-        :type="$store.state._alert_.type"
         v-show="$store.state._alert_.show"
+        :type="$store.state._alert_.type"
         transition="scroll-y-transition"
-      >{{ $store.state._alert_.message }}</v-alert>
+      >{{ $store.state._alert_.message }}
+      </v-alert>
     </v-app>
   </template>
 
@@ -109,6 +110,10 @@ export default App;
 
 .v-alert {
   z-index: 1001;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 0;
 }
 
 .slide-y-enter-active, .slide-y-leave-active {
