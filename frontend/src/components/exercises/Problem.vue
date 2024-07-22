@@ -21,7 +21,7 @@
               :key="item.name"
             >
               <v-list-item-avatar>
-                <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+                <v-icon> mdi-help-circle-outline</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
@@ -167,7 +167,7 @@ export default {
       this.itemsPerPage = number
     },
     solveProblem(item){
-      this.$router.push('/exercise/solve');
+      this.$router.push({path:'solve',append:true});
     },
   },
   components: {

@@ -56,12 +56,30 @@ const routes: Array<RouteConfig> = [
     }
   },
   {
-    path: '/exercise/solve',
+    path: '/exercises/solve',
     name: 'solves',
     component: () => import('../components/exercises/Solve.vue'),
     meta: {
       requireAuth: true,
       title: '去做题'
+    }
+  },
+  {
+    path: '/exercises/list/solve',
+    name: 'solves',
+    component: () => import('../components/exercises/Solve.vue'),
+    meta: {
+      requireAuth: true,
+      title: '去做题'
+    }
+  },
+  {
+    path: '/exercises/list',
+    name: 'list',
+    component: () => import('../components/exercises/ListCheck.vue'),
+    meta: {
+      requireAuth: true,
+      title: '进题单'
     }
   },
   {

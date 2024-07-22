@@ -1,5 +1,33 @@
 <template>
   <v-container fluid>
+  <v-col>
+      <v-card class="mb-5">
+        <v-card-title>
+          题目列表名称: {{ listName }}
+        </v-card-title>
+        <v-card-subtitle>
+          题目数量: {{ items.length }}
+        </v-card-subtitle>
+      </v-card>
+    </v-col>
+       <v-row class="align-center">
+      <v-col cols="auto">
+        <v-btn
+          class="fixed-button"
+          fab
+          dark
+          color="indigo"
+          @click="returnback"
+        >
+          <v-icon dark>
+            mdi-arrow-u-left-bottom-bold
+          </v-icon>
+        </v-btn>
+      </v-col>
+      <v-col>
+        <searchbar />
+      </v-col>
+    </v-row>
       <v-col>
         <v-list three-line>
           <template v-for="(item, index) in items">
@@ -18,7 +46,7 @@
               :key="item.name"
             >
               <v-list-item-avatar>
-                <v-icon> mdi-invoice-list-outline</v-icon>
+                <v-icon> mdi-help-circle-outline</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
@@ -33,69 +61,23 @@
               <v-list-item-action>
                 <v-btn
                   color="primary"
-                  @click="openDialog(item)"
-                > 查看题单 </v-btn>
+                  @click="solveProblem(item)"
+                > 去做题 </v-btn>
               </v-list-item-action>
 
             </v-list-item>
           </template>
         </v-list>
       </v-col>
-
-       <v-dialog v-model="dialog" max-width="800px">
-      <v-card>
-        <v-card-title>
-          题单详情
-          <v-spacer></v-spacer>
-          <v-btn icon @click="dialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-subtitle>
-          题单名称: {{ currentItem.name }}
-        </v-card-subtitle>
-
-         <v-card-text>
-          <v-row>
-            <v-col v-for="(problem, index) in currentItem.problems" :key="index" cols="12" md="4">
-              <v-card class="mb-4">
-                <v-card-title>
-                  题目 {{ index + 1 }}
-                </v-card-title>
-                <v-card-subtitle>
-                  Tag: {{ problem.tag }}
-                </v-card-subtitle>
-                <v-card-text>
-                  {{ problem.description }}
-                </v-card-text>
-                <v-card-actions>
-                  <v-btn
-                    color="primary"
-                    @click="startProblem(problem)"
-                  > 去做题 </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-btn text @click="dialog = false">关闭</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-
-
   </v-container>
 </template>
 
 <script>
+import searchbar from '../SearchBar.vue'
+
 export default {
   data () {
     return {
-        dialog: false,
-      currentItem: { name: '', tag: '', content: '' },
       itemsPerPageArray: [4, 8, 12],
       search: '',
       filter: {},
@@ -108,40 +90,86 @@ export default {
         'Tag',
       ],
       items: [
-        { header: '题单列表' },
+        { header: '题目列表' },
         {
           name: 'Problem1',
           tag: 'Descrlines.',
           gid: 'xxx1',
           locked: true,
           content: '66666666',
-          problems: [
-            { tag: 'Math', description: 'Solve the equation x^2 - 4 = 0' },
-            { tag: 'Science', description: 'Describe the process of photosynthesis' },
-          ],
         },
+        { divider: true, inset: true },
         {
           name: 'Group2',
           //founder: 'User2',
           tag: 'Descrlines.',
           gid: 'xxx2',
           locked: true,
-            problems: [
-            { tag: 'History', description: 'Explain the significance of the Renaissance' },
-          ],
         },
+        { divider: true, inset: true },
         {
           name: 'Group3',
           founder: 'User3',
           description: 'Descrlines.',
           gid: 'xxx3',
           locked: false,
-          problems: [
-            { tag: 'Geography', description: 'Describe the major rivers of Africa' },
-            { tag: 'Physics', description: 'Explain Newton\'s three laws of motion' },
-          ],
-          
         },
+        { divider: true, inset: true },
+        {
+          name: 'Group4',
+          founder: 'User4',
+          description: 'Descrlines.',
+          gid: 'xxx4',
+          locked: false,
+        },
+        // { divider: true, inset: true },
+        // {
+        //   name: 'Group5',
+        //   founder: 'User5',
+        //   description: 'Descrlines.',
+        //   gid: 'xxx5',
+        //   locked: false,
+        // },
+        // { divider: true, inset: true },
+        // {
+        //   name: 'Group6',
+        //   founder: 'User6',
+        //   description: 'Descrlines.',
+        //   gid: 'xxx6',
+        //   locked: false,
+        // },
+        // { divider: true, inset: true },
+        // {
+        //   name: 'Group7',
+        //   founder: 'User7',
+        //   description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
+        //   gid: 'xxx7',
+        //   locked: false,
+        // },
+        // { divider: true, inset: true },
+        // {
+        //   name: 'Group8',
+        //   founder: 'User8',
+        //   description: 'Descrlines.',
+        //   gid: 'xxx8',
+        //   locked: false,
+        // },
+        // { divider: true, inset: true },
+        // {
+        //   name: 'Group9',
+        //   founder: 'User9',
+        //   description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
+        //   gid: 'xxx9',
+        //   locked: false,
+        // },
+        // { divider: true, inset: true },
+        // {
+        //   name: 'Group10',
+        //   founder: 'User10',
+        //   description: 'Another description that should also wrap onto multiple lines.',
+        //   gid: 'xxx10',
+        //   locked: false,
+        // }
       ],
     }
   },
@@ -163,16 +191,15 @@ export default {
     updateItemsPerPage (number) {
       this.itemsPerPage = number
     },
-    openDialog(item){
-      this.currentItem = item;
-      this.dialog = true;
+    solveProblem(item){
+      this.$router.push({path:'solve',append:true});
     },
-     startProblem(problem){
-      // 跳转到题目页面或处理题目的逻辑
-     this.$router.push({path:'solve',append:true});
-    },
+    returnback() {
+      this.$router.go(-1);
+    }
   },
   components: {
+    searchbar
   }
 }
 </script>
@@ -219,5 +246,3 @@ export default {
   right: 20px;
 }
 </style>
-
-

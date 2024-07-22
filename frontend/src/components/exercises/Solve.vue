@@ -1,5 +1,18 @@
 <template>
   <v-container>
+    <v-btn
+      class="fixed-button"
+      fab
+      dark
+      color="indigo"
+      @click="returnback"
+    >
+      <v-icon dark>
+        mdi-arrow-u-left-bottom-bold
+      </v-icon>
+    </v-btn>
+   
+
     <v-form @submit.prevent="submitForm">
       <v-card v-for="(question, index) in questions" :key="index" class="mb-4">
         <v-card-title>{{ question.title }}</v-card-title>
@@ -59,46 +72,30 @@ export default {
   },
   methods: {
     getOptionLabel(index) {
-        if(index >= 26) return index - 26;
-        else return String.fromCharCode(65 + index); // 65 is the char code for 'A'
+      return String.fromCharCode(65 + index); // 65 is the char code for 'A'
     },
     submitForm() {
       console.log(this.answers);
       alert(JSON.stringify(this.answers, null, 2));
     },
+    handleButtonClick() {
+      alert('Button clicked!');
+    },
+    returnback() {
+      this.$router.go(-1);
+    }
   },
 };
 </script>
 
 <style>
+.fixed-button {
+  position: fixed;
+  left: 3%;
+  top: 15%;
+  z-index: 5;
+}
 .mb-4 {
   margin-bottom: 1rem;
 }
 </style>
-
-<!-- <template>
-    <div>
-        66666<br/>
-        {{content}}
-    </div>
-</template>
-
-<script>
-    export default{
-        data() {
-            return {
-                content:'',
-                id:-1,
-            }
-        },
-        mounted() {
-            this.id = this.$store.problemid;
-            //this.getProblme(id);
-        },
-        methods: {
-            getProblem(id) {
-                //补充交互功能
-            },
-        }
-    }
-</script> -->
