@@ -56,48 +56,13 @@
         v-model="dialog"
         max-width="290"
       >
-        <!-- <v-card>
-          <v-card-title class="text-h7">
-            确定要离开 {{curItem.name}} 吗？
-          </v-card-title>
-
-           <v-card-actions>
-            <v-spacer></v-spacer>
-  
-            <v-btn
-              color="green darken-1"
-              text
-              @click="handleAboutClick(false)"
-            >
-              取消
-            </v-btn>
-  
-            <v-btn
-              color="red darken-1"
-              text
-              @click="handleAboutClick(true)"
-            >
-              确定
-            </v-btn>
-          </v-card-actions>
-        </v-card> -->
         <template>
           <v-row justify="center">
             <v-dialog
               v-model="dialog"
               persistent
               max-width="600px"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  color="primary"
-                  dark
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  Open Dialog
-                </v-btn>
-              </template>
+            > 
               <v-card>
                 <v-card-title>
                   <span class="text-h5">修改{{curItem.name}}信息</span>
