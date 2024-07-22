@@ -1,9 +1,10 @@
 <template>
   <div>
     <v-container fluid>
-        <v-col>
+        <v-layout>
+          <v-spacer/>
           <searchbar v-model="search" searchBtnText='搜索团队'/>
-        </v-col>
+        </v-layout>
         <v-col>
           <v-list three-line>
             <template v-for="(item, index) in currentPageItems">

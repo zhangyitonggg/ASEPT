@@ -33,9 +33,9 @@
                     </h4>
                   </v-list-item-title>
                   <v-list-item-subtitle>
-                    Founder: 
+                    Password: 
                     <strong>
-                      {{ item.founder }}
+                      {{ item.password }}
                     </strong>
                     <br>
                       {{ item.description }}
@@ -74,24 +74,29 @@
                     <v-row>
                       <v-col cols="12">
                         <v-text-field
-                          label="Group Name*"
+                          label="群名"
                           required
                           v-model="curItem.name"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12">
+                        <v-checkbox
+                          label="需要密码"
+                          v-model="curItem.locked"
+                        ></v-checkbox>
+                      </v-col>
+                      <v-col cols="12" v-if="curItem.locked">
                         <v-text-field
-                          label="Password(可选)"
+                          label="密码"
                           v-model="curItem.password"
                         ></v-text-field>
                       </v-col>
-           
                       <template>
                         <v-container fluid>
                           <v-textarea
-                            name="description"
+                            name="描述"
                             filled
-                            label="Group Description*"
+                            label="描述"
                             auto-grow
                             v-model="curItem.description"
                           ></v-textarea>
@@ -130,7 +135,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    label="Group Name*"
+                    label="群名*"
                     required
                     v-model="newGroup.name"
                   ></v-text-field>
@@ -143,13 +148,13 @@
                 </v-col>
                 <v-col cols="12" v-if="newGroup.locked">
                   <v-text-field
-                    label="Password"
+                    label="密码"
                     v-model="newGroup.password"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-textarea
-                    label="Group Description*"
+                    label="描述"
                     required
                     auto-grow
                     v-model="newGroup.description"
@@ -157,7 +162,6 @@
                 </v-col>
               </v-row>
             </v-container>
-            <small>*indicates required field</small>
           </v-card-text>
           <v-card-actions>
             <v-btn
@@ -172,7 +176,7 @@
               text
               @click="submitNewGroup"
             >
-              保存
+              创建
             </v-btn>
           </v-card-actions>
         </v-card>
