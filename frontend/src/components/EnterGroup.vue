@@ -77,6 +77,7 @@ export default {
       filter: {},
       currentPage: 1,
       itemsPerPage: 13,
+
       items: [
         { header: '所有可以加入的团队' },
         {
@@ -156,7 +157,7 @@ export default {
     }
   },
   mounted() {
-  
+    this.getJoinedGroups();
   },
   computed: {
     numberOfPages () {
@@ -175,6 +176,22 @@ export default {
     },
   },
   methods: {
+    getJoinedGroups() {
+      this.$store
+        .dispatch("showJoinedGroups")
+        .then((res) => {
+          temp = []
+          temp = res.groups;
+          temp.unshift({ header: '所有可以加入的团队' });
+          this.items = temp;
+        })
+        .catch((e) => {
+          this.$store.commit("setAlert", {
+            type: "error",
+            message: e,
+          });
+        });
+    },
     applyJoin(item) {
       if (item.locked) {
         this.selectedItem = item;

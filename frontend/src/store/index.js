@@ -109,6 +109,17 @@ export default new Vuex.Store({
           })
       })
     },
+    showJoinedGroups(context) {
+      return new Promise((resolve, reject) => {
+        api.showJoinedGroups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    }
   },
   modules: {
   }

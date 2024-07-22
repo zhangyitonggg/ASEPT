@@ -22,6 +22,10 @@ const api = {
         password: password
       });
     },
+    showJoinedGroups: async() => {
+      console.log("showJoinedGroups");
+      return await router.get(path.baseUrl + path.showJoinedGroups);
+    }
 };
 
 export default api;
