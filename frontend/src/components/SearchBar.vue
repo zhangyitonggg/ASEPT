@@ -1,11 +1,11 @@
 <template>
   <div class="expandable-search">
-    <v-btn @click="toggleSearch" v-show="!openBar">
+    <v-btn @click="toggleSearch" v-show="!open ^ this.openBar">
       <v-icon> {{ searchBtnIcon }}</v-icon>
       {{searchBtnText}}
     </v-btn>
       <v-text-field
-        v-if="openBar"
+        v-if="open ^ this.openBar"
         v-model="search"
         @input="updateSearch"
         class="search-input"
@@ -22,11 +22,12 @@
 <script>
 export default {
   data: () => ({
+    open: false,
     search: '',
   }),
   methods: {
     toggleSearch() {
-      this.openBar = true;
+      this.open = true;
       this.$nextTick(() => {
         this.$refs.searchInput.focus();
       });
@@ -34,7 +35,7 @@ export default {
     hideSearch() {
       this.search = '';
       this.$emit('input', this.search);
-      this.openBar = false;
+      this.open = false;
     },
     updateSearch() {
       this.$emit('input', this.search);
