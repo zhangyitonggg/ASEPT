@@ -1,9 +1,6 @@
 <template>
   <v-container fluid>
       <v-col>
-        <searchbar />
-      </v-col>
-      <v-col>
         <v-list three-line>
           <template v-for="(item, index) in items">
             <v-subheader
@@ -33,29 +30,27 @@
                   Tag: {{ item.tag }}
                 </v-list-item-subtitle>
               </v-list-item-content>
-              <v-list-item-action class="width:500px;">
-                <v-btn
-                  color="primary"
-                  @click="changeProblem(item)"
-                > 修改问题 </v-btn>
-                 
+              <v-list-item-action>
                 <v-btn
                   color="primary"
                   @click="addToList(item)"
                 > 加入题单 </v-btn>
+              </v-list-item-action>
+              <v-list-item-action>
+                <v-btn
+                  color="primary"
+                  @click="changeProblem(item)"
+                > 修改问题 </v-btn>
               </v-list-item-action>
 
             </v-list-item>
           </template>
         </v-list>
       </v-col>
-       
   </v-container>
 </template>
 
 <script>
-import searchbar from '../SearchBar.vue'
-
 export default {
   data () {
     return {
@@ -80,7 +75,6 @@ export default {
           locked: true,
           content: '66666666',
         },
-        { divider: true, inset: true },
         {
           name: 'Group2',
           //founder: 'User2',
@@ -88,7 +82,6 @@ export default {
           gid: 'xxx2',
           locked: true,
         },
-        { divider: true, inset: true },
         {
           name: 'Group3',
           founder: 'User3',
@@ -96,62 +89,6 @@ export default {
           gid: 'xxx3',
           locked: false,
         },
-        { divider: true, inset: true },
-        // {
-        //   name: 'Group4',
-        //   founder: 'User4',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx4',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group5',
-        //   founder: 'User5',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx5',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group6',
-        //   founder: 'User6',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx6',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group7',
-        //   founder: 'User7',
-        //   description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
-        //   gid: 'xxx7',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group8',
-        //   founder: 'User8',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx8',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group9',
-        //   founder: 'User9',
-        //   description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
-        //   gid: 'xxx9',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group10',
-        //   founder: 'User10',
-        //   description: 'Another description that should also wrap onto multiple lines.',
-        //   gid: 'xxx10',
-        //   locked: false,
-        // }
       ],
     }
   },
@@ -183,7 +120,6 @@ export default {
     },
   },
   components: {
-    searchbar
   }
 }
 </script>

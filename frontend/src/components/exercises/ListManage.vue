@@ -1,9 +1,6 @@
 <template>
   <v-container fluid>
       <v-col>
-        <searchbar />
-      </v-col>
-      <v-col>
         <v-list three-line>
           <template v-for="(item, index) in items">
             <v-subheader
@@ -48,8 +45,6 @@
 </template>
 
 <script>
-import searchbar from '../SearchBar.vue'
-
 export default {
   data () {
     return {
@@ -89,62 +84,6 @@ export default {
           gid: 'xxx3',
           locked: false,
         },
-        { divider: true, inset: true },
-        // {
-        //   name: 'Group4',
-        //   founder: 'User4',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx4',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group5',
-        //   founder: 'User5',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx5',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group6',
-        //   founder: 'User6',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx6',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group7',
-        //   founder: 'User7',
-        //   description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
-        //   gid: 'xxx7',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group8',
-        //   founder: 'User8',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx8',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group9',
-        //   founder: 'User9',
-        //   description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
-        //   gid: 'xxx9',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group10',
-        //   founder: 'User10',
-        //   description: 'Another description that should also wrap onto multiple lines.',
-        //   gid: 'xxx10',
-        //   locked: false,
-        // }
       ],
     }
   },
@@ -172,7 +111,6 @@ export default {
     },
   },
   components: {
-    searchbar
   }
 }
 </script>
