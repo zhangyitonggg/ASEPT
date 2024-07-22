@@ -15,7 +15,7 @@ const errorHandle = (status, info) => {
     case 408:
       return "请求错误。";
     case 422:
-      return "对不起。看起来你的请求格式出了点错误。";
+      return "对不起。看起来你的请求格式出了点错误。重新检查一下你的输入？";
     case 500:
       return "对不起。看起来我们的服务器出了一些问题。";
     case 501:
