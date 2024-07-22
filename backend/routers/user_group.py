@@ -170,12 +170,14 @@ async def show_joined_groups(
                 "group_name": "group1",
                 "need_password":"boolen",
                 "gid":"xxx",
+                "founder":"username",
                 "description":"string"
             },
             {
                 "group_name": "group2",
                 "need_password":"boolen",
                 "gid":"xxx",
+                "founder":"username",
                 "description":"string"
             }
         ]

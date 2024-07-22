@@ -155,6 +155,9 @@ export default {
       password: '',
     }
   },
+  mounted() {
+  
+  },
   computed: {
     numberOfPages () {
       return Math.ceil(this.filteredItems.length / this.itemsPerPage)

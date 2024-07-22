@@ -435,6 +435,7 @@ def show_joined_groups(db, uid: str):
         res.append({
             "group_name": group_info[1],
             "need_password": group_info[5] != None,
+            "founder": get_user_by_uid(db, group_info[3])[0],
             "gid": group_info[0],
             "description": group_info[2] if group_info[2] else "This group has no description."
         })

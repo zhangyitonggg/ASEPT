@@ -42,7 +42,7 @@ methods: {
 </script>
 
 <style scoped>
-body {
-margin: 0;
-}
+  body {
+   margin: 0;
+  }
 </style>
