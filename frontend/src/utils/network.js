@@ -41,8 +41,8 @@ const router = axios.create({
 router.interceptors.request.use(
   config => {
     if (config.method === 'post') {
-      config.params = config.data;
-    } console.log(config);
+      config.data = qs.stringify(config.data);
+    }
     const token = store.state._token_;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
