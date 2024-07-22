@@ -1,11 +1,11 @@
 <template>
   <div class="expandable-search">
-    <v-btn @click="toggleSearch" v-show="!showSearch">
-      <v-icon style="font-size: 32px;">mdi-magnify</v-icon>
-      搜索
+    <v-btn @click="toggleSearch" v-show="!openBar">
+      <v-icon> {{ searchBtnIcon }}</v-icon>
+      {{searchBtnText}}
     </v-btn>
       <v-text-field
-        v-if="showSearch"
+        v-if="openBar"
         v-model="search"
         @input="updateSearch"
         class="search-input"
@@ -22,12 +22,11 @@
 <script>
 export default {
   data: () => ({
-    showSearch: false,
     search: '',
   }),
   methods: {
     toggleSearch() {
-      this.showSearch = true;
+      this.openBar = true;
       this.$nextTick(() => {
         this.$refs.searchInput.focus();
       });
@@ -35,10 +34,24 @@ export default {
     hideSearch() {
       this.search = '';
       this.$emit('input', this.search);
-      this.showSearch = false;
+      this.openBar = false;
     },
     updateSearch() {
       this.$emit('input', this.search);
+    },
+  },
+  props: {
+    openBar: {
+      type: Boolean,
+      default: false,
+    },
+    searchBtnIcon: {
+      type: String,
+      default: 'mdi-magnify',
+    },
+    searchBtnText: {
+      type: String,
+      default: '搜索',
     },
   },
 };
@@ -59,5 +72,4 @@ export default {
 .v-btn {
   height: 56px; /* Ensuring both have the same height */
 }
-
 </style>

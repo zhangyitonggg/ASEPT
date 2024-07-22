@@ -2,21 +2,17 @@
   <div>
     <v-container fluid>
         <v-col>
-          <searchbar v-model="search"/>
+          <searchbar v-model="search" searchBtnText='搜索团队'/>
         </v-col>
         <v-col>
           <v-list three-line>
-            <template v-for="(item, index) in filteredItems">
+            <template v-for="(item, index) in currentPageItems">
+              <v-divider inset></v-divider>
               <v-subheader
                 v-if="item.header"
                 :key="item.header"
                 v-text="item.header"
               ></v-subheader>
-              <v-divider
-                v-else-if="item.divider"
-                :key="index"
-                :inset="item.inset"
-              ></v-divider>
               <v-list-item
                 v-else-if="item.name"
                 :key="item.name"
@@ -45,9 +41,9 @@
                     @click="leave(item)"
                   > 离开 </v-btn>
                 </v-list-item-action>
-
               </v-list-item>
             </template>
+            <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
           </v-list>
         </v-col>
     </v-container>
@@ -92,19 +88,13 @@ import searchbar from './SearchBar.vue'
 export default {
   data () {
     return {
-      itemsPerPageArray: [4, 8, 12],
       dialog: false,
       curItem: {},
       search: '',
       filter: {},
-      sortDesc: false,
       page: 1,
+      currentPage: 1,
       itemsPerPage: 4,
-      sortBy: 'name',
-      keys: [
-        'Name',
-        'description',
-      ],
       items: [
         { header: '您加入的所有团队' },
         {
@@ -114,7 +104,6 @@ export default {
           gid: 'xxx1',
           locked: true,
         },
-        { divider: true, inset: true },
         {
           name: 'Group2',
           founder: 'User2',
@@ -122,7 +111,6 @@ export default {
           gid: 'xxx2',
           locked: true,
         },
-        { divider: true, inset: true },
         {
           name: 'Group3',
           founder: 'User3',
@@ -130,7 +118,6 @@ export default {
           gid: 'xxx3',
           locked: false,
         },
-        { divider: true, inset: true },
         {
           name: 'Group4',
           founder: 'User4',
@@ -138,7 +125,6 @@ export default {
           gid: 'xxx4',
           locked: false,
         },
-        { divider: true, inset: true },
         {
           name: 'Group5',
           founder: 'User5',
@@ -146,7 +132,6 @@ export default {
           gid: 'xxx5',
           locked: false,
         },
-        { divider: true, inset: true },
         {
           name: 'Group6',
           founder: 'User6',
@@ -154,7 +139,6 @@ export default {
           gid: 'xxx6',
           locked: false,
         },
-        { divider: true, inset: true },
         {
           name: 'Group7',
           founder: 'User7',
@@ -162,7 +146,6 @@ export default {
           gid: 'xxx7',
           locked: false,
         },
-        { divider: true, inset: true },
         {
           name: 'Group8',
           founder: 'User8',
@@ -170,7 +153,6 @@ export default {
           gid: 'xxx8',
           locked: false,
         },
-        { divider: true, inset: true },
         {
           name: 'Group9',
           founder: 'User9',
@@ -178,7 +160,6 @@ export default {
           gid: 'xxx9',
           locked: false,
         },
-        { divider: true, inset: true },
         {
           name: 'Group10',
           founder: 'User10',
@@ -191,10 +172,7 @@ export default {
   },
   computed: {
     numberOfPages () {
-      return Math.ceil(this.items.length / this.itemsPerPage)
-    },
-    filteredKeys () {
-      return this.keys.filter(key => key !== 'Name')
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage)
     },
     filteredItems() {
       const filtered = this.items.filter(item =>
@@ -202,7 +180,12 @@ export default {
       );
       // console.log('Filtered Items:', filtered); // 调试输出
       return filtered;
-    }
+    },
+    currentPageItems() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.filteredItems.slice(startIndex, endIndex);
+    },
   },
   methods: {
     nextPage () {

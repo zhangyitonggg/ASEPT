@@ -3,15 +3,6 @@
     class="spacing-playground pa-16"
     fluid
   >
-    <!-- <div>
-      <h1>Exercises</h1>
-      <p>Here is a list of exercises</p>
-      <ul>
-        <li v-for="exercise in exercises" :key="exercise.id">
-          {{ exercise.name }}
-        </li>
-      </ul>
-    </div> -->
     <component :is="currentComponent" />
 
     <v-bottom-navigation

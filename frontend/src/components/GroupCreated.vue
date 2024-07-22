@@ -2,21 +2,17 @@
   <div>
     <v-container fluid>
         <v-col>
-          <searchbar v-model="search"/>
+          <searchbar v-model="search" searchBtnText='搜索团队'/>
         </v-col>
         <v-col>
           <v-list three-line>
-            <template v-for="(item, index) in filteredItems">
+            <template v-for="(item, index) in currentPageItems">
+              <v-divider inset></v-divider>
               <v-subheader
                 v-if="item.header"
                 :key="item.header"
                 v-text="item.header"
               ></v-subheader>
-              <v-divider
-                v-else-if="item.divider"
-                :key="index"
-                :inset="item.inset"
-              ></v-divider>
               <v-list-item
                 v-else-if="item.name"
                 :key="item.name"
@@ -45,10 +41,10 @@
                     @click="manage(item)"
                   > 管理 </v-btn>
                 </v-list-item-action>
-
               </v-list-item>
             </template>
           </v-list>
+          <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-col>
     </v-container>
     <v-row justify="center">
@@ -146,7 +142,6 @@ export default {
           gid: 'xxx1',
           locked: true,
         },
-        { divider: true, inset: true },
         {
           name: 'Group2',
           founder: 'User2',
@@ -155,7 +150,6 @@ export default {
           gid: 'xxx2',
           locked: true,
         },
-        { divider: true, inset: true },
         {
           name: 'Group3',
           founder: 'User3',
@@ -164,7 +158,6 @@ export default {
           gid: 'xxx3',
           locked: false,
         },
-        { divider: true, inset: true },
         {
           name: 'Group4',
           founder: 'User4',
@@ -173,7 +166,6 @@ export default {
           gid: 'xxx4',
           locked: false,
         },
-        { divider: true, inset: true },
         {
           name: 'Group5',
           founder: 'User5',
@@ -191,42 +183,9 @@ export default {
           gid: 'xxx6',
           locked: false,
         },
-        { divider: true, inset: true },
-        {
-          name: 'Group7',
-          founder: 'User7',
-          description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
-          password: "pwd",
-          gid: 'xxx7',
-          locked: false,
-        },
-        { divider: true, inset: true },
-        {
-          name: 'Group8',
-          founder: 'User8',
-          description: 'Descrlines.',
-          password: "pwd",
-          gid: 'xxx8',
-          locked: false,
-        },
-        { divider: true, inset: true },
-        {
-          name: 'Group9',
-          founder: 'User9',
-          description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
-          password: "pwd",
-          gid: 'xxx9',
-          locked: false,
-        },
-        { divider: true, inset: true },
-        {
-          name: 'Group10',
-          founder: 'User10',
-          description: 'Another description that should also wrap onto multiple lines.',
-          gid: 'xxx10',
-          locked: false,
-        }
       ],
+      itemsPerPage: 13,
+      currentPage: 1,
     }
   },
   computed: {
@@ -234,9 +193,16 @@ export default {
       const filtered = this.items.filter(item =>
         item.name && item.name.toLowerCase().includes(this.search.toLowerCase())
       );
-      // console.log('Filtered Items:', filtered); // 调试输出
       return filtered;
-    }
+    },
+    numberOfPages () {
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage)
+    },
+    currentPageItems() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.filteredItems.slice(startIndex, endIndex);
+    },
   },
   methods: {
     manage(item) {

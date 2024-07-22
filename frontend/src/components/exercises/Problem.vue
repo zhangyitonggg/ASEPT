@@ -1,5 +1,3 @@
-
-
 <template>
   <v-container fluid>
       <v-col>

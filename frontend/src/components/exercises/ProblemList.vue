@@ -45,8 +45,6 @@
 </template>
 
 <script>
-import searchbar from '../ListWithSearchBar.vue'
-
 export default {
   data () {
     return {
@@ -111,7 +109,6 @@ export default {
     },
   },
   components: {
-    searchbar
   }
 }
 </script>
