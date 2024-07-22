@@ -48,7 +48,7 @@ router.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
       config.params = {
         ...config.params,
-        authorized_user_name: this.$store.getters.username
+        authorized_user_name: store.getters.username
       };
     }
     return config;
