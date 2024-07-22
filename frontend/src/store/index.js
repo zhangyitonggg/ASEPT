@@ -97,7 +97,18 @@ export default new Vuex.Store({
             reject(error);
           })
       })
-    }
+    },
+    register(context, {username, password}) {
+      return new Promise((resolve, reject) => {
+        api.register(username, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
   },
   modules: {
   }

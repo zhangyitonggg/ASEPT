@@ -183,7 +183,7 @@ def add_user(db, username: str, password: str):
     uid = cursor.fetchone()[0]
     cursor.execute("INSERT INTO Permissions (uid) VALUES (%s)", (uid))
     db.commit()
-    join_group(db, "__default__", uid)
+    join_group(db, "af8f07f4-2029-4d5a-a6f3-378f2f152126", uid)
     return True
 
 

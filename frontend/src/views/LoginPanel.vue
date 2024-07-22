@@ -23,52 +23,63 @@
           </span>
       </v-subheader>
       <v-form
-          v-if="showRegister"
-          class="loginPanelForm"
-          @submit.prevent="handleRegister"
+        v-if="showRegister"
+        class="loginPanelForm"
+        @submit.prevent="handleRegister"
       >
-          <v-text-field
-          class="dense"
-          outlined
-          label="用户名"
-          :rules="[v => !!v || '必填']"
-          autofocus
-          required
-          prepend-inner-icon="mdi-account-box"
-          v-model="username"
-          :disabled="loading"
+        <v-text-field
+        class="dense"
+        outlined
+        label="用户名"
+        :rules="[v => !!v || '必填']"
+        autofocus
+        required
+        prepend-inner-icon="mdi-account-box"
+        v-model="username"
+        :disabled="loading"
+        />
+        <v-text-field
+        class="dense"
+        outlined
+        label="密码"
+        :rules="[
+            v => !!v || '',
+            v => v.length > 8 || '至少9字符',
+            v => v.length < 21 || '至多20字符',
+            v => {
+            const pattern = /^.*[0-9].*$/
+            const pattern_w = /^.*[a-zA-Z].*$/
+            return (
+                (pattern.test(v) && pattern_w.test(v)) || '必须包含数字和字母'
+            )
+            }
+        ]"
+        type="password"
+        prepend-inner-icon="mdi-fingerprint"
+        required
+        v-model="password"
+        :disabled="loading"
+        />
+        <div class="d-flex">
+          <v-checkbox
+              class="dense"
+              v-model="robot"
+              label="我是机器人"
+              color="primary"
+              @change="checkIfIsRobot"
+              :disabled="loading"
           />
-          <v-text-field
-          class="dense"
-          outlined
-          label="密码"
-          :rules="[
-              v => !!v || '',
-              v => v.length > 8 || '至少9字符',
-              v => v.length < 21 || '至多20字符',
-              v => {
-              const pattern = /^.*[0-9].*$/
-              const pattern_w = /^.*[a-zA-Z].*$/
-              return (
-                  (pattern.test(v) && pattern_w.test(v)) || '必须包含数字和字母'
-              )
-              }
-          ]"
-          type="password"
-          prepend-inner-icon="mdi-fingerprint"
-          required
-          v-model="password"
-          :disabled="loading"
-          />
-          <v-btn
-          block
-          depressed
-          color="primary"
-          type="submit"
-          :disabled="loading"
-          >
-          注册
-          </v-btn>
+          <v-spacer />
+        </div>
+        <v-btn
+        block
+        depressed
+        color="primary"
+        type="submit"
+        :disabled="loading"
+        >
+        注册
+        </v-btn>
       </v-form>
       <v-form v-else class="loginPanelForm" @submit.prevent="handleLogin">
           <v-text-field
@@ -127,7 +138,6 @@
   </v-card>
 </template>
 
-
 <script>
 import { vuetify } from 'vuetify';
 
@@ -140,6 +150,7 @@ export default {
       remember: false,
       showRegister: false,
       loading: false,
+      robot: true,
     };
   },
   methods: {
@@ -160,7 +171,7 @@ export default {
         } catch (error) {
           this.$store.commit("setAlert", {
             type: "error",
-            message: "登录失败，请检查输入。",
+            message: error,
           });
         } finally {
           this.loading = false;
@@ -168,17 +179,29 @@ export default {
     },
     handleRegister() {
       this.loading = true;
+      console.log(this.username, this.password);
       this.$store
         .dispatch("register", {
           username: this.username,
           password: this.password,
         })
         .then(() => {
-          this.loading = false;
+          this.$store.commit("setAlert", {
+            type: "success",
+            message: "注册成功，欢迎你！",
+          });
+          this.username = "";
+          this.password = "";
+          this.switchRegisterPage();
         })
-        .catch(() => {
+        .catch((e) => {
+          this.$store.commit("setAlert", {
+            type: "error",
+            message: e,
+          });
+        })
+        .finally(() => {
           this.loading = false;
-          vuetify.framework.dialog.alert("注册失败，请检查输入。");
         });
     },
     switchRegisterPage() {
@@ -192,9 +215,14 @@ export default {
         });
       }
     },
-  },
-  beforeMount() {
-    this.$store.commit("checkToken");
+    checkIfIsRobot() {
+      if (!this.robot) {
+        this.$store.commit("setAlert", {
+          type: "warning",
+          message: "你最好不是。",
+        });
+      }
+    },
   },
 };
 </script>
@@ -206,6 +234,13 @@ export default {
 
 .topmost {
   z-index: 1001;
+}
+
+.v-card {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  height: 100vh; /* 设置容器高度为视窗高度，实现垂直居中 */
 }
 
 #loginPanelProgressBar {

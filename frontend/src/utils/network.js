@@ -3,38 +3,30 @@ import qs from "qs";
 import store from "../store";
 
 const errorHandle = (status, info) => {
-    switch (status) {
-        case 400:
-            console.log("请求错误");
-            break;
-        case 401:
-            console.log("未授权，请登录");
-            break;
-        case 403:
-            console.log("拒绝访问");
-            break;
-        case 404:
-            console.log("请求地址出错");
-            break;
-        case 408:
-            console.log("error408");
-            break;
-        case 500:
-            console.log("服务器内部错误");
-            break;
-        case 501:
-            console.log("服务未实现");
-            break;
-        case 502:
-            console.log("网关错误");
-            break;
-        case 503:
-            console.log("服务不可用");
-            break;
-        default:
-            console.log(info);
-            break;
-    }
+  switch (status) {
+    case 400:
+      return "对不起。看起来你遇到了一些问题。";
+    case 401:
+      return "对不起。看起来你没有对应的权限。";
+    case 403:
+      return "对不起。看起来你的访问被拒绝了。";
+    case 404:
+      return "对不起。看起来你迷路了。";
+    case 408:
+      return "请求错误。";
+    case 422:
+      return "对不起。看起来你的请求格式出了点错误。";
+    case 500:
+      return "对不起。看起来我们的服务器出了一些问题。";
+    case 501:
+      return "对不起。看起来这个服务还没有实现。";
+    case 502:
+      return "对不起。看起来你的网络配置出了一些问题。";
+    case 503:
+      return "对不起。看起来这个服务暂时不可用。";
+    default:
+      return "对不起。看起来你遇到了一些问题。这可能是我们导致的问题。请检查你的网络配置，或者与管理员联系。";
+  }
 };
 
 
@@ -47,34 +39,33 @@ const router = axios.create({
 
 
 router.interceptors.request.use(
-    config => {
-        if (config.method === 'post') {
-            config.data = qs.stringify(config.data);
-        }
-        const token = store.state._token_;
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    error => {
-        return Promise.reject(error);
+  config => {
+    if (config.method === 'post') {
+      config.params = config.data;
+    } console.log(config);
+    const token = store.state._token_;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
 )
 
 router.interceptors.response.use(
-    response => {
-        if (response.status === 200) {
-            return Promise.resolve(response);
-        } else {
-            return Promise.reject(response);
-        }
-    },
-    error => {
-        console.log(error);
-        const { response } = error;
-        errorHandle(response.status, response.info);
+  response => {
+    if (response.status === 200) {
+      return Promise.resolve(response);
+    } else {
+      return Promise.reject(response);
     }
+  },
+  error => {
+    const { response } = error;
+    return Promise.reject(errorHandle(response.status, response.info));
+  }
 )
 
 export default router;
