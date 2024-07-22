@@ -284,6 +284,79 @@ async def get_my_problems(
     return database.get_my_problems(db, user)
 
 
+@router.get('/submit_problem')
+async def submit_problem(
+    pid: str,
+    answer: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    提交题目答案。
+    
+    pid: str，题目 id
+    
+    answer: str，答案为json格式，没有不可见字符
+    
+    若为选择题，则答案格式为：
+    
+    ```
+    {
+        "A": "Choice A",
+        "B": "Choice B"
+    }
+    ```
+    
+    若为填空题，则答案格式为：
+    
+    ```
+    {
+        "1": "answer1",
+        "2": [
+            "answer2",
+            "answer3"
+        ]
+    }
+    ```
+    
+    在提交时需要把不可见字符删去
+    
+    返回格式为：
+    
+    ```
+    {
+        "status": "success",
+        "is_correct": True | False,
+    }
+    ```
+    
+    '''
+    is_correct = database.submit_problem(db, pid, answer, user)
+    return {'status': 'success', 'is_correct': is_correct}
+
+
+@router.get('/get_user_statistics')
+async def get_user_statistics(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取用户题目统计信息。
+    
+    返回格式：
+    
+    ```
+    {
+        "choice_submit": 100,
+        "choice_correct": 80,
+        "blank_submit": 50,
+        "blank_correct": 40,
+    }
+    ```
+    '''
+    return database.get_user_statistics(db, user)
+
+
 @router.get('/{problem_id}', response_model=Problem)
 async def get_problem(
     problem_id: str,

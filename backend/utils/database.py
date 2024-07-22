@@ -1,3 +1,4 @@
+import json
 import yaml
 import pymysql
 import hashlib
@@ -36,8 +37,6 @@ WHERE
 | Users                   | password        | varchar   | NO          | NULL                |            |
 | Users                   | is_admin        | enum      | NO          | 'False'             | MUL        |
 | Users                   | blocked         | bit       | NO          | b'0'                |            |
-| ProblemAccessibleGroups | pid             | uuid      | NO          | NULL                | MUL        |
-| ProblemAccessibleGroups | gid             | uuid      | NO          | NULL                | MUL        |
 | Permissions             | uid             | uuid      | NO          | NULL                | PRI        |
 | Permissions             | is_admin        | enum      | NO          | 'False'             | MUL        |
 | Permissions             | block_user      | enum      | NO          | 'False'             |            |
@@ -51,6 +50,11 @@ WHERE
 | ProblemGroupPerm        | gid             | uuid      | NO          | NULL                | PRI        |
 | ProblemTags             | pid             | uuid      | NO          | NULL                | MUL        |
 | ProblemTags             | tag             | varchar   | NO          | NULL                |            |
+| ProblemSubmit           | sid             | uuid      | NO          | uuid()              | PRI        |
+| ProblemSubmit           | pid             | uuid      | NO          | NULL                | MUL        |
+| ProblemSubmit           | uid             | uuid      | NO          | NULL                | MUL        |
+| ProblemSubmit           | answer          | text      | NO          | NULL                |            |
+| ProblemSubmit           | is_correct      | tinyint   | NO          | 0                   |            |
 | Announcements           | aid             | uuid      | NO          | NULL                | PRI        |
 | Announcements           | title           | varchar   | NO          | NULL                |            |
 | Announcements           | content         | text      | NO          | NULL                |            |
@@ -726,6 +730,81 @@ def get_my_problems(db, user: User):
         ))
     return {"problems": res}
 
+def submit_problem(db, pid: str, answer: str, user: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if not problem:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    cursor.execute("SELECT * FROM ProblemGroupMembers WHERE pid = %s", (pid))
+    pgroups = cursor.fetchall()
+    groups_with_access = []
+    for pgroup in pgroups:
+        cursor.execute("SELECT * FROM ProblemGroupPerm WHERE pgid = %s", (pgroup[1]))
+        groups_with_access.append(cursor.fetchall())
+    groups_with_access = set([group[1] for group in groups_with_access])
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
+    groups_user_in = cursor.fetchall()
+    groups_user_in = set([group[1] for group in groups_user_in])
+    if not groups_user_in & groups_with_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied."
+        )
+    def judge_problem(type: str, answer: str, user_answer: str):
+        ans = json.loads(answer)
+        usr = json.loads(user_answer)
+        return ans == usr
+    is_correct = judge_problem(problem[3], problem[7], answer)
+    cursor.execute("INSERT INTO ProblemSubmit (sid, pid, uid, answer, is_correct) VALUES (UUID(), %s, %s, %s, %s)", (pid, user.uid, answer, is_correct))
+    db.commit()
+    return is_correct
+
+def get_user_statistics(db, user: User):
+    '''
+    获取用户题目统计信息。
+    
+    返回格式：
+    
+    ```
+    {
+        "choice_submit": 100,
+        "choice_correct": 80,
+        "blank_submit": 50,
+        "blank_correct": 40,
+    }
+    ```
+    '''
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemSubmit WHERE uid = %s", (user.uid))
+    submits = cursor.fetchall()
+    def get_problem_type(pid):
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+        problem = cursor.fetchone()
+        return problem[3]
+    choice_submit = 0
+    choice_correct = 0
+    blank_submit = 0
+    blank_correct = 0
+    for submit in submits:
+        if get_problem_type(submit[2]) == "CHOICE":
+            choice_submit += 1
+            if submit[5]:
+                choice_correct += 1
+        else:
+            blank_submit += 1
+            if submit[5]:
+                blank_correct += 1
+    return {
+        "choice_submit": choice_submit,
+        "choice_correct": choice_correct,
+        "blank_submit": blank_submit,
+        "blank_correct": blank_correct,
+    }
+    
 
 def problem_accessible(db, user: User, pid: str):
     cursor = db.cursor()
