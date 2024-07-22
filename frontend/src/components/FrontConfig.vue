@@ -10,8 +10,9 @@
         <v-col>
           <v-switch
           inset
-          v-model="darkTheme"
+          v-model="$vuetify.theme.dark"
           label="启用黑暗模式"
+          @click="handleDarkTheme"
           />
         </v-col>
       </v-col>
@@ -20,20 +21,12 @@
 </template>
 
 <script>
-import { Component, Watch, Vue } from 'vue-property-decorator'
-
 export default{
-  data() {
-    return {
-      darkTheme: false
+  methods: {
+    handleDarkTheme() {
+      this.$store.commit("setAlert", this.$vuetify.theme.dark ? {"type": "success", "message": "黑暗模式已启用。"} : {"type": "success", "message": "黑暗模式已关闭。"});
+      localStorage.setItem("__dark_theme__", this.$vuetify.theme.dark);
     }
   }
-
-  // @Watch('$vuetify.theme.dark')
-  // triggersUpdateDarkThemeLocalValue() {
-  //   if (this.darkThemeFollowsSystem) return
-  //   // @ts-ignore
-  //   localStorage.setItem('dark', String(this.$vuetify.theme.dark))
-  // }
 }
 </script>

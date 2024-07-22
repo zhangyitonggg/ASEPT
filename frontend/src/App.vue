@@ -98,16 +98,19 @@ const App = Vue.extend({
       return '夜深了'
     },
   },
-
   components: {
   },
-
   created() {
     if (localStorage.getItem('__token__') && localStorage.getItem('__user_name__')) {
       this.$store.commit('setAlert', {
         type: "success",
         message: "欢迎回来，" + localStorage.getItem('__user_name__') + "。",
       });
+    }
+  },
+  beforeCreate() {
+    if (localStorage.getItem('__dark_theme__')) {
+      this.$vuetify.theme.dark = localStorage.getItem('__dark_theme__') === 'true';
     }
   }
 });
