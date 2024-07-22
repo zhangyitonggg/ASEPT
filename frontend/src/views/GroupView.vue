@@ -20,10 +20,6 @@
         <span>管理团队</span>
         <v-icon>mdi-account-supervisor-circle</v-icon>
       </v-btn>
-      <v-btn value="create">
-        <span>创建团队</span>
-        <v-icon> mdi-vector-polyline-plus </v-icon>
-      </v-btn>
     </v-bottom-navigation>
   </v-container>
 </template>
@@ -32,7 +28,6 @@
 import EnterGroup from '@/components/EnterGroup.vue';
 import MyGroups from '@/components/MyGroups.vue';
 import GroupCreated from '@/components/GroupCreated.vue';
-import CreateGroup from '@/components/CreateGroup.vue';
 
 export default {
   name: 'GroupView',
@@ -40,7 +35,6 @@ export default {
     EnterGroup,
     MyGroups,
     GroupCreated,
-    CreateGroup
   },
   data() {
     return {
@@ -49,7 +43,7 @@ export default {
   },
   methods: {
     handleNavigateClick(newValue) {
-      this.$store.commit("setAppTitle", newValue === 'mygroups' ? '我的团队' : newValue === 'join' ? '加入团队' : newValue === 'manage' ? '管理团队' : '创建团队');
+      this.$store.commit("setAppTitle", newValue === 'mygroups' ? '我的团队' : newValue === 'join' ? '加入团队' : '管理团队');
     },
   },
   watch: {
@@ -64,8 +58,6 @@ export default {
           return 'EnterGroup';
         case 'manage':
           return 'GroupCreated';
-        case 'create':
-          return 'CreateGroup';
         default:
           return 'MyGroups';
       }

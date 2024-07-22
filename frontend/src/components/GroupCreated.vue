@@ -1,9 +1,15 @@
 <template>
   <div>
     <v-container fluid>
-        <v-col>
+      <v-layout>
+        <v-flex xs1>
+           <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
+        </v-flex>
+        <v-spacer/>
+        <v-flex xs24>
           <searchbar v-model="search" searchBtnText='搜索团队'/>
-        </v-col>
+        </v-flex>
+      </v-layout>
         <v-col>
           <v-list three-line>
             <template v-for="(item, index) in currentPageItems">
@@ -70,13 +76,13 @@
                         <v-text-field
                           label="Group Name*"
                           required
+                          v-model="curItem.name"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12">
                         <v-text-field
                           label="Password(可选)"
-                          type="password"
-                          required
+                          v-model="curItem.password"
                         ></v-text-field>
                       </v-col>
            
@@ -100,14 +106,7 @@
                   <v-btn
                     color="blue darken-1"
                     text
-                    @click="dialog = false"
-                  >
-                    Close
-                  </v-btn>
-                  <v-btn
-                    color="blue darken-1"
-                    text
-                    @click="dialog = false"
+                    @click="submitModifyInfo"
                   >
                     Save
                   </v-btn>
@@ -116,8 +115,67 @@
             </v-dialog>
           </v-row>
         </template>
-        <!--  -->
-
+      </v-dialog>
+      <v-dialog
+        v-model="createDialog"
+        persistent
+        max-width="600px"
+      > 
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">新建群聊</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field
+                    label="Group Name*"
+                    required
+                    v-model="newGroup.name"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-checkbox
+                    label="需要密码"
+                    v-model="newGroup.locked"
+                  ></v-checkbox>
+                </v-col>
+                <v-col cols="12" v-if="newGroup.locked">
+                  <v-text-field
+                    label="Password"
+                    v-model="newGroup.password"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-textarea
+                    label="Group Description*"
+                    required
+                    auto-grow
+                    v-model="newGroup.description"
+                  ></v-textarea>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>*indicates required field</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="createDialog = false"
+            >
+              取消
+            </v-btn>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="submitNewGroup"
+            >
+              保存
+            </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-dialog>
     </v-row>
   </div>
@@ -130,7 +188,16 @@ export default {
   data () {
     return {
       dialog: false,
+      createDialog: false,
       curItem: {},
+      newGroup: {
+        name: '',
+        founder: '', // 可以动态获取当前用户信息
+        description: '',
+        password: '',
+        locked: false,
+        gid: '',
+      },
       search: '',
       items: [
         { header: '您加入的所有团队' },
@@ -203,11 +270,19 @@ export default {
       const endIndex = startIndex + this.itemsPerPage;
       return this.filteredItems.slice(startIndex, endIndex);
     },
+
   },
   methods: {
+    openCreateDialog() {
+      this.createDialog = true;
+    },
     manage(item) {
       this.curItem = item;
       this.dialog = true;
+    },
+    submitModifyInfo() { // todo
+      this.dialog = false;
+      console.log(this.curItem);
     },
     handleAboutClick(flag) {
       console.log(flag);  
@@ -220,6 +295,22 @@ export default {
           this.items.splice(index, 1);
         }
       }
+    },
+    submitNewGroup() {
+      // 为新群聊生成一个唯一的gid
+      this.newGroup.gid = 'gid-' + Date.now(); // todo
+      this.newGroup.founder = this.$store.getters.username; // 可以动态获取当前用户信息
+      this.items.push({ ...this.newGroup }); 
+      this.createDialog = false;
+      // 重置 newGroup
+      this.newGroup = {
+        name: '',
+        founder: '当前用户',
+        description: '',
+        password: '',
+        locked: false,
+        gid: '',
+      };
     },
   },
   components: {
