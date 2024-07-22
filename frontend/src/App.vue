@@ -7,7 +7,7 @@
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
         <v-spacer></v-spacer>
-        <div>别卷了，{{ $store.getters.username }}</div>
+        <div>{{ getCurrentTimeGreetings() }}，{{ $store.getters.username }}</div>
       </v-app-bar>
       <v-navigation-drawer
         v-model="drawer"
@@ -86,7 +86,17 @@ const App = Vue.extend({
     },
     handleAboutClick() { // 处理关于按钮点击事件
       this.navigateTo('/about');
-    }
+    },
+    getCurrentTimeGreetings() {
+      const h = new Date().getHours()
+      if (h < 2) return '夜深了'
+      if (h < 6) return '别卷了'
+      if (h < 12) return '上午好'
+      if (h < 13) return '中午好'
+      if (h < 18) return '下午好'
+      if (h < 23) return '晚上好'
+      return '夜深了'
+    },
   },
 
   components: {
