@@ -45,7 +45,6 @@ config => {
       config.headers['Content-Type'] = 'application/json';
     }
   }
-  console.log(config);
   const token = store.state._token_;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

@@ -464,14 +464,15 @@ def modify_group(db, uid: str, gid: str, group_name: str | None = None, password
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied. You are not the admin of this group.",
         )
-    if group_name:
+    if group_name != None:
         cursor.execute("UPDATE UserGroups SET name = %s WHERE gid = %s", (group_name, gid))
-    if description:
+    if description != None:
         if description == "":
             cursor.execute("UPDATE UserGroups SET description = NULL WHERE gid = %s", (gid))
         else:
             cursor.execute("UPDATE UserGroups SET description = %s WHERE gid = %s", (description, gid))
-    if password!=None:
+    if password != None:
+        print("password: ", password)
         if password == "":
             cursor.execute("UPDATE UserGroups SET password = NULL WHERE gid = %s", (gid))
         else:
@@ -676,7 +677,7 @@ def add_problem_tag(db, pid: str, tag: str, user: User):
     cursor.execute("INSERT INTO ProblemTags (pid, tag) VALUES (%s, %s)", (pid, tag))
     db.commit()
 
-def search_problem_by_tag(db, tag: str, user: User):
+def get_all_accessible_problems(db, user: User):
     # get problems that user has access to
     # get the problems owned by the user
     cursor = db.cursor()
@@ -706,6 +707,11 @@ def search_problem_by_tag(db, tag: str, user: User):
         cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
         problem = cursor.fetchone()
         problems_with_access.append(problem)
+    return problems_with_access
+    
+
+def search_problem_by_tag(db, tag: str, user: User):
+    problems_with_access = get_all_accessible_problems(db, user)
     # get problems whose tag contains the input tag
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemTags")
@@ -932,24 +938,73 @@ def problem_accessible(db, user: User, pid: str):
     return False
 
 
-def get_problem(db, pid: str):
+def get_problem(db, pid: str, user: User):
+    '''
+    根据pid获取题目信息。
+    
+    返回格式：
+    
+    ```
+    {
+        "pid": 1,
+        "title": "Problem Title",
+        "content": "Problem Content",
+        "type": 0,
+        “author”: "Author Name",
+        "upload_time": "2021-10-01 12:00:00",
+        "choices": {
+            "A": "Choice A",
+            "B": "Choice B",
+            "C": "Choice C",
+            "D": "Choice D"
+        },
+        "answers": {
+            "A": "Choice A",
+            "B": "Choice B"
+        },
+        "is_public": 0
+    }
+    '''
+    # check user's permission and then return problem or raise error
+    problems_with_access = get_all_accessible_problems(db, user)
+    problems_with_access = [problem[0] for problem in problems_with_access]
+    if pid not in problems_with_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied."
+        )
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
     problem = cursor.fetchone()
-    if problem == None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Problem not found."
-        )
-    problem = Problem(
-        pid=problem[0],
-        title=problem[1],
-        content=problem[2],
-        type=ProblemType[problem[3].upper()],
-        author=problem[4],
-        update_time=str(problem[5]),
-        choices=problem[6],
-        answers=problem[7],
-        is_published=bool(problem[8])
-    )
-    return problem
+    return {
+        "pid": problem[0],
+        "title": problem[1],
+        "content": problem[2],
+        "type": problem[3],
+        "author": get_user_by_uid(db, problem[4])[0],
+        "upload_time": problem[5],
+        "choices": problem[6],
+        "answers": problem[7],
+        "is_public": problem[8],
+    }
+    
+    # cursor = db.cursor()
+    # cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    # problem = cursor.fetchone()
+    # if problem == None:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail="Problem not found."
+    #     )
+    # problem = Problem(
+    #     pid=problem[0],
+    #     title=problem[1],
+    #     content=problem[2],
+    #     type=ProblemType[problem[3].upper()],
+    #     author=problem[4],
+    #     update_time=str(problem[5]),
+    #     choices=problem[6],
+    #     answers=problem[7],
+    #     is_published=bool(problem[8])
+    # )
+    # return problem
