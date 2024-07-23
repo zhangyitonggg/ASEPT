@@ -65,6 +65,14 @@ export default new Vuex.Store({
     },
     setProblemid(state, id){
       state._problem_id_ = id;
+    },
+    clearPersonalInfo(state) {
+      state._user_name_ = null;
+      state._token_ = null;
+      localStorage.removeItem('__token__');
+      localStorage.removeItem('__user_name__');
+      sessionStorage.removeItem('__token__');
+      sessionStorage.removeItem('__user_name__');
     }
   },
   actions: {
