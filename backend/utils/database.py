@@ -254,7 +254,7 @@ def join_group(db, gid: str, uid: str, password: str | None = None):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Group not found.",
         )
-    if group[5] != None and group[5] != password:
+    if group[5] != None and group[5] != md5_passwd(password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Password incorrect.",

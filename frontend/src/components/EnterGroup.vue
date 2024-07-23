@@ -195,6 +195,7 @@ export default {
         this.selectedItem = item;
         this.dialog = true;
       } else {
+        this.selectedItem = item;
         this.password = "";
         this.confirmJoin();
       }
