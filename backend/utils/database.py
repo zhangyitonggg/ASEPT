@@ -254,7 +254,7 @@ def join_group(db, gid: str, uid: str, password: str | None = None):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Group not found.",
         )
-    if group[5] != None and group[5] != password:
+    if group[5] != None and group[5] != md5_passwd(password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Password incorrect.",
@@ -395,19 +395,18 @@ def find_open_groups(db, uid: str):
 
 def show_unentered_groups(db, uid: str, search_key: str):
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM UserGroups WHERE owner != %s AND MATCH(name) AGAINST(%s IN NATURAL LANGUAGE MODE)", (uid, search_key))
+    cursor.execute("SELECT * FROM UserGroups WHERE owner != %s", (uid))
     groups = cursor.fetchall()
     res = []
     for group in groups:
-        cursor.execute("SELECT * FROM UserGroupMembers WHERE gid = %s AND uid = %s", (group[1], uid))
-        relation = cursor.fetchone()
-        if relation == None:
+        cursor.execute("SELECT * FROM UserGroupMembers WHERE gid = %s AND uid = %s", (group[0], uid))
+        if cursor.fetchone() == None:
             res.append({
-                "group_name": relation[2],
-                "founder": get_user_by_uid(relation[3])[0],
-                "need_password": get_group_by_gid(relation[1])[5] != None,
-                "gid": relation[1],
-                "description": relation[3] if relation[3] else "This group has no description."
+                "group_name": group[1],
+                "founder": get_user_by_uid(db, group[3])[0],
+                "need_password": group[5] != None,
+                "gid": group[0],
+                "description": group[2] if group[2] else "This group has no description."
             })
     return {"groups": res}
 
