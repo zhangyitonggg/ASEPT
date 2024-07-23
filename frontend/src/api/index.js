@@ -25,6 +25,18 @@ const api = {
     leaveGroup:async(gid) => {
       return await router.post(path.baseUrl + path.leaveGroup, {}, {params: {gid: gid}});
     },
+    showCreatedGroups: async() => {
+      console.log("showCreatedGroups");
+      return await router.get(path.baseUrl + path.showCreatedGroups);
+    },
+    createGroup: async(group_name, description, password) => {
+      console.log("createGroup");
+      return await router.post(path.baseUrl + path.createGroup, {group_name: group_name, description: description, password: password});
+    },
+    modifyGroup: async(gid, group_name, description, password) => {
+      console.log("modifyGroup");
+      return await router.post(path.baseUrl + path.modifyGroup, {gid: gid, password: password, description: description, group_name: group_name});
+    },
     showUnGroups: async() => {
       console.log("showUnGroups");
       return await router.get(path.baseUrl + path.showUnGroups);

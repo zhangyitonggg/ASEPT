@@ -142,6 +142,28 @@ export default new Vuex.Store({
           })
       })
     },
+    createGroup(context, {group_name, description, password}) {
+      return new Promise((resolve, reject) => {
+        api.createGroup(group_name, description, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    modifyGroup(context, {gid, group_name, description, password}) {
+      return new Promise((resolve, reject) => {
+        api.modifyGroup(gid, group_name, description, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     showUnGroups(context) {
       return new Promise((resolve, reject) => {
         api.showUnGroups()
