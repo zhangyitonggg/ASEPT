@@ -27,6 +27,7 @@ const api = {
       return await router.get(path.baseUrl + path.showJoinedGroups);
     },
     leaveGroup:async(gid) => {
+      console.log("leaveGroup");
       return await router.post(path.baseUrl + path.leaveGroup, {}, {params: {gid: gid}});
     },
     showCreatedGroups: async() => {
@@ -44,6 +45,10 @@ const api = {
     showUnGroups: async() => {
       console.log("showUnGroups");
       return await router.get(path.baseUrl + path.showUnGroups);
+    },
+    joinGroup: async(gid, password) => {
+      console.log("joinGroup");
+      return await router.post(path.baseUrl + path.joinGroup, {gid: gid, password: password});
     },
     createProblemGroup: async(group_name, description) => {
       console.log("createProblemGroup");
@@ -88,7 +93,7 @@ const api = {
     get_problem: async(pid) => {
       console.log("get_problem");
       return await router.get(path.baseUrl + path.get_problem, {pid: pid});
-    }
+    },
 };
 
 export default api;

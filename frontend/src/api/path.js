@@ -10,6 +10,7 @@ const base = {
     modifyGroup: '/user_group/modify_group',
     showUnGroups: '/user_group/show_unentered_groups',
     createProblem: '/problems/upload_problem',
+<<<<<<< HEAD
     createProblemGroup: '/problems/create_problem_group',
     change_problem_group_info: '/problems/change_problem_group_info',
     add_problem_to_group: '/problems/add_problem_to_group',
@@ -21,6 +22,9 @@ const base = {
     get_user_statistics: '/problems/get_user_statistics',
     get_problem_recommend: '/problems/get_problem_recommend',
     get_problem: '/problems/get_problem',
+=======
+    joinGroup: '/user_group/join_group',
+>>>>>>> b86a0db9a4dbeb85ad41d7ad96173c4beb4f4526
 }
 
 export default base;

@@ -404,6 +404,7 @@ def show_unentered_groups(db, uid: str, search_key: str):
         if relation == None:
             res.append({
                 "group_name": relation[2],
+                "founder": get_user_by_uid(relation[3])[0],
                 "need_password": get_group_by_gid(relation[1])[5] != None,
                 "gid": relation[1],
                 "description": relation[3] if relation[3] else "This group has no description."
