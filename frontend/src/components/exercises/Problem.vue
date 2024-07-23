@@ -17,8 +17,8 @@
               :inset="item.inset"
             ></v-divider>
             <v-list-item
-              v-else-if="item.name"
-              :key="item.name"
+              v-else-if="item.title"
+              :key="item.pid"
             >
               <v-list-item-avatar>
                 <v-icon> mdi-help-circle-outline</v-icon>
@@ -26,7 +26,7 @@
               <v-list-item-content>
                 <v-list-item-title>
                   <h4>
-                    {{ item.name }}
+                    {{ item.title }}
                   </h4>
                 </v-list-item-title>
                 <v-list-item-subtitle>
@@ -90,63 +90,12 @@ export default {
           locked: false,
         },
         { divider: true, inset: true },
-        // {
-        //   name: 'Group4',
-        //   founder: 'User4',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx4',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group5',
-        //   founder: 'User5',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx5',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group6',
-        //   founder: 'User6',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx6',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group7',
-        //   founder: 'User7',
-        //   description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
-        //   gid: 'xxx7',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group8',
-        //   founder: 'User8',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx8',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group9',
-        //   founder: 'User9',
-        //   description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
-        //   gid: 'xxx9',
-        //   locked: false,
-        // },
-        // { divider: true, inset: true },
-        // {
-        //   name: 'Group10',
-        //   founder: 'User10',
-        //   description: 'Another description that should also wrap onto multiple lines.',
-        //   gid: 'xxx10',
-        //   locked: false,
-        // }
+        
       ],
     }
+  },
+  created() {
+    this.fetchProblems();
   },
   computed: {
     numberOfPages () {
@@ -157,6 +106,35 @@ export default {
     },
   },
   methods: {
+     fetchProblems() {
+        this.$store
+        .dispatch('getMyProblem')
+        .then(res => {
+          // this.items = response.problems.map(problem => {
+          //   return {
+          //     pid: problem.pid,
+          //     title: problem.title,
+          //     content: problem.content,
+          //     type: problem.type === 0 ? 'SINGLE_CHOICE' : 'MULTIPLE_CHOICE',
+          //     author: problem.author,
+          //     upload_time: problem.upload_time,
+          //     choices: problem.choices,
+          //     answers: problem.answers,
+          //     s_public: problem.is_public === 1,
+          //   }
+          // });
+           this.items.splice(0, this.items.length, { header: '我创建的题目' }, ...res.problems); // 清空当前数组并插入新数据
+          console.log("我创建的：",this.items);
+        })
+        .catch(error => {
+             this.$store.commit("setAlert", {
+             type: "error",
+            message: error,
+          });
+          }).finally(() => {
+          this.loading = false;
+        });
+    },
     nextPage () {
       if (this.page + 1 <= this.numberOfPages) this.page += 1
     },

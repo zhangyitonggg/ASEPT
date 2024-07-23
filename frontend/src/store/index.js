@@ -140,6 +140,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getProblemById(context,pid) {
+      return new Promise((resolve, reject) => {
+        api.getProblemById(pid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     showJoinedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showJoinedGroups()

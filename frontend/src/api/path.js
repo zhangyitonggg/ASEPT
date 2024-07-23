@@ -22,7 +22,8 @@ const base = {
     get_problem_recommend: '/problems/get_problem_recommend',
     get_problem: '/problems/get_problem',
     joinGroup: '/user_group/join_group',
-    getMyProblem: '/problems/my_problems'
+    getMyProblem: '/problems/my_problems',
+    getProblemById: '/problems',
 }
 
 export default base;
