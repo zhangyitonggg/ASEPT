@@ -24,6 +24,7 @@ async def get_announcements(
     {
         "announcements": [
             {
+                "id": xxxxxx-xxxx,
                 "title": "公告标题",
                 "content": "公告内容",
                 "update_at": "2021-01-01 00:00:00",
@@ -31,6 +32,7 @@ async def get_announcements(
                 "author": "zyt"
             },
             {
+                "aid": xxxx-xxxx,
                 "title": "公告标题",
                 "content": "公告内容",
                 "update_at": "2021-01-01 00:00:00",

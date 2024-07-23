@@ -90,3 +90,32 @@ async def open_announcement(
         )
     database.open_announcement(db, announcement, user)
     return {"status": "success"}
+
+
+@router.post("/modify_announcement")
+async def modify_announcement(
+    announcement: Announcement,
+    user: User = Depends(security.get_admin),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    修改公告，只有管理员可以修改公告。
+
+    在 body 中传入一个 json，格式如下：
+
+    ```
+    {
+        "aid": "xxxx-xxxx",
+        "title": "公告标题",
+        "content": "公告内容",
+        "is_active": 0
+    }
+    ```
+    '''
+    if user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are not an admin."
+        )
+    database.modify_announcement(db, announcement, user)
+    return {"status": "success"}
