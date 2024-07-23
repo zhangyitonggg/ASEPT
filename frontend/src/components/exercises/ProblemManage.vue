@@ -259,15 +259,77 @@ export default {
     addFillBlank() {
       this.newProblem.fillBlanks.push('');
     },
+
     createProblem() {
       if (this.newProblem.name && this.newProblem.content) {
-        this.items.push({ ...this.newProblem, gid: Date.now().toString() }); // 添加新题目
-        this.newProblem = { name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] }; // 重置表单
-        this.dialogCreate = false; // 关闭对话框
+         let choices = {};
+        let answer = {};
+        let ptype = '';
+         if (this.newProblem.type === 'SINGLE_CHOICE' || this.newProblem.type === 'MULTIPLE_CHOICE') {
+        this.newProblem.options.forEach((option, index) => {
+          const key = String.fromCharCode(65 + index); // A, B, C, D...
+          choices[key] = option;
+        });
+
+        // 根据题目类型设置答案格式
+        if (this.newProblem.type === 'SINGLE_CHOICE') {
+          ptype = 'CHOICE';
+          answer = { "A": this.newProblem.options[0] }; // 示例答案，可根据需要调整
+        } else if (this.newProblem.type === 'MULTIPLE_CHOICE') {
+          answer = { "A": this.newProblem.options[0], "B": this.newProblem.options[1] }; // 示例答案，可根据需要调整
+          ptype = 'CHOICE';
+        }
+      } else if (this.newProblem.type === 'FILL_BLANK') {
+        this.newProblem.fillBlanks.forEach((blank, index) => {
+          answer[(index + 1).toString()] = blank.split(';'); // 将填空答案按分号分割成数组
+        ptype = 'CHOICE';
+       });
+      }
+        const problemData = {
+        title: this.newProblem.name,
+        type: ptype,
+        content: this.newProblem.content,
+        choices: JSON.stringify(choices),
+        answer: JSON.stringify(answer)
+      };
+        //console.log('Problem Data:', JSON.stringify(problemData, null, 2));
+
+
+        this.$store
+        .dispatch('createProblem',problemData)
+         .then(response => {
+            this.items.push({ ...this.newProblem, gid: Date.now().toString() }); // 添加新题目
+            this.newProblem = { name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] }; // 重置表单
+            this.dialogCreate = false; // 关闭对话框
+          })
+          .catch(error => {
+             this.$store.commit("setAlert", {
+             type: "error",
+            message: error,
+          });
+          }).finally(() => {
+          this.loading = false;
+        });
+        // axios.post({
+        //   url:'http://localhost:8080/problems/upload_problem',
+        //   params: {
+        //     authorized_user_name:currentName,
+        //   },
+        //   data:problemData})
+        //   .then(response => {
+        //     this.items.push({ ...this.newProblem, gid: Date.now().toString() }); // 添加新题目
+        //     this.newProblem = { name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] }; // 重置表单
+        //     this.dialogCreate = false; // 关闭对话框
+        //   })
+        //   .catch(error => {
+        //     console.error('Error creating problem:', error);
+        //     alert('创建题目失败，请重试。');
+        //   });
       } else {
         alert('请填写题目名称和内容！');
       }
     },
+
     changeProblem(item) {
       this.currentProblem = { ...item }; // 复制题目以进行编辑
       this.dialogEdit = true;
