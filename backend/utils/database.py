@@ -470,7 +470,7 @@ def modify_group(db, uid: str, gid: str, group_name: str | None = None, password
             cursor.execute("UPDATE UserGroups SET description = NULL WHERE gid = %s", (gid))
         else:
             cursor.execute("UPDATE UserGroups SET description = %s WHERE gid = %s", (description, gid))
-    if password:
+    if password!=None:
         if password == "":
             cursor.execute("UPDATE UserGroups SET password = NULL WHERE gid = %s", (gid))
         else:

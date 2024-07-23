@@ -9,6 +9,7 @@ const base = {
     createGroup: '/user_group/create_group',
     modifyGroup: '/user_group/modify_group',
     showUnGroups: '/user_group/show_unentered_groups',
+    createProblem: '/problems/upload_problem',
 }
 
 export default base;

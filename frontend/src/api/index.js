@@ -18,6 +18,10 @@ const api = {
     register: async(username, password) => {
       return await router.post(path.baseUrl + path.logon, {}, {params: {username: username, password: password}});
     },
+    createProblem: async(problemData) => {
+      console.log("createProblem");
+        return await router.post(path.baseUrl + path.createProblem,problemData);
+    },
     showJoinedGroups: async() => {
       console.log("showJoinedGroups");
       return await router.get(path.baseUrl + path.showJoinedGroups);
