@@ -154,10 +154,11 @@ export default {
       dialog: false,
       selectedItem: null,
       password: '',
+      temp: []
     }
   },
   mounted() {
-    this.getJoinedGroups();
+    this.getUnGroups();
   },
   computed: {
     numberOfPages () {
@@ -176,14 +177,14 @@ export default {
     },
   },
   methods: {
-    getJoinedGroups() {
+    getUnGroups() {
       this.$store
-        .dispatch("showJoinedGroups")
+        .dispatch("showUnGroups")
         .then((res) => {
-          temp = []
-          temp = res.groups;
-          temp.unshift({ header: '所有可以加入的团队' });
-          this.items = temp;
+          this.temp = []
+          this.temp = res.groups;
+          this.temp.unshift({ header: '所有可以加入的团队' });
+          this.items = this.temp;
         })
         .catch((e) => {
           this.$store.commit("setAlert", {

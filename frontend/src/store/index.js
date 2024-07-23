@@ -119,7 +119,40 @@ export default new Vuex.Store({
             reject(error);
           })
       })
-    }
+    },
+    leaveGroup(context, {gid}) {
+      return new Promise((resolve, reject) => {
+        api.leaveGroup(gid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    showCreatedGroups(context) {
+      return new Promise((resolve, reject) => {
+        api.showCreatedGroups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    showUnGroups(context) {
+      return new Promise((resolve, reject) => {
+        api.showUnGroups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
   },
   modules: {
   }
