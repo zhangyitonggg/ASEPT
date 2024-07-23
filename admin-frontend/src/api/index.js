@@ -22,6 +22,14 @@ const api = {
         title: title,
         content: content
       });
+    },
+    modifyAnnouncement: async(aid, title, content, is_active) => {
+      return await router.post(path.baseUrl + path.modifyAnnouncement, {
+        aid: aid,
+        title: title,
+        content: content,
+        is_active: is_active,
+      });
     }
 };
 
