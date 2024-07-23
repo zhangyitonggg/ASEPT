@@ -27,6 +27,7 @@ const api = {
       return await router.get(path.baseUrl + path.showJoinedGroups);
     },
     leaveGroup:async(gid) => {
+      console.log("leaveGroup");
       return await router.post(path.baseUrl + path.leaveGroup, {}, {params: {gid: gid}});
     },
     showCreatedGroups: async() => {
@@ -45,6 +46,10 @@ const api = {
       console.log("showUnGroups");
       return await router.get(path.baseUrl + path.showUnGroups);
     },
+    joinGroup: async(gid, password) => {
+      console.log("joinGroup");
+      return await router.post(path.baseUrl + path.joinGroup, {gid: gid, password: password});
+    }
 };
 
 export default api;
