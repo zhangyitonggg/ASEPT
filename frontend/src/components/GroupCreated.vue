@@ -276,10 +276,11 @@ export default {
       }
       if (!this.changePassword) {
         this.tempItem.password = null;
+        if (!this.tempItem.need_password) {
+          this.tempItem.password = "";
+        }
       }
-      if (!this.tempItem.need_password) {
-        this.tempItem.password = "";
-      }
+      console.log('!',this.tempItem);
       this.$store
         .dispatch('modifyGroup', {gid: this.tempItem.gid, group_name: this.tempItem.group_name, description: this.tempItem.description, password: this.tempItem.password})
         .then((res) => {

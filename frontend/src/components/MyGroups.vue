@@ -105,69 +105,6 @@ export default {
           gid: 'xxx1',
           locked: true,
         },
-        {
-          name: 'Group2',
-          founder: 'User2',
-          description: 'Descrlines.',
-          gid: 'xxx2',
-          locked: true,
-        },
-        {
-          name: 'Group3',
-          founder: 'User3',
-          description: 'Descrlines.',
-          gid: 'xxx3',
-          locked: false,
-        },
-        {
-          name: 'Group4',
-          founder: 'User4',
-          description: 'Descrlines.',
-          gid: 'xxx4',
-          locked: false,
-        },
-        {
-          name: 'Group5',
-          founder: 'User5',
-          description: 'Descrlines.',
-          gid: 'xxx5',
-          locked: false,
-        },
-        {
-          name: 'Group6',
-          founder: 'User6',
-          description: 'Descrlines.',
-          gid: 'xxx6',
-          locked: false,
-        },
-        {
-          name: 'Group7',
-          founder: 'User7',
-          description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
-          gid: 'xxx7',
-          locked: false,
-        },
-        {
-          name: 'Group8',
-          founder: 'User8',
-          description: 'Descrlines.',
-          gid: 'xxx8',
-          locked: false,
-        },
-        {
-          name: 'Group9',
-          founder: 'User9',
-          description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
-          gid: 'xxx9',
-          locked: false,
-        },
-        {
-          name: 'Group10',
-          founder: 'User10',
-          description: 'Another description that should also wrap onto multiple lines.',
-          gid: 'xxx10',
-          locked: false,
-        }
       ],
     }
   },
@@ -189,17 +126,15 @@ export default {
     },
   },
   mounted() {
-    this.getUnGroups();
+    this.getJoinedGroups();
   },
   methods: {
-    getUnGroups() {
+    getJoinedGroups() {
       this.$store
         .dispatch("showJoinedGroups")
         .then((res) => {
-          this.temp = []
-          this.temp = res.groups;
-          this.temp.unshift({ header: '所有可以加入的团队' });
-          this.items = this.temp;
+          this.items.splice(0, this.items.length, { header: '所有可以加入的团队' }, ...res.groups); // 清空当前数组并插入新数据
+          console.log(this.items);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {
