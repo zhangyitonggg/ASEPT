@@ -98,17 +98,6 @@ export default new Vuex.Store({
           })
       })
     },
-    register(context, {username, password}) {
-      return new Promise((resolve, reject) => {
-        api.register(username, password)
-          .then(response => {
-            resolve(response.data);
-          })
-          .catch(error => {
-            reject(error);
-          })
-      })
-    },
     showJoinedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showJoinedGroups()
@@ -120,9 +109,9 @@ export default new Vuex.Store({
           })
       })
     },
-    leaveGroup(context, {gid}) {
+    publishAnnouncement(context, { title, content }) {
       return new Promise((resolve, reject) => {
-        api.leaveGroup(gid)
+        api.publishAnnouncement(title, content)
           .then(response => {
             resolve(response.data);
           })
@@ -130,29 +119,7 @@ export default new Vuex.Store({
             reject(error);
           })
       })
-    },
-    showCreatedGroups(context) {
-      return new Promise((resolve, reject) => {
-        api.showCreatedGroups()
-          .then(response => {
-            resolve(response.data);
-          })
-          .catch(error => {
-            reject(error);
-          })
-      })
-    },
-    showUnGroups(context) {
-      return new Promise((resolve, reject) => {
-        api.showUnGroups()
-          .then(response => {
-            resolve(response.data);
-          })
-          .catch(error => {
-            reject(error);
-          })
-      })
-    },
+    }
   },
   modules: {
   }

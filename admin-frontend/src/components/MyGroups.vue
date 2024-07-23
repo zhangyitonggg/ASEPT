@@ -188,26 +188,7 @@ export default {
       return this.filteredItems.slice(startIndex, endIndex);
     },
   },
-  mounted() {
-    this.getUnGroups();
-  },
   methods: {
-    getUnGroups() {
-      this.$store
-        .dispatch("showJoinedGroups")
-        .then((res) => {
-          this.temp = []
-          this.temp = res.groups;
-          this.temp.unshift({ header: '所有可以加入的团队' });
-          this.items = this.temp;
-        })
-        .catch((e) => {
-          this.$store.commit("setAlert", {
-            type: "error",
-            message: e,
-          });
-        });
-    },
     nextPage () {
       if (this.page + 1 <= this.numberOfPages) this.page += 1
     },
@@ -222,25 +203,15 @@ export default {
       this.dialog = true;
     },
     handleAboutClick(flag) {
-      this.dialog = false;
+      console.log(flag);  
+      this.dialog = false
       if (flag) {
-        this.$store
-        .dispatch("leaveGroup",{gid: this.curItem.gid})
-        .then((res) => {
-          if (flag) {
-            alert(`你选择了离开 ${this.curItem.name}`);
-            const index = this.items.findIndex(item => item.gid === this.curItem.gid);
-            if (index !== -1) {
-              this.items.splice(index, 1);
-            }
-          }
-        })
-        .catch((e) => {
-          this.$store.commit("setAlert", {
-            type: "error",
-            message: e,
-          });
-        });
+        alert(`你选择了离开 ${this.curItem.name}`);
+        // 使用 splice 方法从 items 中移除 curItem
+        const index = this.items.findIndex(item => item.gid === this.curItem.gid);
+        if (index !== -1) {
+          this.items.splice(index, 1);
+        }
       }
     },
   },

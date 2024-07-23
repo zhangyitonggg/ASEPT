@@ -204,7 +204,7 @@ export default {
       },
       search: '',
       items: [
-        { header: '您创建的所有团队' },
+        { header: '您加入的所有团队' },
         {
           name: 'Group1',
           founder: 'User1',
@@ -277,22 +277,6 @@ export default {
 
   },
   methods: {
-    getCreatedGroups() {
-      this.$store
-        .dispatch("showCreatedGroups")
-        .then((res) => {
-          this.temp = []
-          this.temp = res.groups;
-          this.temp.unshift({ header: '您创建的所有团队' });
-          this.items = this.temp;
-        })
-        .catch((e) => {
-          this.$store.commit("setAlert", {
-            type: "error",
-            message: e,
-          });
-        });
-    },
     openCreateDialog() {
       this.createDialog = true;
     },

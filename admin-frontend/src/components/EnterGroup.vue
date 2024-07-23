@@ -3,7 +3,7 @@
     <v-layout>
       <v-spacer/>
       <searchbar v-model="search" searchBtnText='搜索团队'/>
-    </v-layout>  
+    </v-layout>
     <v-col>
       <v-list three-line>
         <template v-for="(item, index) in currentPageItems">
@@ -154,11 +154,10 @@ export default {
       dialog: false,
       selectedItem: null,
       password: '',
-      temp: []
     }
   },
   mounted() {
-    this.getUnGroups();
+    this.getJoinedGroups();
   },
   computed: {
     numberOfPages () {
@@ -177,14 +176,14 @@ export default {
     },
   },
   methods: {
-    getUnGroups() {
+    getJoinedGroups() {
       this.$store
-        .dispatch("showUnGroups")
+        .dispatch("showJoinedGroups")
         .then((res) => {
-          this.temp = []
-          this.temp = res.groups;
-          this.temp.unshift({ header: '所有可以加入的团队' });
-          this.items = this.temp;
+          temp = []
+          temp = res.groups;
+          temp.unshift({ header: '所有可以加入的团队' });
+          this.items = temp;
         })
         .catch((e) => {
           this.$store.commit("setAlert", {

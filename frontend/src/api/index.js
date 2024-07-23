@@ -1,12 +1,13 @@
 import router from "../utils/network";
 import path from "./path";
-import { qs } from "qs";
 
 const api = {
     login: async(username, password) => {
         const response = await router.post(path.baseUrl + path.login, {
-            username: username,
-            password: password
+          username: username,
+          password: password
+        }, {
+          useQs: true
         });
         return response;
     },
@@ -15,17 +16,19 @@ const api = {
         return response;
     },
     register: async(username, password) => {
-      console.log("register");
-      console.log(username, password);
-      return await router.post(path.baseUrl + path.logon, {
-        username: username,
-        password: password
-      });
+      return await router.post(path.baseUrl + path.logon, {}, {params: {username: username, password: password}});
     },
     showJoinedGroups: async() => {
       console.log("showJoinedGroups");
       return await router.get(path.baseUrl + path.showJoinedGroups);
-    }
+    },
+    leaveGroup:async(gid) => {
+      return await router.post(path.baseUrl + path.leaveGroup, {}, {params: {gid: gid}});
+    },
+    showUnGroups: async() => {
+      console.log("showUnGroups");
+      return await router.get(path.baseUrl + path.showUnGroups);
+    },
 };
 
 export default api;

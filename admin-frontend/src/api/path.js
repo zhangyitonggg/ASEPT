@@ -1,11 +1,9 @@
 const base = {
     baseUrl: 'http://localhost:8000',
-    login: '/security/token',
-    logon: '/create_user',
+    login: '/security/admin',
     news_getannouncements: '/news/get_announcements?max_announcements=20',
     showJoinedGroups: '/user_group/show_joined_groups',
-    leaveGroup: '/user_group/leave_group',
-    showUnGroups: '/user_group/show_unentered_groups',
+    publishAnnouncement: '/admin/open_announcement',
 }
 
 export default base;
