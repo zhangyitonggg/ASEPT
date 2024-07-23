@@ -463,14 +463,15 @@ def modify_group(db, uid: str, gid: str, group_name: str | None = None, password
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied. You are not the admin of this group.",
         )
-    if group_name:
+    if group_name != None:
         cursor.execute("UPDATE UserGroups SET name = %s WHERE gid = %s", (group_name, gid))
-    if description:
+    if description != None:
         if description == "":
             cursor.execute("UPDATE UserGroups SET description = NULL WHERE gid = %s", (gid))
         else:
             cursor.execute("UPDATE UserGroups SET description = %s WHERE gid = %s", (description, gid))
-    if password:
+    if password != None:
+        print("password: ", password)
         if password == "":
             cursor.execute("UPDATE UserGroups SET password = NULL WHERE gid = %s", (gid))
         else:

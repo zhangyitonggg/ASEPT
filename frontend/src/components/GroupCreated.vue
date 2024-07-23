@@ -40,7 +40,7 @@
                 <v-list-item-action>
                   <v-btn
                     color="secondary"
-                    @click="manage(item)"
+                    @click="init_modified_group(item)"
                   > 管理 </v-btn>
                 </v-list-item-action>
               </v-list-item>
@@ -52,93 +52,72 @@
     <v-row justify="center">
       <v-dialog
         v-model="dialog"
-        max-width="290"
+        max-width="50%"
       >
-        <template>
-          <v-row justify="center">
-            <v-dialog
-              v-model="dialog"
-              persistent
-              max-width="600px"
-            > 
-              <v-card>
-                <v-card-title>
-                  <span class="text-h5">修改{{curItem.name}}信息</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-row>
-                      <v-col cols="12">
-                        <v-text-field
-                          label="群名"
-                          required
-                          v-model="tempItem.group_name"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12">
-                        <v-checkbox
-                          label="取消密码"
-                          v-if="curItem.need_password && !changePassword"
-                          @change="tempItem.need_password = !tempItem.need_password"
-                        ></v-checkbox>
-                        <v-checkbox
-                          label="设置密码"
-                          v-if="!curItem.need_password"
-                          v-model="changePassword"
-                        ></v-checkbox>
-                        <v-checkbox
-                          label="修改密码"
-                          v-if="curItem.need_password && tempItem.need_password"
-                          v-model="changePassword"
-                        ></v-checkbox>
-                        <v-text-field
-                          label="密码"
-                          v-if="changePassword"
-                          v-model="tempItem.password"
-                        ></v-text-field>
-                      </v-col>
-                      <template>
-                        <v-container fluid>
-                          <v-textarea
-                            name="描述"
-                            filled
-                            label="描述"
-                            auto-grow
-                            v-model="tempItem.description"
-                          ></v-textarea>
-                        </v-container>
-                      </template>
-                    </v-row>
-                  </v-container>
-                  <small>*indicates required field</small>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                  color="blue darken-1"
-                  text
-                  @click="submitModifyInfo(false)"
-                >
-                  Cancel
-                </v-btn>
-                  <v-btn
-                    color="warning"
-                    text
-                    @click="submitModifyInfo(true)"
-                  >
-                    Save
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-row>
-        </template>
+        <v-card>
+          <v-card-title>
+            修改团队信息
+          </v-card-title>
+          <v-card-text>
+            <v-text-field
+              label="群名"
+              required
+              filled
+              v-model="modified_group.group_name"
+            ></v-text-field>
+            <v-textarea
+              name="描述"
+              filled
+              label="描述"
+              auto-grow
+              v-model="modified_group.description"
+            ></v-textarea>
+            <v-switch v-model="modified_group.need_password">
+              <template v-slot:label>加入需要密码：{{ `${modified_group.need_password ? '是' : '否'}` }}</template>
+            </v-switch>
+            <template v-if="modified_group.need_password">
+              <v-text-field
+                label="修改密码"
+                v-model="modified_group.password"
+                hint="可选，留空则不修改密码。"
+                :rules="[
+                    v => !!v || '',
+                    v => v == null,
+                    v => v.length > 8 || '至少9字符',
+                    v => v.length < 21 || '至多20字符',
+                    v => {
+                      const pattern = /^.*[0-9].*$/
+                      const pattern_w = /^.*[a-zA-Z].*$/
+                      return (
+                        (pattern.test(v) && pattern_w.test(v)) || '必须包含数字和字母'
+                      )
+                    }
+                ]"
+                type="password"
+                persistent-hint
+              ></v-text-field>
+            </template>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="primary"
+              text
+              @click.stop="submitModifyInfo"
+            > 保存 </v-btn>
+            <v-btn
+              color="error"
+              text
+              @click="dialog = false"
+            > 取消 </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-dialog>
       <v-dialog
         v-model="createDialog"
         persistent
         max-width="600px"
-      > 
+      >
         <v-card>
           <v-card-title>
             <span class="text-h5">新建群聊</span>
@@ -207,8 +186,13 @@ export default {
       dialog: false,
       changePassword: false,
       createDialog: false,
-      curItem: {},
-      tempItem: {},
+      modified_group: {
+        group_name: '',
+        description: '',
+        password: '',
+        need_password: false,
+        gid: '',
+      },
       newGroup: {
         group_name: '',
         description: '',
@@ -260,31 +244,32 @@ export default {
     openCreateDialog() {
       this.createDialog = true;
     },
-    manage(item) {
-      this.curItem = {gid: item.gid, group_name: item.group_name, description: item.description, password: null, need_password: item.need_password};
-      this.tempItem = {gid: item.gid, group_name: item.group_name, description: item.description, password: null, need_password: item.need_password};
-      this.dialog = true;
+    init_modified_group(item) {
+      this.modified_group = {
+        gid: item.gid,
+        group_name: item.group_name,
+        description: item.description,
+        password: "",
+        need_password: item.need_password
+      };
       this.changePassword = false;
+      this.dialog = true;
     },
-    submitModifyInfo(flag) {
-      this.dialog = false;
-      console.log('@',this.curItem);
-      console.log('#',this.tempItem);
-      if (!flag) {
-        this.tempItem = {};
-        return;
+    submitModifyInfo() {
+      let password = this.modified_group.password;
+      if (this.modified_group.need_password === false) {
+        password = "";
+      } else if (this.modified_group.password === "") {
+        password = null;
       }
-      if (!this.changePassword) {
-        this.tempItem.password = null;
-        if (!this.tempItem.need_password) {
-          this.tempItem.password = "";
-        }
-      }
-      console.log('!',this.tempItem);
-      this.$store
-        .dispatch('modifyGroup', {gid: this.tempItem.gid, group_name: this.tempItem.group_name, description: this.tempItem.description, password: this.tempItem.password})
-        .then((res) => {
-          this.$store.commit("setAlert", {type: "success", message: `修改 ${this.curItem.group_name} 信息成功`});
+      this.$store.dispatch('modifyGroup', {
+        gid: this.modified_group.gid,
+        group_name: this.modified_group.group_name,
+        description: this.modified_group.description,
+        password: password
+      })
+        .then(() => {
+          this.$store.commit("setAlert", {type: "success", message: `修改团队 ${this.modified_group.group_name} 信息成功。`});
           this.getCreatedGroups();
         })
         .catch((e) => {
@@ -294,6 +279,7 @@ export default {
           this.tempItem = {};
           this.curItem = {};
         });
+      this.dialog = false;
     },
     submitNewGroup() {
       this.createDialog = false;
