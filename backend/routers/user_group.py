@@ -187,7 +187,7 @@ async def show_joined_groups(
     return database.show_joined_groups(db, user.uid)
 
 
-@router.post("modify_group")
+@router.post("/modify_group")
 async def modify_group(
     group_info: group_infomation,
     user: User = Depends(security.get_user),
@@ -202,7 +202,14 @@ async def modify_group(
         * 群名---group_name,同密码
         * 返回：如果是群主或者admin的话返回ac，否则返回error
     '''
-    database.modify_group(db, group_info, user.uid)
+    database.modify_group(
+      db,
+      uid=user.uid,
+      gid=group_info.gid,
+      group_name=group_info.group_name,
+      description=group_info.description,
+      password=group_info.password
+    )
     return {"status": "success"}
 
 

@@ -4,6 +4,7 @@ const base = {
     news_getannouncements: '/news/get_announcements?max_announcements=20',
     showJoinedGroups: '/user_group/show_joined_groups',
     publishAnnouncement: '/admin/open_announcement',
+    modifyAnnouncement: '/admin/modify_announcement',
 }
 
 export default base;

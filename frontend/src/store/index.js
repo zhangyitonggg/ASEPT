@@ -65,6 +65,14 @@ export default new Vuex.Store({
     },
     setProblemid(state, id){
       state._problem_id_ = id;
+    },
+    clearPersonalInfo(state) {
+      state._user_name_ = null;
+      state._token_ = null;
+      localStorage.removeItem('__token__');
+      localStorage.removeItem('__user_name__');
+      sessionStorage.removeItem('__token__');
+      sessionStorage.removeItem('__user_name__');
     }
   },
   actions: {
@@ -134,6 +142,28 @@ export default new Vuex.Store({
     showCreatedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showCreatedGroups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    createGroup(context, {group_name, description, password}) {
+      return new Promise((resolve, reject) => {
+        api.createGroup(group_name, description, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    modifyGroup(context, {gid, group_name, description, password}) {
+      return new Promise((resolve, reject) => {
+        api.modifyGroup(gid, group_name, description, password)
           .then(response => {
             resolve(response.data);
           })

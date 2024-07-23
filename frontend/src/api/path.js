@@ -5,6 +5,9 @@ const base = {
     news_getannouncements: '/news/get_announcements?max_announcements=20',
     showJoinedGroups: '/user_group/show_joined_groups',
     leaveGroup: '/user_group/leave_group',
+    showCreatedGroups: '/user_group/show_create_groups',
+    createGroup: '/user_group/create_group',
+    modifyGroup: '/user_group/modify_group',
     showUnGroups: '/user_group/show_unentered_groups',
 }
 

@@ -450,7 +450,7 @@ def modify_group(db, uid: str, gid: str, group_name: str | None = None, password
             detail="Group not found.",
         )
     cursor = db.cursor()
-    cursor.excute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
     relation = cursor.fetchone()
     if not relation:
         raise HTTPException(
@@ -498,6 +498,20 @@ def open_announcement(db, announcement:Announcement, user: User):
     db.commit()
 
 
+def modify_announcement(db, announcement:Announcement, user: User):
+    cursor = db.cursor()
+    try:
+        cursor.execute("UPDATE Announcements SET title = %s, content = %s, is_active = %s WHERE aid = %s", (announcement.title, announcement.content, 1 if announcement.is_active else 0 ,announcement.aid))
+        db.commit()
+    except Exception as e:
+        print("Error modifying announcement: ", e)
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error modifying announcement. Maybe the announcement does not exist.",
+        )
+
+
 def get_announcements(db, max_announcements: int):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Announcements ORDER BY update_at DESC LIMIT %s", (max_announcements))
@@ -505,6 +519,7 @@ def get_announcements(db, max_announcements: int):
     res = []
     for announcement in announcements:
         res.append({
+            "aid": announcement[0],
             "title": announcement[1],
             "content": announcement[2],
             "update_at": announcement[3],

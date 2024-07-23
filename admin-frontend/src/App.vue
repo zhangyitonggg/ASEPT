@@ -64,10 +64,10 @@ const App = Vue.extend({
     return {
       drawer: null,
       links: [
-        ['mdi-home', '首页', '/'],
-        ['mdi-book-open-variant-outline', '题库', '/exercises'],
-        ['mdi-account-group', '团队', '/groups'],
-        ['mdi-head-lightbulb-outline', '精心安排', '/arrange'],
+        ['mdi-home', '管理首页', '/'],
+        ['mdi-book-open-variant-outline', '管理题库', '/exercises'],
+        ['mdi-account-group', '管理团队', '/groups'],
+        ['mdi-head-lightbulb-outline', '管理用户', '/users'],
         ['mdi-account', '个人中心', '/me'],
       ],
     };

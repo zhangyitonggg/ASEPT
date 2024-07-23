@@ -20,24 +20,20 @@
                 v-text="item.header"
               ></v-subheader>
               <v-list-item
-                v-else-if="item.name"
-                :key="item.name"
+                v-else-if="item.group_name"
+                :key="item.group_name"
               >
                 <v-list-item-avatar>
-                  <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+                  <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-title>
                     <h4>
-                      {{ item.name }}
+                      {{ item.group_name }}
                     </h4>
                   </v-list-item-title>
                   <v-list-item-subtitle>
-                    Password: 
-                    <strong>
-                      {{ item.password }}
-                    </strong>
-                    <br>
+                    Description:
                       {{ item.description }}
                   </v-list-item-subtitle>
                 </v-list-item-content>
@@ -76,19 +72,29 @@
                         <v-text-field
                           label="群名"
                           required
-                          v-model="curItem.name"
+                          v-model="tempItem.group_name"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12">
                         <v-checkbox
-                          label="需要密码"
-                          v-model="curItem.locked"
+                          label="取消密码"
+                          v-if="curItem.need_password && !changePassword"
+                          @change="tempItem.need_password = !tempItem.need_password"
                         ></v-checkbox>
-                      </v-col>
-                      <v-col cols="12" v-if="curItem.locked">
+                        <v-checkbox
+                          label="设置密码"
+                          v-if="!curItem.need_password"
+                          v-model="changePassword"
+                        ></v-checkbox>
+                        <v-checkbox
+                          label="修改密码"
+                          v-if="curItem.need_password && tempItem.need_password"
+                          v-model="changePassword"
+                        ></v-checkbox>
                         <v-text-field
                           label="密码"
-                          v-model="curItem.password"
+                          v-if="changePassword"
+                          v-model="tempItem.password"
                         ></v-text-field>
                       </v-col>
                       <template>
@@ -98,7 +104,7 @@
                             filled
                             label="描述"
                             auto-grow
-                            v-model="curItem.description"
+                            v-model="tempItem.description"
                           ></v-textarea>
                         </v-container>
                       </template>
@@ -109,9 +115,16 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn
-                    color="blue darken-1"
+                  color="blue darken-1"
+                  text
+                  @click="submitModifyInfo(false)"
+                >
+                  Cancel
+                </v-btn>
+                  <v-btn
+                    color="warning"
                     text
-                    @click="submitModifyInfo"
+                    @click="submitModifyInfo(true)"
                   >
                     Save
                   </v-btn>
@@ -137,16 +150,16 @@
                   <v-text-field
                     label="群名*"
                     required
-                    v-model="newGroup.name"
+                    v-model="newGroup.group_name"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-checkbox
                     label="需要密码"
-                    v-model="newGroup.locked"
+                    v-model="newGroup.need_password"
                   ></v-checkbox>
                 </v-col>
-                <v-col cols="12" v-if="newGroup.locked">
+                <v-col cols="12" v-if="newGroup.need_password">
                   <v-text-field
                     label="密码"
                     v-model="newGroup.password"
@@ -192,69 +205,19 @@ export default {
   data () {
     return {
       dialog: false,
+      changePassword: false,
       createDialog: false,
       curItem: {},
+      tempItem: {},
       newGroup: {
-        name: '',
-        founder: '', // 可以动态获取当前用户信息
+        group_name: '',
         description: '',
         password: '',
-        locked: false,
+        need_password: false,
         gid: '',
       },
       search: '',
-      items: [
-        { header: '您创建的所有团队' },
-        {
-          name: 'Group1',
-          founder: 'User1',
-          description: 'Descrlines.',
-          password: "pwd",
-          gid: 'xxx1',
-          locked: true,
-        },
-        {
-          name: 'Group2',
-          founder: 'User2',
-          description: 'Descrlines.',
-          password: "pwd",
-          gid: 'xxx2',
-          locked: true,
-        },
-        {
-          name: 'Group3',
-          founder: 'User3',
-          description: 'Descrlines.',
-          password: "pwd",
-          gid: 'xxx3',
-          locked: false,
-        },
-        {
-          name: 'Group4',
-          founder: 'User4',
-          description: 'Descrlines.',
-          password: "pwd",
-          gid: 'xxx4',
-          locked: false,
-        },
-        {
-          name: 'Group5',
-          founder: 'User5',
-          description: 'Descrlines.',
-          password: "pwd",
-          gid: 'xxx5',
-          locked: false,
-        },
-        { divider: true, inset: true },
-        {
-          name: 'Group6',
-          founder: 'User6',
-          description: 'Descrlines.',
-          password: "pwd",
-          gid: 'xxx6',
-          locked: false,
-        },
-      ],
+      items: [],
       itemsPerPage: 13,
       currentPage: 1,
     }
@@ -262,7 +225,7 @@ export default {
   computed: {
     filteredItems() {
       const filtered = this.items.filter(item =>
-        item.name && item.name.toLowerCase().includes(this.search.toLowerCase())
+        item.group_name && item.group_name.toLowerCase().includes(this.search.toLowerCase())
       );
       return filtered;
     },
@@ -276,15 +239,16 @@ export default {
     },
 
   },
+  mounted() {
+    this.getCreatedGroups();
+  },
   methods: {
     getCreatedGroups() {
       this.$store
         .dispatch("showCreatedGroups")
         .then((res) => {
-          this.temp = []
-          this.temp = res.groups;
-          this.temp.unshift({ header: '您创建的所有团队' });
-          this.items = this.temp;
+          this.items.splice(0, this.items.length, { header: '您创建的所有团队' }, ...res.groups); // 清空当前数组并插入新数据
+          console.log(this.items);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {
@@ -297,40 +261,59 @@ export default {
       this.createDialog = true;
     },
     manage(item) {
-      this.curItem = item;
+      this.curItem = {gid: item.gid, group_name: item.group_name, description: item.description, password: null, need_password: item.need_password};
+      this.tempItem = {gid: item.gid, group_name: item.group_name, description: item.description, password: null, need_password: item.need_password};
       this.dialog = true;
+      this.changePassword = false;
     },
-    submitModifyInfo() { // todo
+    submitModifyInfo(flag) {
       this.dialog = false;
-      console.log(this.curItem);
-    },
-    handleAboutClick(flag) {
-      console.log(flag);  
-      this.dialog = false
-      if (flag) {
-        alert(`你选择了离开 ${this.curItem.name}`);
-        // 使用 splice 方法从 items 中移除 curItem
-        const index = this.items.findIndex(item => item.gid === this.curItem.gid);
-        if (index !== -1) {
-          this.items.splice(index, 1);
-        }
+      console.log('@',this.curItem);
+      console.log('#',this.tempItem);
+      if (!flag) {
+        this.tempItem = {};
+        return;
       }
+      if (!this.changePassword) {
+        this.tempItem.password = null;
+      }
+      if (!this.tempItem.need_password) {
+        this.tempItem.password = "";
+      }
+      this.$store
+        .dispatch('modifyGroup', {gid: this.tempItem.gid, group_name: this.tempItem.group_name, description: this.tempItem.description, password: this.tempItem.password})
+        .then((res) => {
+          this.$store.commit("setAlert", {type: "success", message: `修改 ${this.curItem.group_name} 信息成功`});
+          this.getCreatedGroups();
+        })
+        .catch((e) => {
+          this.$store.commit("setAlert", {type: "error", message: e});
+        })
+        .finally(() => {
+          this.tempItem = {};
+          this.curItem = {};
+        });
     },
     submitNewGroup() {
-      // 为新群聊生成一个唯一的gid
-      this.newGroup.gid = 'gid-' + Date.now(); // todo
-      this.newGroup.founder = this.$store.getters.username; // 可以动态获取当前用户信息
-      this.items.push({ ...this.newGroup }); 
       this.createDialog = false;
-      // 重置 newGroup
-      this.newGroup = {
-        name: '',
-        founder: '当前用户',
-        description: '',
-        password: '',
-        locked: false,
-        gid: '',
-      };
+      this.$store
+      .dispatch('createGroup', {group_name: this.newGroup.group_name, description: this.newGroup.description, password: this.newGroup.password})
+      .then((res) => {
+        this.$store.commit("setAlert", {type: "success", message: `创建 ${this.newGroup.group_name} 成功`});
+        this.getCreatedGroups();
+      })
+      .catch((e) => {
+        this.$store.commit("setAlert", {type: "error", message: e});
+      })
+      .finally(() => {
+        this.newGroup = {
+          group_name: '',
+          description: '',
+          password: '',
+          need_password: false,
+          gid: '',
+        };
+      });
     },
   },
   components: {

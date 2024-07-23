@@ -77,7 +77,7 @@
             <v-btn
               block
               depressed
-              @click.stop="switchRegisterPage"
+              @click.stop="logout"
               :disabled="loading"
               class="mt-2"
               color="error"
@@ -127,6 +127,10 @@ export default {
       this.$store.dispatch('userModify', this.user).then(() => {
         this.loading = false;
       });
+    },
+    logout() {
+      this.$store.commit("clearPersonalInfo");
+      this.$router.push({ name: 'login' });
     }
   },
   components: {
