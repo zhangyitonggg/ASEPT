@@ -357,6 +357,62 @@ async def get_user_statistics(
     return database.get_user_statistics(db, user)
 
 
+@router.get('/get_problem_recommend')
+async def get_problem_recommend(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取题目推荐。
+    
+    返回格式：
+    
+    ```
+    {
+        "problems": [
+            {
+                "pid": 1,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 0,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "A": "Choice A",
+                    "B": "Choice B"
+                },
+                "is_public": 0
+            },
+            {
+                "pid": 2,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 1,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "B": "Choice B"
+                },
+                "is_published": 1
+            }
+        ]
+    }
+    '''
+    return database.get_problem_recommend(db, user)
+
+
 @router.get('/{problem_id}', response_model=Problem)
 async def get_problem(
     problem_id: str,

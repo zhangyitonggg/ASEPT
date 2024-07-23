@@ -1,4 +1,5 @@
 import json
+import random
 import yaml
 import pymysql
 import hashlib
@@ -820,6 +821,90 @@ def get_user_statistics(db, user: User):
         "blank_submit": blank_submit,
         "blank_correct": blank_correct,
     }
+    
+
+def get_problem_recommend(db, user: User):
+    '''
+    获取题目推荐。
+    
+    返回格式：
+    
+    ```
+    {
+        "problems": [
+            {
+                "pid": 1,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 0,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "A": "Choice A",
+                    "B": "Choice B"
+                },
+                "is_public": 0
+            },
+            {
+                "pid": 2,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 1,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "B": "Choice B"
+                },
+                "is_published": 1
+            }
+        ]
+    }
+    '''
+    # take 20 problem with max wrong rate and choose rondom 10 problem within them
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems")
+    problems = cursor.fetchall()
+    res = []
+    for problem in problems:
+        cursor.execute("SELECT * FROM ProblemSubmit WHERE pid = %s", (problem[0]))
+        submits = cursor.fetchall()
+        correct = 0
+        for submit in submits:
+            if submit[5]:
+                correct += 1
+        res.append((problem[0], correct / len(submits)))
+    res = sorted(res, key=lambda x: x[1])
+    res = res[:20]
+    res = random.sample(res, 10)
+    res = res[:10]
+    final_res = []
+    for problem in res:
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (problem[0]))
+        problem = cursor.fetchone()
+        final_res.append({
+            "pid": problem[0],
+            "title": problem[1],
+            "content": problem[2],
+            "type": problem[3],
+            "author": get_user_by_uid(db, problem[4])[0],
+            "upload_time": problem[5],
+            "choices": problem[6],
+            "answers": problem[7],
+            "is_public": problem[8],
+        })
+    return {"problems": final_res}
     
 
 def problem_accessible(db, user: User, pid: str):
