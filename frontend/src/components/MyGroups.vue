@@ -96,16 +96,7 @@ export default {
       page: 1,
       currentPage: 1,
       itemsPerPage: 13,
-      items: [
-        { header: '您加入的所有团队' },
-        {
-          group_name: 'Group1',
-          founder: 'User1',
-          description: 'Descrlines.',
-          gid: 'xxx1',
-          need_password: true,
-        },
-      ],
+      items: [],
     }
   },
   computed: {

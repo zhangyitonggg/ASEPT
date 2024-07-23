@@ -48,7 +48,7 @@ const api = {
     },
     showUnGroups: async() => {
       console.log("showUnGroups");
-      return await router.get(path.baseUrl + path.showUnGroups);
+      return await router.get(path.baseUrl + path.showUnGroups, {}, {params: {sub_name: ""}});
     },
     joinGroup: async(gid, password) => {
       console.log("joinGroup");
