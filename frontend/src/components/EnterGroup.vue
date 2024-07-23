@@ -78,79 +78,7 @@ export default {
       currentPage: 1,
       itemsPerPage: 13,
 
-      items: [
-        { header: '所有可以加入的团队' },
-        {
-          group_name: 'Group1',
-          founder: 'User1',
-          description: 'Descrlines.',
-          gid: 'xxx1',
-          need_password: true,
-        },
-        {
-          group_name: 'Group2',
-          founder: 'User2',
-          description: 'Descrlines.',
-          gid: 'xxx2',
-          need_password: true,
-        },
-        {
-          group_name: 'Group3',
-          founder: 'User3',
-          description: 'Descrlines.',
-          gid: 'xxx3',
-          need_password: false,
-        },
-        {
-          group_name: 'Group4',
-          founder: 'User4',
-          description: 'Descrlines.',
-          gid: 'xxx4',
-          need_password: false,
-        },
-        {
-          group_name: 'Group5',
-          founder: 'User5',
-          description: 'Descrlines.',
-          gid: 'xxx5',
-          need_password: false,
-        },
-        {
-          group_name: 'Group6',
-          founder: 'User6',
-          description: 'Descrlines.',
-          gid: 'xxx6',
-          need_password: false,
-        },
-        {
-          group_name: 'Group7',
-          founder: 'User7',
-          description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
-          gid: 'xxx7',
-          need_password: false,
-        },
-        {
-          group_name: 'Group8',
-          founder: 'User8',
-          description: 'Descrlines.',
-          gid: 'xxx8',
-          need_password: false,
-        },
-        {
-          group_name: 'Group9',
-          founder: 'User9',
-          description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
-          gid: 'xxx9',
-          need_password: false,
-        },
-        {
-          group_name: 'Group10',
-          founder: 'User10',
-          description: 'Another description that should also wrap onto multiple lines.',
-          gid: 'xxx10',
-          need_password: false,
-        }
-      ],
+      items: [],
       dialog: false,
       selectedItem: null,
       password: '',
@@ -195,6 +123,7 @@ export default {
         this.selectedItem = item;
         this.dialog = true;
       } else {
+        this.selectedItem = item;
         this.password = "";
         this.confirmJoin();
       }
