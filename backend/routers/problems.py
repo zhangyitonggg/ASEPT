@@ -167,6 +167,8 @@ async def search_problem_by_tag(
     '''
     根据标签搜索题目。
     
+    若tag为空，则返回所有有权限能看到的题目。
+    
     tag: str，标签名称
     
     返回格式：
@@ -413,19 +415,48 @@ async def get_problem_recommend(
     return database.get_problem_recommend(db, user)
 
 
-@router.get('/{problem_id}', response_model=Problem)
+@router.get('/get_problem', response_model=Problem)
 async def get_problem(
-    problem_id: str,
+    pid: str,
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
     '''
+    根据pid获取题目信息。
+    
+    返回格式：
+    
+    ```
+    {
+        "pid": 1,
+        "title": "Problem Title",
+        "content": "Problem Content",
+        "type": 0,
+        “author”: "Author Name",
+        "upload_time": "2021-10-01 12:00:00",
+        "choices": {
+            "A": "Choice A",
+            "B": "Choice B",
+            "C": "Choice C",
+            "D": "Choice D"
+        },
+        "answers": {
+            "A": "Choice A",
+            "B": "Choice B"
+        },
+        "is_public": 0
+    }
+    '''
+    return database.get_problem(db, pid, user)
+    
+    
+    '''
     NOTICE: This function is not complete and will not work as expected.
             This function must be placed at the end of the file to avoid conflict with other routers.
     '''
-    if database.problem_accessible(db, user, problem_id):
-        return database.get_problem(db, problem_id)
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
+    # if database.problem_accessible(db, user, problem_id):
+    #     return database.get_problem(db, problem_id)
+    # raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
 
 
 def check_problem_format(problem: Choice_Problem | Blank_Filling_Problem):

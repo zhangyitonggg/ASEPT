@@ -14,16 +14,16 @@
             v-text="item.header"
           ></v-subheader>
           <v-list-item
-            v-else-if="item.name"
-            :key="item.name"
+            v-else-if="item.group_name"
+            :key="item.group_name"
           >
             <v-list-item-avatar>
-              <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+              <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title>
                 <h4>
-                  {{ item.name }}
+                  {{ item.group_name }}
                 </h4>
               </v-list-item-title>
               <v-list-item-subtitle>
@@ -81,80 +81,79 @@ export default {
       items: [
         { header: '所有可以加入的团队' },
         {
-          name: 'Group1',
+          group_name: 'Group1',
           founder: 'User1',
           description: 'Descrlines.',
           gid: 'xxx1',
-          locked: true,
+          need_password: true,
         },
         {
-          name: 'Group2',
+          group_name: 'Group2',
           founder: 'User2',
           description: 'Descrlines.',
           gid: 'xxx2',
-          locked: true,
+          need_password: true,
         },
         {
-          name: 'Group3',
+          group_name: 'Group3',
           founder: 'User3',
           description: 'Descrlines.',
           gid: 'xxx3',
-          locked: false,
+          need_password: false,
         },
         {
-          name: 'Group4',
+          group_name: 'Group4',
           founder: 'User4',
           description: 'Descrlines.',
           gid: 'xxx4',
-          locked: false,
+          need_password: false,
         },
         {
-          name: 'Group5',
+          group_name: 'Group5',
           founder: 'User5',
           description: 'Descrlines.',
           gid: 'xxx5',
-          locked: false,
+          need_password: false,
         },
         {
-          name: 'Group6',
+          group_name: 'Group6',
           founder: 'User6',
           description: 'Descrlines.',
           gid: 'xxx6',
-          locked: false,
+          need_password: false,
         },
         {
-          name: 'Group7',
+          group_name: 'Group7',
           founder: 'User7',
           description: 'Description of Group7 that is long enough to wrap onto multiple lines.',
           gid: 'xxx7',
-          locked: false,
+          need_password: false,
         },
         {
-          name: 'Group8',
+          group_name: 'Group8',
           founder: 'User8',
           description: 'Descrlines.',
           gid: 'xxx8',
-          locked: false,
+          need_password: false,
         },
         {
-          name: 'Group9',
+          group_name: 'Group9',
           founder: 'User9',
           description: 'Description of Group9 that is long enough to wrap onto multiple lines.',
           gid: 'xxx9',
-          locked: false,
+          need_password: false,
         },
         {
-          name: 'Group10',
+          group_name: 'Group10',
           founder: 'User10',
           description: 'Another description that should also wrap onto multiple lines.',
           gid: 'xxx10',
-          locked: false,
+          need_password: false,
         }
       ],
       dialog: false,
       selectedItem: null,
       password: '',
-      temp: []
     }
   },
   mounted() {
@@ -166,7 +165,7 @@ export default {
     },
     filteredItems() {
       const filtered = this.items.filter(item =>
-        item.name && item.name.toLowerCase().includes(this.search.toLowerCase())
+        item.group_name && item.group_name.toLowerCase().includes(this.search.toLowerCase())
       );
       return filtered;
     },
@@ -181,10 +180,8 @@ export default {
       this.$store
         .dispatch("showUnGroups")
         .then((res) => {
-          this.temp = []
-          this.temp = res.groups;
-          this.temp.unshift({ header: '所有可以加入的团队' });
-          this.items = this.temp;
+          this.items.splice(0, this.items.length, { header: '所有可以加入的团队' }, ...res.groups); // 清空当前数组并插入新数据
+          console.log('@',this.items);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {
@@ -194,31 +191,36 @@ export default {
         });
     },
     applyJoin(item) {
-      if (item.locked) {
+      if (item.need_password) {
         this.selectedItem = item;
         this.dialog = true;
       } else {
-        this.$store.commit("setAlert", {type: "success", message: `加入 ${item.name} 成功`});
-        this.removeItem(item);
+        this.password = "";
+        this.confirmJoin();
       }
     },
     confirmJoin() {
-      if (this.password === '正确的密码') {
-        this.$store.commit("setAlert", {type: "success", message: `加入 ${this.selectedItem.name} 成功`});
-        this.removeItem(this.selectedItem);
-        this.dialog = false;
-        this.password = '';
-        this.selectedItem = null;
-      } else {
-        this.$store.commit("setAlert", {type: "error", message: `密码错误`});
-      }
+      this.dialog = false;
+      this.$store
+        .dispatch("joinGroup", { gid: this.selectedItem.gid, password: this.password })
+        .then((res) => {
+          this.$store.commit("setAlert", {
+            type: "success",
+            message: `加入 ${this.selectedItem.group_name} 成功`,
+          });
+        })
+        .catch((e) => {
+          this.$store.commit("setAlert", {
+            type: "error",
+            message: e,
+          });
+        })
+        .finally(() => {
+          this.getUnGroups();
+          this.password = '';
+          this.selectedItem = null;
+        });
     },
-    removeItem(item) {
-      const index = this.items.indexOf(item);
-      if (index > -1) {
-        this.items.splice(index, 1);
-      }
-    }
   },
   components: {
     searchbar

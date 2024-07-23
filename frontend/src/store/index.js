@@ -195,6 +195,17 @@ export default new Vuex.Store({
           })
       })
     },
+    JoinGroup(context, {gid, password}) {
+      return new Promise((resolve, reject) => {
+        api.JoinGroup(gid, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
   },
   modules: {
   }

@@ -15,16 +15,16 @@
                 v-text="item.header"
               ></v-subheader>
               <v-list-item
-                v-else-if="item.name"
-                :key="item.name"
+                v-else-if="item.group_name"
+                :key="item.group_name"
               >
                 <v-list-item-avatar>
-                  <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+                  <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-title>
                     <h4>
-                      {{ item.name }}
+                      {{ item.group_name }}
                     </h4>
                   </v-list-item-title>
                   <v-list-item-subtitle>
@@ -55,7 +55,7 @@
       >
         <v-card>
           <v-card-title class="text-h7">
-            确定要离开 {{curItem.name}} 吗？
+            确定要离开 {{curItem.group_name}} 吗？
           </v-card-title>
 
            <v-card-actions>
@@ -95,15 +95,15 @@ export default {
       filter: {},
       page: 1,
       currentPage: 1,
-      itemsPerPage: 4,
+      itemsPerPage: 13,
       items: [
         { header: '您加入的所有团队' },
         {
-          name: 'Group1',
+          group_name: 'Group1',
           founder: 'User1',
           description: 'Descrlines.',
           gid: 'xxx1',
-          locked: true,
+          need_password: true,
         },
       ],
     }
@@ -114,7 +114,7 @@ export default {
     },
     filteredItems() {
       const filtered = this.items.filter(item =>
-        item.name && item.name.toLowerCase().includes(this.search.toLowerCase())
+        item.group_name && item.group_name.toLowerCase().includes(this.search.toLowerCase())
       );
       // console.log('Filtered Items:', filtered); // 调试输出
       return filtered;
@@ -133,7 +133,7 @@ export default {
       this.$store
         .dispatch("showJoinedGroups")
         .then((res) => {
-          this.items.splice(0, this.items.length, { header: '所有可以加入的团队' }, ...res.groups); // 清空当前数组并插入新数据
+          this.items.splice(0, this.items.length, { header: '所有已加入的团队' }, ...res.groups); // 清空当前数组并插入新数据
           console.log(this.items);
         })
         .catch((e) => {
@@ -163,7 +163,7 @@ export default {
         .dispatch("leaveGroup",{gid: this.curItem.gid})
         .then((res) => {
           if (flag) {
-            alert(`你选择了离开 ${this.curItem.name}`);
+            alert(`你选择了离开 ${this.curItem.group_name}`);
             const index = this.items.findIndex(item => item.gid === this.curItem.gid);
             if (index !== -1) {
               this.items.splice(index, 1);
