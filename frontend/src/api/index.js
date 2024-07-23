@@ -22,6 +22,10 @@ const api = {
       console.log("createProblem");
         return await router.post(path.baseUrl + path.createProblem,problemData);
     },
+    getMyProblem: async() => {
+      console.log("getMyProblem");
+        return await router.get(path.baseUrl + path.getMyProblem);
+    },
     showJoinedGroups: async() => {
       console.log("showJoinedGroups");
       return await router.get(path.baseUrl + path.showJoinedGroups);

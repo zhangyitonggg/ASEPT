@@ -11,6 +11,7 @@ const base = {
     showUnGroups: '/user_group/show_unentered_groups',
     createProblem: '/problems/upload_problem',
     joinGroup: '/user_group/join_group',
+    getMyProblem: '/problems/my_problems'
 }
 
 export default base;

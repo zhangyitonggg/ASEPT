@@ -15,8 +15,8 @@
             :inset="item.inset"
           ></v-divider>
           <v-list-item
-            v-else-if="item.name"
-            :key="item.name"
+            v-else-if="item.title"
+            :key="item.pid"
           >
             <v-list-item-avatar>
               <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link" }}</v-icon>
@@ -24,7 +24,7 @@
             <v-list-item-content>
               <v-list-item-title>
                 <h4>
-                  {{ item.name }}
+                  {{ item.title }}
                 </h4>
               </v-list-item-title>
               <v-list-item-subtitle>
@@ -213,28 +213,31 @@ export default {
       ],
       items: [
         { header: '我创建的题目' },
-        {
-          name: 'Problem1',
-          tag: 'Descrlines.',
-          gid: 'xxx1',
-          locked: true,
-          content: '66666666',
-        },
-        {
-          name: 'Group2',
-          tag: 'Descrlines.',
-          gid: 'xxx2',
-          locked: true,
-        },
-        {
-          name: 'Group3',
-          founder: 'User3',
-          description: 'Descrlines.',
-          gid: 'xxx3',
-          locked: false,
-        },
+        // {
+        //   name: 'Problem1',
+        //   tag: 'Descrlines.',
+        //   gid: 'xxx1',
+        //   locked: true,
+        //   content: '66666666',
+        // },
+        // {
+        //   name: 'Group2',
+        //   tag: 'Descrlines.',
+        //   gid: 'xxx2',
+        //   locked: true,
+        // },
+        // {
+        //   name: 'Group3',
+        //   founder: 'User3',
+        //   description: 'Descrlines.',
+        //   gid: 'xxx3',
+        //   locked: false,
+        // },
       ],
     }
+  },
+  created() {
+    this.fetchProblems();
   },
   computed: {
     numberOfPages () {
@@ -245,6 +248,35 @@ export default {
     },
   },
   methods: {
+    fetchProblems() {
+        this.$store
+        .dispatch('getMyProblem')
+        .then(res => {
+          // this.items = response.problems.map(problem => {
+          //   return {
+          //     pid: problem.pid,
+          //     title: problem.title,
+          //     content: problem.content,
+          //     type: problem.type === 0 ? 'SINGLE_CHOICE' : 'MULTIPLE_CHOICE',
+          //     author: problem.author,
+          //     upload_time: problem.upload_time,
+          //     choices: problem.choices,
+          //     answers: problem.answers,
+          //     s_public: problem.is_public === 1,
+          //   }
+          // });
+           this.items.splice(0, this.items.length, { header: '我创建的题目' }, ...res.problems); // 清空当前数组并插入新数据
+          console.log("我创建的：",this.items);
+        })
+        .catch(error => {
+             this.$store.commit("setAlert", {
+             type: "error",
+            message: error,
+          });
+          }).finally(() => {
+          this.loading = false;
+        });
+    },
     isMultipleChoice(type) {
       return ['SINGLE_CHOICE', 'MULTIPLE_CHOICE'].includes(type);
     },
