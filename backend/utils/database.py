@@ -450,7 +450,7 @@ def modify_group(db, uid: str, gid: str, group_name: str | None = None, password
             detail="Group not found.",
         )
     cursor = db.cursor()
-    cursor.excute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
     relation = cursor.fetchone()
     if not relation:
         raise HTTPException(

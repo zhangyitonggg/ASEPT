@@ -7,7 +7,7 @@ const base = {
     leaveGroup: '/user_group/leave_group',
     showCreatedGroups: '/user_group/show_create_groups',
     createGroup: '/user_group/create_group',
-    modifyGroup: '/user_groupmodify_group',
+    modifyGroup: '/user_group/modify_group',
     showUnGroups: '/user_group/show_unentered_groups',
 }
 
