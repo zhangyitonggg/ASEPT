@@ -394,7 +394,7 @@ def find_open_groups(db, uid: str):
 
 def show_unentered_groups(db, uid: str, search_key: str):
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM UserGroups WHERE uid != %s AND MATCH(name) AGAINST(%s IN NATURAL LANGUAGE MODE)", (uid, search_key))
+    cursor.execute("SELECT * FROM UserGroups WHERE owner != %s AND MATCH(name) AGAINST(%s IN NATURAL LANGUAGE MODE)", (uid, search_key))
     groups = cursor.fetchall()
     res = []
     for group in groups:
