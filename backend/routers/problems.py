@@ -530,8 +530,8 @@ async def get_problem(
         "pid": 1,
         "title": "Problem Title",
         "content": "Problem Content",
-        "type": 'choice',
-        “author”: "xxx",(uuid)
+        "type": 'SINGLE_CHOICE' | 'MULTI_CHOICE' | 'BLANK_FILLING',
+        “author”: "xxx",
         "update_time": "2021-10-01 12:00:00",
         "choices": {
             "A": "Choice A",
@@ -539,14 +539,12 @@ async def get_problem(
             "C": "Choice C",
             "D": "Choice D"
         },
-        "answers": {
-            "A": "Choice A",
-            "B": "Choice B"
-        },
         "is_public": 0
     }
     '''
-    return database.get_problem(db, pid, user)
+    pinfo = database.get_problem(db, pid, user)
+    pinfo.pop('answers', None)
+    return pinfo
 
 @router.post('/set_problem_public_status')
 async def set_problem_public_status(

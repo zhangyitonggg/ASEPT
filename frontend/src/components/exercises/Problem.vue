@@ -1,18 +1,21 @@
 <template>
   <v-container fluid>
-      <v-col>
-        <searchbar />
-      </v-col>
+      <v-layout>
+        <v-spacer/>
+        <v-flex xs24>
+          <searchbar v-model="search" searchBtnText='搜索题目'/>
+        </v-flex>
+      </v-layout>
       <v-col>
         <v-list three-line>
-          <template v-for="(item, index) in items">
-            <v-subheader
+          <template v-for="(item, index) in currentPageItems">
+            <!-- <v-subheader
               v-if="item.header"
               :key="item.header"
               v-text="item.header"
-            ></v-subheader>
+            ></v-subheader> -->
             <v-divider
-              v-else-if="item.divider"
+              v-if="item.divider"
               :key="index"
               :inset="item.inset"
             ></v-divider>
@@ -42,6 +45,7 @@
 
             </v-list-item>
           </template>
+          <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
       </v-col>
   </v-container>
@@ -58,7 +62,8 @@ export default {
       filter: {},
       sortDesc: false,
       page: 1,
-      itemsPerPage: 4,
+      itemsPerPage: 13,
+      currentPage: 1,
       sortBy: 'name',
       keys: [
         'Name',
@@ -104,6 +109,17 @@ export default {
     filteredKeys () {
       return this.keys.filter(key => key !== 'Name')
     },
+    filteredItems() {
+      const filtered = this.items.filter(item =>
+        item.title && item.title.toLowerCase().includes(this.search.toLowerCase())
+      );
+      return filtered;
+    },
+    currentPageItems() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.filteredItems.slice(startIndex, endIndex);
+    },
   },
   methods: {
      fetchProblems() {
@@ -123,7 +139,7 @@ export default {
           //     s_public: problem.is_public === 1,
           //   }
           // });
-           this.items.splice(0, this.items.length, { header: '我创建的题目' }, ...res.problems); // 清空当前数组并插入新数据
+          this.items.splice(0, this.items.length, { header: '我创建的题目' }, ...res.problems); // 清空当前数组并插入新数据
           console.log("我创建的：",this.items);
         })
         .catch(error => {

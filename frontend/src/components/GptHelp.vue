@@ -55,7 +55,8 @@
       }
     },
     mounted() {
-        this.sendToApi("你好。")
+      this.$store.commit('setAppTitle', 'AI助手');
+      this.sendToApi("你好。")
     },
     methods: {
       // 发送消息

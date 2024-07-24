@@ -1,8 +1,18 @@
 <template>
   <v-container fluid>
+    <v-layout>
+      <!-- 创建题目按钮 -->
+      <v-flex xs1>
+        <v-btn color="primary" @click="dialogCreate = true">创建题目</v-btn>
+      </v-flex>
+      <v-spacer/>
+      <v-flex xs24>
+        <searchbar v-model="search" searchBtnText='搜索题目'/>
+      </v-flex>
+    </v-layout>
     <v-col>
       <v-list three-line>
-        <template v-for="(item, index) in items">
+        <template v-for="(item, index) in currentPageItems">
           <v-subheader
             v-if="item.header"
             :key="item.header"
@@ -44,14 +54,8 @@
             </v-list-item-action>
           </v-list-item>
         </template>
+        <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
       </v-list>
-      <v-btn
-        color="primary"
-        @click="dialogCreate = true"
-        class="mt-4"
-      >
-        创建题目
-      </v-btn>
     </v-col>
 
     <!-- 创建题目对话框 -->
@@ -188,6 +192,7 @@
 </template>
 
 <script>
+import searchbar from '../SearchBar.vue';
 export default {
   data() {
     return {
@@ -206,6 +211,9 @@ export default {
       items: [
         { header: '我创建的题目' },
       ],
+      itemsPerPage: 13,
+      currentPage: 1,
+      search:'',
     };
   },
   created() {
@@ -219,6 +227,20 @@ export default {
     filteredKeys() {
       return this.keys.filter((key) => key !== 'Name');
     },
+    filteredItems() {
+      const filtered = this.items.filter(item =>
+        item.title && item.title.toLowerCase().includes(this.search.toLowerCase())
+      );
+      return filtered;
+    },
+    currentPageItems() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.filteredItems.slice(startIndex, endIndex);
+    },
+  },
+  components: {
+    searchbar,
   },
   methods: {
     fetchProblems() {
