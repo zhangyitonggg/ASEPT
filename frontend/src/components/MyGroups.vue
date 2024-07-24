@@ -133,7 +133,7 @@ export default {
     getJoinedGroups() {
       this.$store.dispatch("showJoinedGroups")
         .then((res) => {
-          this.items.splice(0, this.items.length, { header: '所有已加入的团队' }, ...res.groups);
+          this.items.splice(0, this.items.length, ...res.groups);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {
