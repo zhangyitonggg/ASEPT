@@ -98,13 +98,13 @@ async def get_problem_groups(
                 "pgid": "1",
                 "name": "Problem Group Name",
                 "description": "Problem Group Description",
-                "owner": "Creator Name",
+                "owner": "xxx",(uuid)
             },
             {
                 "pgid": "2",
                 "name": "Problem Group Name",
                 "description": "Problem Group Description",
-                "owner": "Creator Name",
+                "owner": "xxx",(uuid)
             }
         ]
     }
@@ -131,7 +131,7 @@ async def get_problem_group_info(
         "pgid": "1",
         "name": "Problem Group Name",
         "description": "Problem Group Description",
-        "owner": "Creator Name",
+        "owner": "xxx",(uuid)
     }
     ```
     '''
@@ -158,9 +158,9 @@ async def get_problem_group_problems(
                 "pid": 1,
                 "title": "Problem Title",
                 "content": "Problem Content",
-                "type": 0,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
+                "type": 'choice',
+                “author”: 'xxxx',(uuid)
+                "update_time": "2021-10-01 12:00:00",
                 "choices": {
                     "A": "Choice A",
                     "B": "Choice B",
@@ -177,15 +177,10 @@ async def get_problem_group_problems(
                 "pid": 2,
                 "title": "Problem Title",
                 "content": "Problem Content",
-                "type": 1,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
-                "choices": {
-                    "A": "Choice A",
-                    "B": "Choice B",
-                    "C": "Choice C",
-                    "D": "Choice D"
-                },
+                "type": 'blank_filling',
+                “author”: 'xxxx',(uuid)
+                "update_time": "2021-10-01 12:00:00",
+                "choices": null,
                 "answers": {
                     "B": "Choice B"
                 },
@@ -296,9 +291,9 @@ async def search_problem_by_tag(
                 "pid": 1,
                 "title": "Problem Title",
                 "content": "Problem Content",
-                "type": 0,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
+                "type": 'choice',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
                 "choices": {
                     "A": "Choice A",
                     "B": "Choice B",
@@ -315,15 +310,10 @@ async def search_problem_by_tag(
                 "pid": 2,
                 "title": "Problem Title",
                 "content": "Problem Content",
-                "type": 1,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
-                "choices": {
-                    "A": "Choice A",
-                    "B": "Choice B",
-                    "C": "Choice C",
-                    "D": "Choice D"
-                },
+                "type": 'blank_filling',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
+                "choices": null,
                 "answers": {
                     "B": "Choice B"
                 },
@@ -351,9 +341,9 @@ async def get_my_problems(
                 "pid": 1,
                 "title": "Problem Title",
                 "content": "Problem Content",
-                "type": 0,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
+                "type": 'choice',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
                 "choices": {
                     "A": "Choice A",
                     "B": "Choice B",
@@ -370,15 +360,10 @@ async def get_my_problems(
                 "pid": 2,
                 "title": "Problem Title",
                 "content": "Problem Content",
-                "type": 1,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
-                "choices": {
-                    "A": "Choice A",
-                    "B": "Choice B",
-                    "C": "Choice C",
-                    "D": "Choice D"
-                },
+                "type": 'blank_filling',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
+                "choices": null,
                 "answers": {
                     "B": "Choice B"
                 },
@@ -388,9 +373,9 @@ async def get_my_problems(
                 "pid": 2,
                 "title": "Problem Title",
                 "content": "Problem Content",
-                "type": 1,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
+                "type": 'blank_filling',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
                 "choices": null,
                 "answers": {
                     "B": "Choice B"
@@ -493,9 +478,9 @@ async def get_problem_recommend(
                 "pid": 1,
                 "title": "Problem Title",
                 "content": "Problem Content",
-                "type": 0,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
+                "type": 'choice',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
                 "choices": {
                     "A": "Choice A",
                     "B": "Choice B",
@@ -512,15 +497,10 @@ async def get_problem_recommend(
                 "pid": 2,
                 "title": "Problem Title",
                 "content": "Problem Content",
-                "type": 1,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
-                "choices": {
-                    "A": "Choice A",
-                    "B": "Choice B",
-                    "C": "Choice C",
-                    "D": "Choice D"
-                },
+                "type": 'blank_filling',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
+                "choices": null,
                 "answers": {
                     "B": "Choice B"
                 },
@@ -548,9 +528,9 @@ async def get_problem(
         "pid": 1,
         "title": "Problem Title",
         "content": "Problem Content",
-        "type": 0,
-        “author”: "Author Name",
-        "upload_time": "2021-10-01 12:00:00",
+        "type": 'choice',
+        “author”: "xxx",(uuid)
+        "update_time": "2021-10-01 12:00:00",
         "choices": {
             "A": "Choice A",
             "B": "Choice B",
@@ -565,10 +545,23 @@ async def get_problem(
     }
     '''
     return database.get_problem(db, pid, user)
-    # if database.problem_accessible(db, user, problem_id):
-    #     return database.get_problem(db, problem_id)
-    # raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
 
+@router.post('/set_problem_public_status')
+async def set_problem_public_status(
+    pid: str,
+    is_public: bool,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    设置题目是否公开。
+    
+    pid: str，题目 id
+    
+    is_public: bool，是否公开
+    '''
+    database.set_problem_public_status(db, pid, is_public, user)
+    return {'status': 'success'}
 
 def check_problem_format(problem: Choice_Problem | Blank_Filling_Problem):
     try:

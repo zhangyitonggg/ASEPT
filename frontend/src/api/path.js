@@ -23,7 +23,7 @@ const base = {
     get_problem: '/problems/get_problem',
     joinGroup: '/user_group/join_group',
     getMyProblem: '/problems/my_problems',
-    getProblemById: '/problems',
+    getProblemById: '/problems/get_problem',
     get_problem_group_info: '/problems/get_problem_group_info',
     get_problem_group_problems: '/problems/get_problem_group_problems',
     get_problem_groups: '/problems/get_problem_groups',

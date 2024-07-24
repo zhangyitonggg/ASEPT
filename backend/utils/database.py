@@ -564,6 +564,55 @@ def create_problem_group(db, group_name: str, description: str, owner: User):
     cursor.execute("INSERT INTO ProblemGroups (pgid, name, description, owner) VALUES (UUID(), %s, %s, %s)", (group_name, description, owner.uid))
     db.commit()
 
+def get_pgids_user_can_access(db, user: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
+    groups = cursor.fetchall()
+    gids = [group[1] for group in groups]
+    all_pgids = []
+    for gid in gids:
+        cursor.execute("SELECT * FROM ProblemGroupPerm WHERE gid = %s", (gid))
+        pgids = cursor.fetchall()
+        pgids = [pgid[0] for pgid in pgids]
+        all_pgids.extend(pgids)
+    # get the problem groups that the user created
+    cursor.execute("SELECT * FROM ProblemGroups WHERE owner = %s", (user.uid))
+    groups = cursor.fetchall()
+    pgids = [group[0] for group in groups]
+    all_pgids.extend(pgids)
+    return list(set(all_pgids))
+
+def get_all_accessible_problems(db, user: User):
+    # get problem groups that user has access to
+    # print('problems')
+    all_pgids = get_pgids_user_can_access(db, user)
+    # print('pgids:', all_pgids)
+    # get the problems owned by the user
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE author = %s", (user.uid))
+    all_pids = cursor.fetchall()
+    all_pids = [pid[0] for pid in all_pids]
+    # print('all_pids:', all_pids)
+    # get all the pids
+    for pgid in all_pgids:
+        cursor.execute("SELECT * FROM ProblemGroupMembers WHERE pgid = %s", (pgid))
+        pids = cursor.fetchall()
+        pids = [pid[1] for pid in pids]
+        all_pids.extend(pids)
+    # print('all_pids:', all_pids)
+    all_pids = list(set(all_pids))
+    # print('uniqued all_pids:', all_pids)
+    # get all the problems that the user has access to
+    problems_with_access = []
+    for pid in all_pids:
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+        problem = cursor.fetchone()
+        # print('problem: ', problem)
+        problems_with_access.append(problem)
+        # print('problem added')
+    # delete problmes that is not public and not created by the user
+    problems_with_access = [problem for problem in problems_with_access if problem[8] == 1 or problem[4] == user.uid]
+    return problems_with_access
 
 def get_problem_groups(db, user: User):
     '''
@@ -590,17 +639,8 @@ def get_problem_groups(db, user: User):
     }
     ```
     '''
+    all_pgids = get_pgids_user_can_access(db, user)
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
-    groups = cursor.fetchall()
-    gids = [group[1] for group in groups]
-    all_pgids = []
-    for gid in gids:
-        cursor.execute("SELECT * FROM ProblemGroupPerm WHERE gid = %s", (gid))
-        pgids = cursor.fetchall()
-        pgids = [pgid[0] for pgid in pgids]
-        all_pgids.extend(pgids)
-    all_pgids = list(set(all_pgids))
     res = []
     for pgid in all_pgids:
         cursor.execute("SELECT * FROM ProblemGroups WHERE pgid = %s", (pgid))
@@ -609,45 +649,17 @@ def get_problem_groups(db, user: User):
             "pgid": group[0],
             "name": group[1],
             "description": group[2],
-            "owner": get_user_by_uid(db, group[3])[0],
+            "owner": group[3],
         })
     return {"problem_groups": res}
     
-    
-def get_all_accessible_problems(db, user: User):
-    # get problems that user has access to
-    # get the problems owned by the user
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM Problems WHERE author = %s", (user.uid))
-    all_pids = cursor.fetchall()
-    all_pids = [pid[0] for pid in all_pids]
-    # get all the groups that the user is in
-    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
-    groups = cursor.fetchall()
-    # for each group, get problems the group has access to
-    # get all the pgids
-    all_pgids = []
-    for group in groups:
-        cursor.execute("SELECT * FROM ProblemGroupPerm WHERE gid = %s", (group[1]))
-        pgids = cursor.fetchall()
-        all_pgids.extend(pgids)
-    all_pgids = list(set(all_pgids))
-    # get all the pids
-    for pgid in all_pgids:
-        cursor.execute("SELECT * FROM ProblemGroupMembers WHERE pgid = %s", (pgid))
-        pids = cursor.fetchall()
-        all_pids.extend(pids)
-    all_pids = list(set(all_pids))
-    # get all the problems that the user has access to
-    problems_with_access = []
-    for pid in all_pids:
-        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
-        problem = cursor.fetchone()
-        problems_with_access.append(problem)
-    return problems_with_access
-    
-
-def get_problem_group_info(db, pgid: str):
+def get_problem_group_info(db, pgid: str, user: User):
+    all_pgids = get_pgids_user_can_access(db, user)
+    if pgid not in all_pgids:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied. You do not have access to this group."
+        )
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemGroups WHERE pgid = %s", (pgid))
     group = cursor.fetchone()
@@ -660,11 +672,17 @@ def get_problem_group_info(db, pgid: str):
         "pgid": group[0],
         "name": group[1],
         "description": group[2],
-        "owner": get_user_by_uid(db, group[3])[0],
+        "owner": group[3],
     }
 
 
-def get_problem_group_problems(db, pgid: str):
+def get_problem_group_problems(db, pgid: str, user: User):
+    all_pgids = get_pgids_user_can_access(db, user)
+    if pgid not in all_pgids:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied. You do not have access to this group."
+        )
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemGroupMembers WHERE pgid = %s", (pgid))
     problems = cursor.fetchall()
@@ -677,7 +695,7 @@ def get_problem_group_problems(db, pgid: str):
             "title": problem_info[1],
             "content": problem_info[2],
             "type": problem_info[3],
-            "author": get_user_by_uid(db, problem_info[4])[0],
+            "author": problem_info[4],
             "update_time": problem_info[5],
             "choices": problem_info[6],
             "answers": problem_info[7],
@@ -744,10 +762,12 @@ def share_problem_group_to_user_group(db, pgid: str, gid: str, user: User):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Group not found."
         )
-    if group[3] != user.uid:
+    # if the user is not in the problem group
+    cursor.execute("SELECT * FROM ProblemGroupMembers WHERE (pgid, pid) = (%s, %s)", (pgid, user.uid))
+    if not cursor.fetchone():
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permission denied. You are not the owner of this group."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Permission denied. You are not in the group."
         )
     cursor.execute("SELECT * FROM UserGroups WHERE gid = %s", (gid))
     user_group = cursor.fetchone()
@@ -815,7 +835,7 @@ def search_problem_by_tag(db, tag: str, user: User):
             "title": problem[1],
             "content": problem[2],
             "type": problem[3],
-            "author": get_user_by_uid(db, problem[4])[0],
+            "author": problem[4],
             "update_time": problem[5],
             "choices": problem[6],
             "answers": problem[7],
@@ -829,20 +849,25 @@ def get_my_problems(db, user: User):
     problems = cursor.fetchall()
     res = []
     for problem in problems:
-        res.append(Problem(
-            pid=problem[0],
-            title=problem[1],
-            content=problem[2],
-            type=ProblemType[problem[3].upper()],
-            author=problem[4],
-            update_time=str(problem[5]),
-            choices=problem[6],
-            answers=problem[7],
-            is_public=bool(problem[8])
-        ))
+        res.append({
+            "pid": problem[0],
+            "title": problem[1],
+            "content": problem[2],
+            "type": problem[3],
+            "author": problem[4],
+            "update_time": problem[5],
+            "choices": problem[6],
+            "answers": problem[7],
+            "is_public": problem[8],
+        })
     return {"problems": res}
 
 def submit_problem(db, pid: str, answer: str, user: User):
+    if len(answer) > 2000:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Answer too long"
+        )
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
     problem = cursor.fetchone()
@@ -851,17 +876,8 @@ def submit_problem(db, pid: str, answer: str, user: User):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Problem not found."
         )
-    cursor.execute("SELECT * FROM ProblemGroupMembers WHERE pid = %s", (pid))
-    pgroups = cursor.fetchall()
-    groups_with_access = []
-    for pgroup in pgroups:
-        cursor.execute("SELECT * FROM ProblemGroupPerm WHERE pgid = %s", (pgroup[1]))
-        groups_with_access.append(cursor.fetchall())
-    groups_with_access = set([group[1] for group in groups_with_access])
-    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
-    groups_user_in = cursor.fetchall()
-    groups_user_in = set([group[1] for group in groups_user_in])
-    if not groups_user_in & groups_with_access:
+    problems_with_access = get_all_accessible_problems(db, user)
+    if problem not in problems_with_access:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permission denied."
@@ -968,9 +984,11 @@ def get_problem_recommend(db, user: User):
     }
     '''
     # take 20 problem with max wrong rate and choose rondom 10 problem within them
+    # print("enter")
+    problems = get_all_accessible_problems(db, user)
+    print("get problems:")
+    print(problems)
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM Problems")
-    problems = cursor.fetchall()
     res = []
     for problem in problems:
         cursor.execute("SELECT * FROM ProblemSubmit WHERE pid = %s", (problem[0]))
@@ -979,14 +997,11 @@ def get_problem_recommend(db, user: User):
         for submit in submits:
             if submit[5]:
                 correct += 1
-        if len(submits) != 0:
-            res.append((problem[0], correct / len(submits)))
+        res.append((problem[0], correct / len(submits) if len(submits) != 0 else 0))
     res = sorted(res, key=lambda x: x[1])
     res = res[:20]
-    if len(res) < 10:
-        res = random.sample(res, len(res))
-    else:
-        res = random.sample(res, 10)
+    if len(res) > 10:
+        res = random.sample(res, (10))
     res = res[:10]
     final_res = []
     for problem in res:
@@ -1068,14 +1083,31 @@ def get_problem(db, pid: str, user: User):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
     problem = cursor.fetchone()
-    return Problem(
-        pid=problem[0],
-        title=problem[1],
-        content=problem[2],
-        type=ProblemType[problem[3].upper()],
-        author=problem[4],
-        update_time=str(problem[5]),
-        choices=problem[6],
-        answers=problem[7],
-        is_public=bool(problem[8])
-    )
+    return {
+        "pid": problem[0],
+        "title": problem[1],
+        "content": problem[2],
+        "type": problem[3],
+        "author": get_user_by_uid(db, problem[4])[0],
+        "upload_time": problem[5],
+        "choices": problem[6],
+        "answers": problem[7],
+        "is_public": problem[8],
+    }
+    
+def set_problem_public_status(db, pid: str, is_public: bool, user: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if problem == None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    if problem[4] != user.uid:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied."
+        )
+    cursor.execute("UPDATE Problems SET is_public = %s WHERE pid = %s", (1 if is_public else 0, pid))
+    db.commit()
