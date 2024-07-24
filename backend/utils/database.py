@@ -987,8 +987,6 @@ def get_problem_recommend(db, user: User):
     # take 20 problem with max wrong rate and choose rondom 10 problem within them
     # print("enter")
     problems = get_all_accessible_problems(db, user)
-    print("get problems:")
-    print(problems)
     cursor = db.cursor()
     res = []
     for problem in problems:
@@ -1098,3 +1096,18 @@ def set_problem_public_status(db, pid: str, is_public: bool, user: User):
         )
     cursor.execute("UPDATE Problems SET is_public = %s WHERE pid = %s", (1 if is_public else 0, pid))
     db.commit()
+
+
+def get_user_problem_groups(db, user: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemGroups WHERE owner = %s", (user.uid))
+    groups = cursor.fetchall()
+    res = []
+    for group in groups:
+        res.append({
+            "pgid": group[0],
+            "name": group[1],
+            "description": group[2],
+            "owner": group[3],
+        })
+    return {"problem_groups": res}

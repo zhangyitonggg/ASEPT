@@ -83,7 +83,7 @@ async def create_problem_group(
     return {'status': 'success'}
 
 
-@router.get('/get_problem_groups')
+@router.get('/accessible_problem_groups')
 async def get_problem_groups(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
@@ -562,6 +562,39 @@ async def set_problem_public_status(
     '''
     database.set_problem_public_status(db, pid, is_public, user)
     return {'status': 'success'}
+
+
+@router.post('/my_problem_groups')
+async def get_user_problem_groups(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取用户创建的题目组。
+    
+    返回格式：
+    
+    ```json
+    {
+        "problem_groups": [
+            {
+                "pgid": "1",
+                "name": "Problem Group Name",
+                "description": "Problem Group Description",
+                "owner": "xxx",(uuid)
+            },
+            {
+                "pgid": "2",
+                "name": "Problem Group Name",
+                "description": "Problem Group Description",
+                "owner": "xxx",(uuid)
+            }
+        ]
+    }
+    ```
+    '''
+    return database.get_user_problem_groups(db, user)
+
 
 def check_problem_format(problem: Choice_Problem | Blank_Filling_Problem):
     try:
