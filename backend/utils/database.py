@@ -563,8 +563,90 @@ def create_problem_group(db, group_name: str, description: str, owner: User):
     cursor = db.cursor()
     cursor.execute("INSERT INTO ProblemGroups (pgid, name, description, owner) VALUES (UUID(), %s, %s, %s)", (group_name, description, owner.uid))
     db.commit()
+
+
+def get_problem_groups(db, user: User):
+    '''
+    获取用户有权限访问的题目组。
+    
+    返回格式：
+    
+    ```json
+    {
+        "problem_groups": [
+            {
+                "pgid": "1",
+                "name": "Problem Group Name",
+                "description": "Problem Group Description",
+                "owner": "Creator Name",
+            },
+            {
+                "pgid": "2",
+                "name": "Problem Group Name",
+                "description": "Problem Group Description",
+                "owner": "Creator Name",
+            }
+        ]
+    }
+    ```
+    '''
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
+    groups = cursor.fetchall()
+    gids = [group[1] for group in groups]
+    all_pgids = []
+    for gid in gids:
+        cursor.execute("SELECT * FROM ProblemGroupPerm WHERE gid = %s", (gid))
+        pgids = cursor.fetchall()
+        pgids = [pgid[0] for pgid in pgids]
+        all_pgids.extend(pgids)
+    all_pgids = list(set(all_pgids))
+    res = []
+    for pgid in all_pgids:
+        cursor.execute("SELECT * FROM ProblemGroups WHERE pgid = %s", (pgid))
+        group = cursor.fetchone()
+        res.append({
+            "pgid": group[0],
+            "name": group[1],
+            "description": group[2],
+            "owner": get_user_by_uid(db, group[3])[0],
+        })
+    return {"problem_groups": res}
     
     
+def get_all_accessible_problems(db, user: User):
+    # get problems that user has access to
+    # get the problems owned by the user
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE author = %s", (user.uid))
+    all_pids = cursor.fetchall()
+    all_pids = [pid[0] for pid in all_pids]
+    # get all the groups that the user is in
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
+    groups = cursor.fetchall()
+    # for each group, get problems the group has access to
+    # get all the pgids
+    all_pgids = []
+    for group in groups:
+        cursor.execute("SELECT * FROM ProblemGroupPerm WHERE gid = %s", (group[1]))
+        pgids = cursor.fetchall()
+        all_pgids.extend(pgids)
+    all_pgids = list(set(all_pgids))
+    # get all the pids
+    for pgid in all_pgids:
+        cursor.execute("SELECT * FROM ProblemGroupMembers WHERE pgid = %s", (pgid))
+        pids = cursor.fetchall()
+        all_pids.extend(pids)
+    all_pids = list(set(all_pids))
+    # get all the problems that the user has access to
+    problems_with_access = []
+    for pid in all_pids:
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+        problem = cursor.fetchone()
+        problems_with_access.append(problem)
+    return problems_with_access
+    
+
 def get_problem_group_info(db, pgid: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemGroups WHERE pgid = %s", (pgid))
@@ -715,38 +797,6 @@ def add_problem_tag(db, pid: str, tag: str, user: User):
     cursor.execute("INSERT INTO ProblemTags (pid, tag) VALUES (%s, %s)", (pid, tag))
     db.commit()
 
-def get_all_accessible_problems(db, user: User):
-    # get problems that user has access to
-    # get the problems owned by the user
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM Problems WHERE author = %s", (user.uid))
-    all_pids = cursor.fetchall()
-    all_pids = [pid[0] for pid in all_pids]
-    # get all the groups that the user is in
-    cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
-    groups = cursor.fetchall()
-    # for each group, get problems the group has access to
-    # get all the pgids
-    all_pgids = []
-    for group in groups:
-        cursor.execute("SELECT * FROM ProblemGroupPerm WHERE gid = %s", (group[1]))
-        pgids = cursor.fetchall()
-        all_pgids.extend(pgids)
-    all_pgids = list(set(all_pgids))
-    # get all the pids
-    for pgid in all_pgids:
-        cursor.execute("SELECT * FROM ProblemGroupMembers WHERE pgid = %s", (pgid))
-        pids = cursor.fetchall()
-        all_pids.extend(pids)
-    all_pids = list(set(all_pids))
-    # get all the problems that the user has access to
-    problems_with_access = []
-    for pid in all_pids:
-        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
-        problem = cursor.fetchone()
-        problems_with_access.append(problem)
-    return problems_with_access
-    
 
 def search_problem_by_tag(db, tag: str, user: User):
     problems_with_access = get_all_accessible_problems(db, user)

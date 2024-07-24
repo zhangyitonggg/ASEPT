@@ -81,6 +81,38 @@ async def create_problem_group(
     return {'status': 'success'}
 
 
+@router.get('/get_problem_groups')
+async def get_problem_groups(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取用户有权限访问的题目组。
+    
+    返回格式：
+    
+    ```json
+    {
+        "problem_groups": [
+            {
+                "pgid": "1",
+                "name": "Problem Group Name",
+                "description": "Problem Group Description",
+                "owner": "Creator Name",
+            },
+            {
+                "pgid": "2",
+                "name": "Problem Group Name",
+                "description": "Problem Group Description",
+                "owner": "Creator Name",
+            }
+        ]
+    }
+    ```
+    '''
+    return database.get_problem_groups(db, user)
+
+
 @router.get('/get_problem_group_info')
 async def get_problem_group_info(
     pgid: str,
