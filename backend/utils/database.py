@@ -1014,35 +1014,14 @@ def get_problem(db, pid: str, user: User):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
     problem = cursor.fetchone()
-    return {
-        "pid": problem[0],
-        "title": problem[1],
-        "content": problem[2],
-        "type": problem[3],
-        "author": get_user_by_uid(db, problem[4])[0],
-        "upload_time": problem[5],
-        "choices": problem[6],
-        "answers": problem[7],
-        "is_public": problem[8],
-    }
-    
-    # cursor = db.cursor()
-    # cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
-    # problem = cursor.fetchone()
-    # if problem == None:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND,
-    #         detail="Problem not found."
-    #     )
-    # problem = Problem(
-    #     pid=problem[0],
-    #     title=problem[1],
-    #     content=problem[2],
-    #     type=ProblemType[problem[3].upper()],
-    #     author=problem[4],
-    #     update_time=str(problem[5]),
-    #     choices=problem[6],
-    #     answers=problem[7],
-    #     is_public=bool(problem[8])
-    # )
-    # return problem
+    return Problem(
+        pid=problem[0],
+        title=problem[1],
+        content=problem[2],
+        type=ProblemType[problem[3].upper()],
+        author=problem[4],
+        update_time=str(problem[5]),
+        choices=problem[6],
+        answers=problem[7],
+        is_public=bool(problem[8])
+    )

@@ -500,7 +500,7 @@ async def get_problem_recommend(
     return database.get_problem_recommend(db, user)
 
 
-@router.get('/get_problem', response_model=Problem)
+@router.get('/get_problem')
 async def get_problem(
     pid: str,
     user: User = Depends(security.get_user),
@@ -533,12 +533,6 @@ async def get_problem(
     }
     '''
     return database.get_problem(db, pid, user)
-    
-    
-    '''
-    NOTICE: This function is not complete and will not work as expected.
-            This function must be placed at the end of the file to avoid conflict with other routers.
-    '''
     # if database.problem_accessible(db, user, problem_id):
     #     return database.get_problem(db, problem_id)
     # raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
