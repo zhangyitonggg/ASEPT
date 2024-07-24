@@ -140,6 +140,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getProblemsRecommended(context) {
+      return new Promise((resolve, reject) => {
+        api.getProblemsRecommended()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     getProblemById(context,pid) {
       return new Promise((resolve, reject) => {
         api.getProblemById(pid)

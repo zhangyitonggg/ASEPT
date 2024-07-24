@@ -24,7 +24,11 @@ const api = {
     },
     getMyProblem: async() => {
       console.log("getMyProblem");
-        return await router.get(path.baseUrl + path.getMyProblem);
+      return await router.get(path.baseUrl + path.getMyProblem);
+    },
+    getProblemsRecommended: async() => {
+      console.log("getProblemsRecommended");
+      return await router.get(path.baseUrl + path.getProblemsRecommended);
     },
     getProblemById: async(pid) => {
       console.log("getProblemById");
@@ -109,6 +113,10 @@ const api = {
     get_problem_group_problems: async(pgid) => {
       console.log("get_problem_group_problems");
       return await router.get(path.baseUrl + path.get_problem_group_problems, {pgid: pgid});
+    },
+    get_problem_groups: async() => {
+      console.log("get_problem_groups");
+      return await router.get(path.baseUrl + path.get_problem_groups);
     },
 };
 
