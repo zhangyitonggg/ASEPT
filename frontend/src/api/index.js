@@ -30,6 +30,11 @@ const api = {
       console.log("getProblemById");
         return await router.get(path.baseUrl + path.getProblemById,{params:{pid :pid }});
     },
+    createProblemList: async(list) => {
+      console.log("createProblemList: ", list);
+
+      return await router.post(path.baseUrl + path.createProblemGroup,{},{params:{name :list.name,description:list.description }});
+    },
     showJoinedGroups: async() => {
       console.log("showJoinedGroups");
       return await router.get(path.baseUrl + path.showJoinedGroups);
