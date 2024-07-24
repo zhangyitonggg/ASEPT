@@ -26,6 +26,7 @@ const base = {
     getProblemById: '/problems',
     get_problem_group_info: '/problems/get_problem_group_info',
     get_problem_group_problems: '/problems/get_problem_group_problems',
+    get_problem_groups: '/problems/get_problem_groups',
 }
 
 export default base;
