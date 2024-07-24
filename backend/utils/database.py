@@ -1047,33 +1047,6 @@ def problem_accessible(db, user: User, pid: str):
 
 
 def get_problem(db, pid: str, user: User):
-    '''
-    根据pid获取题目信息。
-    
-    返回格式：
-    
-    ```
-    {
-        "pid": 1,
-        "title": "Problem Title",
-        "content": "Problem Content",
-        "type": 0,
-        “author”: "Author Name",
-        "upload_time": "2021-10-01 12:00:00",
-        "choices": {
-            "A": "Choice A",
-            "B": "Choice B",
-            "C": "Choice C",
-            "D": "Choice D"
-        },
-        "answers": {
-            "A": "Choice A",
-            "B": "Choice B"
-        },
-        "is_public": 0
-    }
-    '''
-    # check user's permission and then return problem or raise error
     problems_with_access = get_all_accessible_problems(db, user)
     problems_with_access = [problem[0] for problem in problems_with_access]
     if pid not in problems_with_access:
@@ -1084,18 +1057,31 @@ def get_problem(db, pid: str, user: User):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
     problem = cursor.fetchone()
+    if problem == None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    if problem[3] == "choice":
+        if len(json.loads(problem[7])) > 1:
+            ptype = "MULTIPLE_CHOICE"
+        else:
+            ptype = "SINGLE_CHOICE"
+    else:
+        ptype = "BLANK_FILLING"
     return {
         "pid": problem[0],
         "title": problem[1],
         "content": problem[2],
-        "type": problem[3].upper(),
+        "type": ptype,
         "author": get_user_by_uid(db, problem[4])[0],
         "upload_time": problem[5],
         "choices": problem[6],
         "answers": problem[7],
         "is_public": problem[8],
     }
-    
+
+
 def set_problem_public_status(db, pid: str, is_public: bool, user: User):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
