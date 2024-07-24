@@ -297,33 +297,35 @@ export default {
       this.currentProblem = item;
       this.dialogEdit = true;
     },
-    createProblem() {
-      const newProblemData = {
-        title: this.newProblem.name,
-        content: this.newProblem.content,
-        tag: this.newProblem.tag,
-        type: this.newProblem.type,
-        choices: this.newProblem.options,
-        answer: this.newProblem.correctAnswer,
-        fillBlanks: this.newProblem.fillBlanks,
-      };
-      this.$store
-        .dispatch('createProblem', newProblemData)
-        .then(() => {
-          this.$store.commit('setAlert', {
-            type: 'success',
-            message: '题目创建成功！',
-          });
-          this.dialogCreate = false;
-          this.fetchProblems(); // 重新获取题目列表
-        })
-        .catch((error) => {
-          this.$store.commit('setAlert', {
-            type: 'error',
-            message: error,
-          });
-        });
-    },
+    // createProblem() {
+      
+    //   const newProblemData = {
+    //     title: this.newProblem.name,
+    //     content: this.newProblem.content,
+    //     tag: this.newProblem.tag,
+    //     type: this.newProblem.type,
+    //     choices: this.newProblem.options,
+    //     answer: this.newProblem.correctAnswer,
+    //     fillBlanks: this.newProblem.fillBlanks,
+    //   };
+    //   console.log(newProblemData);
+    //   this.$store
+    //     .dispatch('createProblem', newProblemData)
+    //     .then(() => {
+    //       this.$store.commit('setAlert', {
+    //         type: 'success',
+    //         message: '题目创建成功！',
+    //       });
+    //       this.dialogCreate = false;
+    //       this.fetchProblems(); // 重新获取题目列表
+    //     })
+    //     .catch((error) => {
+    //       this.$store.commit('setAlert', {
+    //         type: 'error',
+    //         message: error,
+    //       });
+    //     });
+    // },
     confirmAddToList() {
       let proid = this.currentProblem.pid;
       let listid = this.selectedList;
@@ -346,6 +348,58 @@ export default {
           });
         });
     },
+     createProblem() {
+    // 构造 choices 对象
+    const choices = this.newProblem.options.reduce((acc, choice, index) => {
+      const key = String.fromCharCode(65 + index); // 生成键名，如 'A', 'B', 'C' 等
+      if (choice.trim()) {
+        acc[key] = choice;
+      }
+      return acc;
+    }, {});
+
+    // 将 choices 对象转换为 JSON 字符串
+    const choicesJson = JSON.stringify(choices);
+
+    // 构造 answer 对象
+    const answer = {};
+    const correctAnswerKey = this.newProblem.correctAnswer;
+    if (correctAnswerKey && choices[correctAnswerKey]) {
+      answer[correctAnswerKey] = choices[correctAnswerKey];
+    }
+
+    // 将 answer 对象转换为 JSON 字符串
+    const answerJson = JSON.stringify(answer);
+
+    // 准备新的题目数据
+    const newProblemData = {
+      title: this.newProblem.name,
+      content: this.newProblem.content,
+      tag: this.newProblem.tag,
+      type: this.newProblem.type,
+      choices: choicesJson, // 转换为 JSON 字符串
+      answer: answerJson, // 转换为 JSON 字符串
+      fillBlanks: this.newProblem.fillBlanks, // 假设 fillBlanks 可以直接发送
+    };
+  console.log(newProblemData);
+    // 发送请求创建题目
+    this.$store
+      .dispatch('createProblem', newProblemData)
+      .then(() => {
+        this.$store.commit('setAlert', {
+          type: 'success',
+          message: '题目创建成功！',
+        });
+        this.dialogCreate = false;
+        this.fetchProblems(); // 刷新题目列表
+      })
+      .catch((error) => {
+        this.$store.commit('setAlert', {
+          type: 'error',
+          message: error,
+        });
+      });
+  },
     confirmChangeProblem() {
       this.$store
         .dispatch('updateProblem', this.currentProblem)

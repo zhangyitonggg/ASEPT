@@ -161,7 +161,7 @@ export default {
             <v-card-title>{{ question.title }}</v-card-title>
             <v-card-text>
               <p>{{ question.content }}</p>
-              <template v-if="question.type === 'CHOICE' && question.choices">
+              <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
                 <template v-if="isSingleChoice">
                   <v-radio-group v-model="answer">
                     <v-radio
@@ -204,7 +204,7 @@ export default {
         <v-card v-if="correctAnswers" class="mt-4">
           <v-card-title>Correct Answers</v-card-title>
           <v-card-text>
-            <div v-if="question.type === 'CHOICE'">
+            <div v-if="question.type === 'SINGLE_CHOICE'">
               <p>Correct Choice(s):</p>
               <ul>
                 <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
@@ -260,6 +260,7 @@ export default {
             choices: this.parseChoices(res.choices),
             answers: this.parseAnswers(res.answers),
           };
+          console.log(this.question);
           this.isSingleChoice = this.question.answers && Object.keys(this.question.answers).length === 1;
         })
         .catch(error => {
@@ -285,7 +286,7 @@ export default {
       let correctAnswers = this.question.answers;
       let isCorrect = false;
 
-      if (this.question.type === 'CHOICE') {
+      if (this.question.type === 'SINGLE_CHOICE') {
         if (this.isSingleChoice) {
            console.log('cor: ',correctAnswers);
           console.log('cor: ',Object.keys(correctAnswers));
