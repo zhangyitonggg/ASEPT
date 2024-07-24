@@ -24,7 +24,11 @@ const api = {
     },
     getMyProblem: async() => {
       console.log("getMyProblem");
-        return await router.get(path.baseUrl + path.getMyProblem);
+      return await router.get(path.baseUrl + path.getMyProblem);
+    },
+    getProblemsRecommended: async() => {
+      console.log("getProblemsRecommended");
+      return await router.get(path.baseUrl + path.getProblemsRecommended);
     },
     getProblemById: async(pid) => {
       console.log("getProblemById");

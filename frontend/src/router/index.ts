@@ -92,6 +92,15 @@ const routes: Array<RouteConfig> = [
     }
   },
   {
+    path:'/arrange',
+    name:'arrange',
+    component: () => import('../views/ArrangeView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: '推荐题目'
+    }
+  },
+  {
     path: '*',
     name: 'NotFound',
     component: NotFound,
