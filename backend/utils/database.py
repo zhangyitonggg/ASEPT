@@ -563,6 +563,45 @@ def create_problem_group(db, group_name: str, description: str, owner: User):
     cursor = db.cursor()
     cursor.execute("INSERT INTO ProblemGroups (pgid, name, description, owner) VALUES (UUID(), %s, %s, %s)", (group_name, description, owner.uid))
     db.commit()
+    
+    
+def get_problem_group_info(db, pgid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemGroups WHERE pgid = %s", (pgid))
+    group = cursor.fetchone()
+    if not group:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Group not found."
+        )
+    return {
+        "pgid": group[0],
+        "name": group[1],
+        "description": group[2],
+        "owner": get_user_by_uid(db, group[3])[0],
+    }
+
+
+def get_problem_group_problems(db, pgid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemGroupMembers WHERE pgid = %s", (pgid))
+    problems = cursor.fetchall()
+    res = []
+    for problem in problems:
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (problem[1]))
+        problem_info = cursor.fetchone()
+        res.append({
+            "pid": problem_info[0],
+            "title": problem_info[1],
+            "content": problem_info[2],
+            "type": problem_info[3],
+            "author": get_user_by_uid(db, problem_info[4])[0],
+            "update_time": problem_info[5],
+            "choices": problem_info[6],
+            "answers": problem_info[7],
+            "is_public": problem_info[8],
+        })
+    return {"problems": res}
 
 
 def change_problem_group_info(db, pgid: str, group_name: str, description: str, owner: User):
@@ -730,7 +769,7 @@ def search_problem_by_tag(db, tag: str, user: User):
             "update_time": problem[5],
             "choices": problem[6],
             "answers": problem[7],
-            "is_published": problem[8],
+            "is_public": problem[8],
         })
     return {"problems": res}
 
@@ -749,7 +788,7 @@ def get_my_problems(db, user: User):
             update_time=str(problem[5]),
             choices=problem[6],
             answers=problem[7],
-            is_published=bool(problem[8])
+            is_public=bool(problem[8])
         ))
     return {"problems": res}
 
@@ -873,7 +912,7 @@ def get_problem_recommend(db, user: User):
                 "answers": {
                     "B": "Choice B"
                 },
-                "is_published": 1
+                "is_public": 1
             }
         ]
     }
@@ -1004,6 +1043,6 @@ def get_problem(db, pid: str, user: User):
     #     update_time=str(problem[5]),
     #     choices=problem[6],
     #     answers=problem[7],
-    #     is_published=bool(problem[8])
+    #     is_public=bool(problem[8])
     # )
     # return problem

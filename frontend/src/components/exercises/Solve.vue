@@ -78,7 +78,7 @@ export default {
           type: res.data.type,
           author: res.data.author,
           update_time: res.data.update_time,
-          is_published: res.data.is_published,
+          is_public: res.data.is_public,
           choices: this.parseChoices(res.data.choices),
           answers: this.parseAnswers(res.data.answers),
         };

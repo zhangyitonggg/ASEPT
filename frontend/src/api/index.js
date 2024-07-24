@@ -102,6 +102,14 @@ const api = {
       console.log("get_problem");
       return await router.get(path.baseUrl + path.get_problem, {pid: pid});
     },
+    get_problem_group_info: async(pgid) => {
+      console.log("get_problem_group_info");
+      return await router.get(path.baseUrl + path.get_problem_group_info, {pgid: pgid});
+    },
+    get_problem_group_problems: async(pgid) => {
+      console.log("get_problem_group_problems");
+      return await router.get(path.baseUrl + path.get_problem_group_problems, {pgid: pgid});
+    },
 };
 
 export default api;

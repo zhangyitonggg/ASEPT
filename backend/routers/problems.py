@@ -81,6 +81,91 @@ async def create_problem_group(
     return {'status': 'success'}
 
 
+@router.get('/get_problem_group_info')
+async def get_problem_group_info(
+    pgid: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取题目组信息。
+    
+    pgid: str，题目组 id
+    
+    返回格式：
+    
+    ```json
+    {
+        "pgid": "1",
+        "name": "Problem Group Name",
+        "description": "Problem Group Description",
+        "owner": "Creator Name",
+    }
+    ```
+    '''
+    return database.get_problem_group_info(db, pgid, user)
+
+
+@router.get('/get_problem_group_problems')
+async def get_problem_group_problems(
+    pgid: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取题目组中的题目。
+    
+    pgid: str，题目组 id
+    
+    返回格式：
+    
+    ```json
+    {
+        "problems": [
+            {
+                "pid": 1,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 0,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "A": "Choice A",
+                    "B": "Choice B"
+                },
+                "is_public": 0
+            },
+            {
+                "pid": 2,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 1,
+                “author”: "Author Name",
+                "upload_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "B": "Choice B"
+                },
+                "is_public": 1
+            }
+        ]
+    }
+    ```
+    '''
+    return database.get_problem_group_problems(db, pgid, user)
+
+
 @router.post('/change_problem_group_info')
 async def change_problem_group_info(
     pgid: str,
@@ -210,7 +295,7 @@ async def search_problem_by_tag(
                 "answers": {
                     "B": "Choice B"
                 },
-                "is_published": 1
+                "is_public": 1
             }
         ]
     }   
@@ -265,7 +350,7 @@ async def get_my_problems(
                 "answers": {
                     "B": "Choice B"
                 },
-                "is_published": 1
+                "is_public": 1
             },
             {
                 "pid": 2,
@@ -278,7 +363,7 @@ async def get_my_problems(
                 "answers": {
                     "B": "Choice B"
                 },
-                "is_published": 1
+                "is_public": 1
             }
         ]
     }
@@ -407,7 +492,7 @@ async def get_problem_recommend(
                 "answers": {
                     "B": "Choice B"
                 },
-                "is_published": 1
+                "is_public": 1
             }
         ]
     }

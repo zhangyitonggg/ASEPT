@@ -24,6 +24,8 @@ const base = {
     joinGroup: '/user_group/join_group',
     getMyProblem: '/problems/my_problems',
     getProblemById: '/problems',
+    get_problem_group_info: '/problems/get_problem_group_info',
+    get_problem_group_problems: '/problems/get_problem_group_problems',
 }
 
 export default base;

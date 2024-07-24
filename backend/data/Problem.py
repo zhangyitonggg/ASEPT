@@ -29,6 +29,6 @@ class Problem(BaseModel):
     type: ProblemType
     author: str
     update_time: str
-    is_published: bool
+    is_public: bool
     choices: str | None = None
     answers: str | None = None
