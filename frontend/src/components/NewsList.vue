@@ -25,7 +25,7 @@
           </template>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <div class="panel-content">
+          <div class="panel-content" style="white-space: pre-wrap;">
             <p>{{ item.content }}</p>
           </div>
         </v-expansion-panel-content>
