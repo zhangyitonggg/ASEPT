@@ -1,15 +1,28 @@
 <template>
   <div>
-    <v-container fluid>
-      <v-layout>
-        <v-flex xs1>
-           <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
-        </v-flex>
-        <v-spacer/>
-        <v-flex xs24>
-          <searchbar v-model="search" searchBtnText='搜索团队'/>
-        </v-flex>
-      </v-layout>
+    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
+    </v-container>
+    <v-container fluid v-else>
+      <v-col v-if="items.length == 0" class="d-flex justify-center">
+        <h2>
+          没有你可以管理的团队。试着创建一个？
+        </h2>
+      </v-col>
+      <div v-else>
+        <v-layout>
+          <v-flex xs1>
+             <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
+          </v-flex>
+          <v-spacer/>
+          <v-flex xs24>
+            <searchbar v-model="search" searchBtnText='搜索团队'/>
+          </v-flex>
+        </v-layout>
         <v-col>
           <v-list three-line>
             <template v-for="(item, index) in currentPageItems">
@@ -48,6 +61,7 @@
           </v-list>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-col>
+      </div>
     </v-container>
     <v-row justify="center">
       <v-dialog
@@ -183,6 +197,7 @@ import searchbar from './SearchBar.vue'
 export default {
   data () {
     return {
+      loading: true,
       dialog: false,
       changePassword: false,
       createDialog: false,
@@ -228,10 +243,9 @@ export default {
   },
   methods: {
     getCreatedGroups() {
-      this.$store
-        .dispatch("showCreatedGroups")
+      this.$store.dispatch("showCreatedGroups")
         .then((res) => {
-          this.items.splice(0, this.items.length, { header: '您创建的所有团队' }, ...res.groups); // 清空当前数组并插入新数据
+          this.items.splice(0, this.items.length, ...res.groups); // 清空当前数组并插入新数据
           console.log(this.items);
         })
         .catch((e) => {
@@ -239,7 +253,10 @@ export default {
             type: "error",
             message: e,
           });
-        });
+        })
+        .finally(() => {
+          this.loading = false;
+        })
     },
     openCreateDialog() {
       this.createDialog = true;

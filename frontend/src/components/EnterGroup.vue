@@ -1,69 +1,81 @@
 <template>
-  <v-container fluid>
-    <v-layout>
-      <v-spacer/>
-      <searchbar v-model="search" searchBtnText='搜索团队'/>
-    </v-layout>  
-    <v-col>
-      <v-list three-line>
-        <template v-for="(item, index) in currentPageItems">
-          <v-divider inset></v-divider>
-          <v-subheader
-            v-if="item.header"
-            :key="item.header"
-            v-text="item.header"
-          ></v-subheader>
-          <v-list-item
-            v-else-if="item.group_name"
-            :key="item.group_name"
-          >
-            <v-list-item-avatar>
-              <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title>
-                <h4>
-                  {{ item.group_name }}
-                </h4>
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                Founder: 
-                <strong>
-                  {{ item.founder }}
-                </strong>
-                <br>
-                {{ item.description }}
-              </v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-btn
-                color="primary"
-                @click="applyJoin(item)"
-              > 加入 </v-btn>
-            </v-list-item-action>
-          </v-list-item>
-        </template>
-        <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
-      </v-list>
-    </v-col>
-    
-    <!-- 锁定群组的加入对话框 -->
-    <v-dialog v-model="dialog" max-width="500px">
-      <v-card>
-        <v-card-title>
-          <span class="headline">输入密码</span>
-        </v-card-title>
-        <v-card-text>
-          <v-text-field v-model="password" label="密码" type="password"></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">取消</v-btn>
-          <v-btn color="blue darken-1" text @click="confirmJoin">确认</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+  <div>
+    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
+    </v-container>
+    <v-container fluid v-else>
+      <v-layout>
+        <v-spacer/>
+        <searchbar v-model="search" searchBtnText='搜索团队'/>
+      </v-layout>
+      <v-col v-if="items.length == 0" class="d-flex justify-center">
+        <h2>
+          暂时没有你可以加入的团队。
+        </h2>
+      </v-col>
+      <v-col v-else>
+        <v-list three-line>
+          <template v-for="(item, index) in currentPageItems">
+            <v-divider inset></v-divider>
+            <v-subheader
+              v-if="item.header"
+              :key="item.header"
+              v-text="item.header"
+            ></v-subheader>
+            <v-list-item
+              v-else-if="item.group_name"
+              :key="item.group_name"
+            >
+              <v-list-item-avatar>
+                <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>
+                  <h4>
+                    {{ item.group_name }}
+                  </h4>
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  Founder: 
+                  <strong>
+                    {{ item.founder }}
+                  </strong>
+                  <br>
+                  {{ item.description }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn
+                  color="primary"
+                  @click="applyJoin(item)"
+                > 加入 </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </template>
+          <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
+        </v-list>
+      </v-col>
+      <v-dialog v-model="dialog" max-width="500px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">输入密码</span>
+          </v-card-title>
+          <v-card-text>
+            <v-text-field v-model="password" label="密码" type="password"></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">取消</v-btn>
+            <v-btn color="blue darken-1" text @click="confirmJoin">确认</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -77,7 +89,7 @@ export default {
       filter: {},
       currentPage: 1,
       itemsPerPage: 13,
-
+      loading: true,
       items: [],
       dialog: false,
       selectedItem: null,
@@ -105,10 +117,9 @@ export default {
   },
   methods: {
     getUnGroups() {
-      this.$store
-        .dispatch("showUnGroups")
+      this.$store.dispatch("showUnGroups")
         .then((res) => {
-          this.items.splice(0, this.items.length, { header: '所有可以加入的团队' }, ...res.groups); // 清空当前数组并插入新数据
+          this.items.splice(0, this.items.length, ...res.groups);
           console.log('@',this.items);
         })
         .catch((e) => {
@@ -116,6 +127,9 @@ export default {
             type: "error",
             message: e,
           });
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
     applyJoin(item) {

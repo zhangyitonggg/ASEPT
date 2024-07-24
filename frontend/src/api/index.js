@@ -20,7 +20,7 @@ const api = {
     },
     createProblem: async(problemData) => {
       console.log("createProblem");
-        return await router.post(path.baseUrl + path.createProblem,problemData);
+      return await router.post(path.baseUrl + path.createProblem,problemData);
     },
     getMyProblem: async() => {
       console.log("getMyProblem");
@@ -32,39 +32,31 @@ const api = {
     },
     getProblemById: async(pid) => {
       console.log("getProblemById");
-        return await router.get(path.baseUrl + path.getProblemById,{params:{pid :pid }});
+      return await router.get(path.baseUrl + path.getProblemById,{params:{pid :pid }});
     },
     createProblemList: async(list) => {
       console.log("createProblemList: ", list);
-
       return await router.post(path.baseUrl + path.createProblemGroup,{},{params:{name :list.name,description:list.description }});
     },
     showJoinedGroups: async() => {
-      console.log("showJoinedGroups");
       return await router.get(path.baseUrl + path.showJoinedGroups);
     },
     leaveGroup:async(gid) => {
-      console.log("leaveGroup");
       return await router.post(path.baseUrl + path.leaveGroup, {}, {params: {gid: gid}});
     },
     showCreatedGroups: async() => {
-      console.log("showCreatedGroups");
       return await router.get(path.baseUrl + path.showCreatedGroups);
     },
     createGroup: async(group_name, description, password) => {
-      console.log("createGroup");
       return await router.post(path.baseUrl + path.createGroup, {group_name: group_name, description: description, password: password});
     },
     modifyGroup: async(gid, group_name, description, password) => {
-      console.log("modifyGroup");
       return await router.post(path.baseUrl + path.modifyGroup, {gid: gid, password: password, description: description, group_name: group_name});
     },
     showUnGroups: async() => {
-      console.log("showUnGroups");
       return await router.get(path.baseUrl + path.showUnGroups, {}, {params: {sub_name: ""}});
     },
     joinGroup: async(gid, password) => {
-      console.log("joinGroup");
       return await router.post(path.baseUrl + path.joinGroup, {gid: gid, password: password});
     },
     createProblemGroup: async(group_name, description) => {
