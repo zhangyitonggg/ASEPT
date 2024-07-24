@@ -199,7 +199,7 @@ export default {
       selectedList: null, // 选择的题单ID
       listOptions: [], // 题单选项，将从后端获取
       questionTypes: [ // 题目类型选项
-        { text: '单选', value: 'SINGLE_CHOICE' },
+        { text: '单选', value: 'CHOICE' },
         { text: '多选', value: 'MULTIPLE_CHOICE' },
         { text: '填空', value: 'FILL_BLANK' },
       ],
@@ -254,7 +254,7 @@ export default {
         });
     },
     isMultipleChoice(type) {
-      return ['SINGLE_CHOICE', 'MULTIPLE_CHOICE'].includes(type);
+      return ['CHOICE', 'MULTIPLE_CHOICE'].includes(type);
     },
     addOption() {
       this.newProblem.options.push('');
@@ -277,12 +277,12 @@ export default {
     },
     createProblem() {
       const newProblemData = {
-        name: this.newProblem.name,
+        title: this.newProblem.name,
         content: this.newProblem.content,
         tag: this.newProblem.tag,
         type: this.newProblem.type,
-        options: this.newProblem.options,
-        correctAnswer: this.newProblem.correctAnswer,
+        choices: this.newProblem.options,
+        answer: this.newProblem.correctAnswer,
         fillBlanks: this.newProblem.fillBlanks,
       };
       this.$store
