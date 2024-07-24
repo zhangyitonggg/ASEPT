@@ -195,6 +195,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getProblemsInList(context,pgid) {
+      return new Promise((resolve, reject) => {
+        api.get_problem_group_problems(pgid.pgid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     showJoinedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showJoinedGroups()
