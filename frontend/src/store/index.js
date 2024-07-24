@@ -162,6 +162,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getProblemGroup(context) {
+      return new Promise((resolve, reject) => {
+        api.get_problem_groups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     showJoinedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showJoinedGroups()
