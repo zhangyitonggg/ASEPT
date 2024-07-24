@@ -77,6 +77,7 @@ export default {
       this.$store
         .dispatch('getProblemById', pid)
         .then(res => {
+          console.log('res:', res);
           this.question = {
             pid: res.pid,
             title: res.title,
@@ -87,7 +88,9 @@ export default {
             is_public: res.is_public,
             choices: this.parseChoices(res.choices),
             answers: this.parseAnswers(res.answers),
+            
           };
+          console.log(this.question.choices);
           this.isSingleChoice = this.question.answers && Object.keys(this.question.answers).length === 1;
         })
         .catch(error => {
