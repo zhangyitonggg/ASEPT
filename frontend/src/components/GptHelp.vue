@@ -4,7 +4,7 @@
         <v-col cols="12" sm="10" md="8" lg="6">
           <!-- 聊天框 -->
           <v-card class="chat-container" outlined>
-            <v-card-title>ChatGPT对话框</v-card-title>
+            <v-card-title>您的AI助手</v-card-title>
             <v-card-text class="chat-box">
               <!-- 消息列表 -->
               <v-container class="message-list">
@@ -17,23 +17,26 @@
                 </v-row>
               </v-container>
             </v-card-text>
+
+          </v-card>
+          <v-card class="chat-container2" outlined>
             <!-- 固定的输入框 -->
             <div class="fixed-input-row">
-              <v-row no-gutters>
+            <v-row no-gutters>
                 <v-col cols="9">
-                  <v-text-field
+                <v-text-field
                     v-model="inputMessage"
                     label="请输入消息"
                     outlined
                     dense
                     hide-details
                     @keyup.enter="sendMessage"
-                  ></v-text-field>
+                ></v-text-field>
                 </v-col>
                 <v-col cols="3">
-                  <v-btn color="primary" @click="sendMessage" class="send-button">发送</v-btn>
+                <v-btn color="primary" @click="sendMessage" class="send-button">发送</v-btn>
                 </v-col>
-              </v-row>
+            </v-row>
             </div>
           </v-card>
         </v-col>
@@ -50,6 +53,9 @@
         inputMessage: '', // 用户输入的消息
         messages: [], // 消息列表
       }
+    },
+    mounted() {
+        this.sendToApi("你好。")
     },
     methods: {
       // 发送消息
@@ -92,6 +98,15 @@
     max-height: 600px; /* 控制最大高度 */
     width: 100%; /* 使宽度适应容器 */
   }
+  .chat-container2 {
+    position: relative; /* 为了使固定元素相对于chat-container定位 */
+    display: flex;
+    margin-top: 4px;
+    flex-direction: column;
+    height: 60vh;
+    max-height:70px; /* 控制最大高度 */
+    width: 100%; /* 使宽度适应容器 */
+  }
   
   .chat-box {
     display: flex;
@@ -122,7 +137,8 @@
   }
   
   .fixed-input-row .send-button {
-    width: 100%; /* 使按钮宽度适应容器 */
+    width: 100px; /* 设置按钮宽度 */
+    flex-shrink: 0; /* 防止按钮被压缩 */
   }
   </style>
   
