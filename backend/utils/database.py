@@ -821,14 +821,11 @@ def add_problem_tag(db, pid: str, tag: str, user: User):
 
 def search_problem_by_tag(db, tag: str, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
-    # get problems whose tag contains the input tag
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemTags")
     problems = cursor.fetchall()
     problems = [problem for problem in problems if tag in problem[1]]
-    # union the two lists
     final_problems = list(set(problems) & set(problems_with_access))
-    # return the final list
     res = []
     for problem in final_problems:
         res.append({
@@ -892,21 +889,8 @@ def submit_problem(db, pid: str, answer: str, user: User):
     db.commit()
     return is_correct
 
+
 def get_user_statistics(db, user: User):
-    '''
-    获取用户题目统计信息。
-    
-    返回格式：
-    
-    ```
-    {
-        "choice_submit": 100,
-        "choice_correct": 80,
-        "blank_submit": 50,
-        "blank_correct": 40,
-    }
-    ```
-    '''
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemSubmit WHERE uid = %s", (user.uid))
     submits = cursor.fetchall()
@@ -936,56 +920,6 @@ def get_user_statistics(db, user: User):
     
 
 def get_problem_recommend(db, user: User):
-    '''
-    获取题目推荐。
-    
-    返回格式：
-    
-    ```
-    {
-        "problems": [
-            {
-                "pid": 1,
-                "title": "Problem Title",
-                "content": "Problem Content",
-                "type": 0,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
-                "choices": {
-                    "A": "Choice A",
-                    "B": "Choice B",
-                    "C": "Choice C",
-                    "D": "Choice D"
-                },
-                "answers": {
-                    "A": "Choice A",
-                    "B": "Choice B"
-                },
-                "is_public": 0
-            },
-            {
-                "pid": 2,
-                "title": "Problem Title",
-                "content": "Problem Content",
-                "type": 1,
-                “author”: "Author Name",
-                "upload_time": "2021-10-01 12:00:00",
-                "choices": {
-                    "A": "Choice A",
-                    "B": "Choice B",
-                    "C": "Choice C",
-                    "D": "Choice D"
-                },
-                "answers": {
-                    "B": "Choice B"
-                },
-                "is_public": 1
-            }
-        ]
-    }
-    '''
-    # take 20 problem with max wrong rate and choose rondom 10 problem within them
-    # print("enter")
     problems = get_all_accessible_problems(db, user)
     cursor = db.cursor()
     res = []
