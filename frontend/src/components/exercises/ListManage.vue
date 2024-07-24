@@ -7,7 +7,7 @@
       </v-flex>
       <v-spacer/>
       <v-flex xs24>
-        <searchbar v-model="search" searchBtnText='搜索团队'/>
+        <searchbar v-model="search" searchBtnText='搜索题单'/>
       </v-flex>
     </v-layout>
     

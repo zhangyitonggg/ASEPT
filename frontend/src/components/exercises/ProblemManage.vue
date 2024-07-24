@@ -3,7 +3,7 @@
     <v-layout>
       <!-- 创建题目按钮 -->
       <v-flex xs1>
-        <v-btn color="primary" @click="dialogCreate = true" class="mt-4">创建题目</v-btn>
+        <v-btn color="primary" @click="dialogCreate = true">创建题目</v-btn>
       </v-flex>
       <v-spacer/>
       <v-flex xs24>

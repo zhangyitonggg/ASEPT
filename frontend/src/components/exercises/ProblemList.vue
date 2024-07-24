@@ -2,9 +2,14 @@
 
 <template>
   <v-container fluid>
+    <v-layout>
+      <v-flex xs24>
+        <searchbar v-model="search" searchBtnText='搜索题目'/>
+      </v-flex>
+    </v-layout>
     <v-col>
       <v-list three-line>
-        <template v-for="(item, index) in items">
+        <template v-for="(item, index) in currentPageItems">
           <v-subheader
             v-if="item.header"
             :key="item.header"
@@ -32,6 +37,7 @@
             </v-list-item-action>
           </v-list-item>
         </template>
+        <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
       </v-list>
     </v-col>
 
@@ -78,6 +84,7 @@
 </template>
 
 <script>
+import searchbar from '../SearchBar.vue';
 export default {
   data() {
     return {
@@ -88,11 +95,15 @@ export default {
       filter: {},
       sortDesc: false,
       page: 1,
-      itemsPerPage: 4,
+      itemsPerPage: 13,
+      currentPage: 1,
       sortBy: 'name',
       keys: ['Name', 'Tag'],
       items: [],
     };
+  },
+  components: {
+    searchbar,
   },
   created() {
     this.fetchItems();
@@ -103,6 +114,17 @@ export default {
     },
     filteredKeys() {
       return this.keys.filter((key) => key !== 'Name');
+    },
+    filteredItems() {
+      const filtered = this.items.filter(item =>
+        item.name && item.name.toLowerCase().includes(this.search.toLowerCase())
+      );
+      return filtered;
+    },
+    currentPageItems() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.filteredItems.slice(startIndex, endIndex);
     },
   },
   methods: {

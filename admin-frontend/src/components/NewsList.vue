@@ -7,8 +7,8 @@
         size="64"
       ></v-progress-circular>
     </v-container>
-    <v-row v-else>
-      <v-row class="pb-3">
+    <template v-else>
+      <v-row class="pb-10">
         <v-spacer />
         <v-btn
           large
@@ -19,9 +19,9 @@
           <span>新建公告</span>
         </v-btn>
       </v-row>
-      <v-row>
-        <v-expansion-panels inset v-model="activePanel" focusable>
-          <v-expansion-panel v-if="news.length > 0" v-for="(item, index) in news" :key="index" :value="index === 0">
+      <template>
+        <v-expansion-panels inset focusable v-if="news.length > 0">
+          <v-expansion-panel v-for="(item, index) in news" :key="index">
             <v-expansion-panel-header :disable-icon-rotate="!item.is_active">
               <div style="display: flex; justify-content: space-between; width: 100%;">
                 <div>{{ item.title }}</div>
@@ -39,7 +39,7 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <div class="panel-content" style="white-space: pre-wrap;">
-                <p>{{ item.content }}</p>
+                <v-md-preview :text="item.content"></v-md-preview>
               </div>
               <v-btn
                 block
@@ -57,11 +57,13 @@
                     <v-text-field
                       label="公告标题"
                       filled
+                      outlined
                       v-model="announcementTitle"
                     ></v-text-field>
                     <v-textarea
                       label="公告内容"
                       filled
+                      outlined
                       v-model="announcementContent"
                     ></v-textarea>
                     <v-switch
@@ -90,12 +92,12 @@
               </v-dialog>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-banner v-if="news.length === 0">
-            好吧，看起来现在还没有公告。
-          </v-banner>
         </v-expansion-panels>
-      </v-row>
-    </v-row>
+        <h2 v-else class="d-flex justify-center align-center">
+          好吧，看起来现在还没有公告。
+        </h2>
+      </template>
+    </template>
     <v-dialog
       v-model="dialog_openannouncement"
       persistent
@@ -140,11 +142,25 @@
   </div>
 </template>
 
-<script>
+<script lang="js">
 import { format } from 'date-fns';
+
+import VMdPreview from '@kangc/v-md-editor/lib/preview';
+import '@kangc/v-md-editor/lib/style/preview.css';
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
+import '@kangc/v-md-editor/lib/theme/style/github.css';
+import hljs from 'highlight.js';
+
+VMdPreview.use(githubTheme, {
+  Hljs: hljs,
+});
+
 
 export default {
   name: "NewsList",
+  components: {
+    VMdPreview,
+  },
   data() {
     return {
       dialog_openannouncement: false,
