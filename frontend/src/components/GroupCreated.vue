@@ -8,11 +8,14 @@
       ></v-progress-circular>
     </v-container>
     <v-container fluid v-else>
-      <v-col v-if="items.length == 0" class="d-flex justify-center">
-        <h2>
-          没有你可以管理的团队。试着创建一个？
-        </h2>
-      </v-col>
+      <template v-if="items.length == 0">
+        <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
+        <v-col class="d-flex justify-center align-center">
+          <h2>
+            没有你可以管理的团队。试着创建一个？
+          </h2>
+        </v-col>
+      </template>
       <div v-else>
         <v-layout>
           <v-flex xs1>
@@ -129,8 +132,7 @@
       </v-dialog>
       <v-dialog
         v-model="createDialog"
-        persistent
-        max-width="600px"
+        max-width="50%"
       >
         <v-card>
           <v-card-title>
