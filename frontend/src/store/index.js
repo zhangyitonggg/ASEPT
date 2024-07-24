@@ -162,6 +162,17 @@ export default new Vuex.Store({
           })
       })
     },
+    addProblemToList(context,data) {
+      return new Promise((resolve, reject) => {
+        api.add_problem_to_group(data.pgid,data.pid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     createProblemList(context,list) {
       return new Promise((resolve, reject) => {
         api.createProblemList(list)

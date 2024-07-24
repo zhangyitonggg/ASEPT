@@ -1,4 +1,3 @@
-
 <template>
   <v-container fluid>
     <v-col>
@@ -144,7 +143,7 @@
             :items="listOptions"
             label="选择题单"
             item-text="name"
-            item-value="id"
+            item-value="pgid"
             required
           ></v-select>
         </v-card-text>
@@ -190,7 +189,7 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       dialogCreate: false, // 控制“创建题目”对话框的显示
       dialogAdd: false, // 控制“添加题单”对话框的显示
@@ -198,90 +197,59 @@ export default {
       currentProblem: {}, // 当前正在修改的题目
       newProblem: { name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] }, // 新创建的题目
       selectedList: null, // 选择的题单ID
-      listOptions: [ // 题单选项
-        { id: 'list1', name: '题单1' },
-        { id: 'list2', name: '题单2' },
-        // 更多题单选项
-      ],
+      listOptions: [], // 题单选项，将从后端获取
       questionTypes: [ // 题目类型选项
         { text: '单选', value: 'SINGLE_CHOICE' },
         { text: '多选', value: 'MULTIPLE_CHOICE' },
         { text: '填空', value: 'FILL_BLANK' },
       ],
-      itemsPerPageArray: [4, 8, 12],
-      search: '',
-      filter: {},
-      sortDesc: false,
-      page: 1,
-      itemsPerPage: 4,
-      sortBy: 'name',
-      keys: [
-        'Name',
-        'Tag',
-      ],
       items: [
         { header: '我创建的题目' },
-        // {
-        //   name: 'Problem1',
-        //   tag: 'Descrlines.',
-        //   gid: 'xxx1',
-        //   locked: true,
-        //   content: '66666666',
-        // },
-        // {
-        //   name: 'Group2',
-        //   tag: 'Descrlines.',
-        //   gid: 'xxx2',
-        //   locked: true,
-        // },
-        // {
-        //   name: 'Group3',
-        //   founder: 'User3',
-        //   description: 'Descrlines.',
-        //   gid: 'xxx3',
-        //   locked: false,
-        // },
       ],
-    }
+    };
   },
   created() {
     this.fetchProblems();
+    this.fetchQuestionLists();
   },
   computed: {
-    numberOfPages () {
-      return Math.ceil(this.items.length / this.itemsPerPage)
+    numberOfPages() {
+      return Math.ceil(this.items.length / this.itemsPerPage);
     },
-    filteredKeys () {
-      return this.keys.filter(key => key !== 'Name')
+    filteredKeys() {
+      return this.keys.filter((key) => key !== 'Name');
     },
   },
   methods: {
     fetchProblems() {
-        this.$store
+      this.$store
         .dispatch('getMyProblem')
-        .then(res => {
-          // this.items = response.problems.map(problem => {
-          //   return {
-          //     pid: problem.pid,
-          //     title: problem.title,
-          //     content: problem.content,
-          //     type: problem.type === 0 ? 'SINGLE_CHOICE' : 'MULTIPLE_CHOICE',
-          //     author: problem.author,
-          //     upload_time: problem.upload_time,
-          //     choices: problem.choices,
-          //     answers: problem.answers,
-          //     s_public: problem.is_public === 1,
-          //   }
-          // });
-           this.items.splice(0, this.items.length, { header: '我创建的题目' }, ...res.problems); // 清空当前数组并插入新数据
-          console.log("我创建的：",this.items);
+        .then((res) => {
+          this.items.splice(0, this.items.length, { header: '我创建的题目' }, ...res.problems); // 清空当前数组并插入新数据
         })
-        .catch(error => {
-             this.$store.commit("setAlert", {
-             type: "error",
+        .catch((error) => {
+          this.$store.commit('setAlert', {
+            type: 'error',
             message: error,
           });
-          }).finally(() => {
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    fetchQuestionLists() {
+      this.$store
+        .dispatch('getProblemGroup')
+        .then((res) => {
+          this.listOptions = res.problem_groups;
+        })
+        .catch((error) => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        })
+        .finally(() => {
           this.loading = false;
         });
     },
@@ -299,132 +267,81 @@ export default {
     addFillBlank() {
       this.newProblem.fillBlanks.push('');
     },
-
-    createProblem() {
-      if (this.newProblem.name && this.newProblem.content) {
-        let choices = {};
-        let answer = {};
-        let ptype = '';
-        if (this.newProblem.type === 'SINGLE_CHOICE' || this.newProblem.type === 'MULTIPLE_CHOICE') {
-          this.newProblem.options.forEach((option, index) => {
-            const key = String.fromCharCode(65 + index); // A, B, C, D...
-            choices[key] = option;
-          });
-
-        // 根据题目类型设置答案格式
-          if (this.newProblem.type === 'SINGLE_CHOICE' || this.newProblem.type === 'MULTIPLE_CHOICE') {
-            this.newProblem.options.forEach((option, index) => {
-              let key = String.fromCharCode(65 + index);
-              choices[key] = option;
-              if (this.newProblem.correctAnswer === key) {
-                answer[key] = option;
-              }
-            });
-            ptype =  'CHOICE';
-          }
-         
-          } 
-        else if (this.newProblem.type === 'FILL_BLANK') {
-          this.newProblem.fillBlanks.forEach((blank, index) => {
-            let key = `blank${index + 1}`;
-            answer[key] = blank;
-          });
-          ptype = 'FILL_BLANK';
-        }
-      
-        const problemData = {
-          title: this.newProblem.name,
-          type: ptype,
-          content: this.newProblem.content,
-          choices: JSON.stringify(choices),
-          answer: JSON.stringify(answer)
-        };
-        //console.log('Problem Data:', JSON.stringify(problemData, null, 2));
-
-
-        this.$store
-        .dispatch('createProblem',problemData)
-         .then(response => {
-            this.items.push({ ...this.newProblem, gid: Date.now().toString() }); // 添加新题目
-            this.newProblem = { name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] }; // 重置表单
-            this.dialogCreate = false; // 关闭对话框
-          })
-          .catch(error => {
-             this.$store.commit("setAlert", {
-             type: "error",
-            message: error,
-          });
-          }).finally(() => {
-          this.loading = false;
-        });
-        
-      } 
-      else {
-        alert('请填写题目名称和内容！');
-      }
-    },
-
-    changeProblem(item) {
-      this.currentProblem = { ...item }; // 复制题目以进行编辑
-      this.dialogEdit = true;
-    },
     addToList(item) {
-      this.currentProblem = item; // 记录当前题目
+      this.currentProblem = item;
       this.dialogAdd = true;
     },
+    changeProblem(item) {
+      this.currentProblem = item;
+      this.dialogEdit = true;
+    },
+    createProblem() {
+      const newProblemData = {
+        name: this.newProblem.name,
+        content: this.newProblem.content,
+        tag: this.newProblem.tag,
+        type: this.newProblem.type,
+        options: this.newProblem.options,
+        correctAnswer: this.newProblem.correctAnswer,
+        fillBlanks: this.newProblem.fillBlanks,
+      };
+      this.$store
+        .dispatch('createProblem', newProblemData)
+        .then(() => {
+          this.$store.commit('setAlert', {
+            type: 'success',
+            message: '题目创建成功！',
+          });
+          this.dialogCreate = false;
+          this.fetchProblems(); // 重新获取题目列表
+        })
+        .catch((error) => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        });
+    },
     confirmAddToList() {
-      alert(`题目 ${this.currentProblem.name} 已添加到题单 ${this.selectedList}`);
-      // 在这里添加将题目加入题单的逻辑
-      this.dialogAdd = false;
+      let proid = this.currentProblem.pid;
+      let listid = this.selectedList;
+      this.$store
+        .dispatch('addProblemToList', {
+          pid: proid,
+          pgid: listid,
+        })
+        .then(() => {
+          this.$store.commit('setAlert', {
+            type: 'success',
+            message: '题目成功加入题单！',
+          });
+          this.dialogAdd = false;
+        })
+        .catch((error) => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        });
     },
     confirmChangeProblem() {
-      alert(`题目 ${this.currentProblem.name} 已保存修改`);
-      // 在这里添加保存题目修改的逻辑
-      this.dialogEdit = false;
-    }
+      this.$store
+        .dispatch('updateProblem', this.currentProblem)
+        .then(() => {
+          this.$store.commit('setAlert', {
+            type: 'success',
+            message: '题目修改成功！',
+          });
+          this.dialogEdit = false;
+          this.fetchProblems(); // 重新获取题目列表
+        })
+        .catch((error) => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        });
+    },
   },
-}
+};
 </script>
-
-<style scoped>
-.scrollable-container {
-  position: relative;
-  top: -10%;
-  height: 100%;
-  overflow: auto;
-}
-
-.header-title {
-  font-size: 18px;
-  font-weight: 500;
-  color: #ffffff;
-  margin-right: 30%;
-}
-
-.pagination-info {
-  font-size: 16px;
-  font-weight: bold;
-  margin-left: 2%; /* Adjust as needed to move it slightly to the right */
-}
-
-.item-card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  position: relative;
-}
-
-.description-text {
-  display: block;
-  white-space: normal; /* Allow text to wrap onto multiple lines */
-}
-
-.apply-button {
-  font-size: 14px;
-  position: absolute;
-  color: white;
-  font-weight:900;
-  top: 15px;
-  right: 20px;
-}
-</style>

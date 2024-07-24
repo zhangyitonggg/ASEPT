@@ -36,7 +36,6 @@ const api = {
     },
     createProblemList: async(list) => {
       console.log("createProblemList: ", list);
-
       return await router.post(path.baseUrl + path.createProblemGroup,{},{params:{name :list.name,description:list.description }});
     },
     showJoinedGroups: async() => {
@@ -75,9 +74,11 @@ const api = {
       console.log("change_problem_group_info");
       return await router.post(path.baseUrl + path.change_problem_group_info, {pgid: pgid, name: group_name, description: description});
     },
-    add_problem_to_group: async(pgid, pid) => {
+    add_problem_to_group: async(ppgid, ppid) => {
       console.log("add_problem_to_group");
-      return await router.post(path.baseUrl + path.add_problem_to_group, {pgid: pgid, pid: pid});
+      console.log('pgid: ',ppgid);
+      console.log('pid: ',ppid);
+      return await router.post(path.baseUrl + path.add_problem_to_group,{},{ params: {pid: ppid,pgid: ppgid}});
     },
     share_problem_group_to_user_group: async(pgid, gid) => {
       console.log("share_problem_group_to_user_group");
