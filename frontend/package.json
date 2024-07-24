@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@kangc/v-md-editor": "^1.7.12",
     "@mdi/font": "^7.4.47",
     "chart.js": "^4.4.3",
     "date-fns": "^3.6.0",

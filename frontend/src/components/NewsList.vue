@@ -26,7 +26,7 @@
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <div class="panel-content" style="white-space: pre-wrap;">
-            <p>{{ item.content }}</p>
+            <v-md-preview :text="item.content"></v-md-preview>
           </div>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -40,8 +40,21 @@
 <script>
 import { format } from 'date-fns';
 
+import VMdPreview from '@kangc/v-md-editor/lib/preview';
+import '@kangc/v-md-editor/lib/style/preview.css';
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
+import '@kangc/v-md-editor/lib/theme/style/github.css';
+import hljs from 'highlight.js';
+
+VMdPreview.use(githubTheme, {
+  Hljs: hljs,
+});
+
 export default {
   name: "NewsList",
+  components: {
+    VMdPreview
+  },
   data() {
     return {
       news: null,
