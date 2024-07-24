@@ -61,6 +61,12 @@
 
 <script>
 export default {
+  props:{
+    pid: {
+      type: String,
+      require:true,
+    }
+  },
   data() {
     return {
       question: null,
@@ -73,9 +79,8 @@ export default {
   },
   methods: {
     fetchQuestion() {
-      let pid = '4a09ac52-2af0-4cca-9d1b-64b0694082e6';
       this.$store
-        .dispatch('getProblemById', pid)
+        .dispatch('getProblemById', this.pid)
         .then(res => {
           console.log('res:', res);
           this.question = {

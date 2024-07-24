@@ -145,7 +145,8 @@ export default {
       this.itemsPerPage = number
     },
     solveProblem(item){
-      this.$router.push({path:'solve',append:true});
+      console.log('pid:',item.pid );
+      this.$router.push({path:'solve/' + item.pid, append:true});
     },
   },
   components: {

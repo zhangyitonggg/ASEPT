@@ -56,18 +56,20 @@ const routes: Array<RouteConfig> = [
     }
   },
   {
-    path: '/exercises/solve',
+    path: '/exercises/solve/:pid',
     name: 'solves',
     component: () => import('../components/exercises/Solve.vue'),
+    props: true,
     meta: {
       requireAuth: true,
       title: '去做题'
     }
   },
   {
-    path: '/exercises/list/solve',
+    path: '/exercises/list/solve/:pid',
     name: 'solves',
     component: () => import('../components/exercises/Solve.vue'),
+    props: true,
     meta: {
       requireAuth: true,
       title: '去做题'
