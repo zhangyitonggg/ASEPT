@@ -1088,7 +1088,7 @@ def get_problem(db, pid: str, user: User):
         "pid": problem[0],
         "title": problem[1],
         "content": problem[2],
-        "type": problem[3],
+        "type": problem[3].upper(),
         "author": get_user_by_uid(db, problem[4])[0],
         "upload_time": problem[5],
         "choices": problem[6],

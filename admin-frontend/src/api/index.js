@@ -7,6 +7,8 @@ const api = {
         const response = await router.post(path.baseUrl + path.login, {
             username: username,
             password: password
+        }, {
+          useQs: true
         });
         return response;
     },
