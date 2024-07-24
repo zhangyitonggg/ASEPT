@@ -1,52 +1,64 @@
 <template>
   <div>
-    <v-container fluid>
-        <v-layout>
-          <v-spacer/>
-          <searchbar v-model="search" searchBtnText='搜索团队'/>
-        </v-layout>
-        <v-col>
-          <v-list three-line>
-            <template v-for="(item, index) in currentPageItems">
-              <v-divider inset></v-divider>
-              <v-subheader
-                v-if="item.header"
-                :key="item.header"
-                v-text="item.header"
-              ></v-subheader>
-              <v-list-item
-                v-else-if="item.group_name"
-                :key="item.group_name"
-              >
-                <v-list-item-avatar>
-                  <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    <h4>
-                      {{ item.group_name }}
-                    </h4>
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    Founder: 
-                    <strong>
-                      {{ item.founder }}
-                    </strong>
-                    <br>
-                      {{ item.description }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-                <v-list-item-action>
-                  <v-btn
-                    color="warning"
-                    @click="leave(item)"
-                  > 离开 </v-btn>
-                </v-list-item-action>
-              </v-list-item>
-            </template>
-            <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
-          </v-list>
-        </v-col>
+    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
+    </v-container>
+    <v-container fluid v-else>
+      <v-layout>
+        <v-spacer/>
+        <searchbar v-model="search" searchBtnText='搜索团队'/>
+      </v-layout>
+      <v-col v-if="items.length == 0" class="d-flex justify-center">
+        <h2>
+          好吧，看起来你还没有加入任何团队。
+        </h2>
+      </v-col>
+      <v-col v-else>
+        <v-list three-line>
+          <template v-for="(item, index) in currentPageItems">
+            <v-divider inset></v-divider>
+            <v-subheader
+              v-if="item.header"
+              :key="item.header"
+              v-text="item.header"
+            ></v-subheader>
+            <v-list-item
+              v-else-if="item.group_name"
+              :key="item.group_name"
+            >
+              <v-list-item-avatar>
+                <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>
+                  <h4>
+                    {{ item.group_name }}
+                  </h4>
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  Founder: 
+                  <strong>
+                    {{ item.founder }}
+                  </strong>
+                  <br>
+                    {{ item.description }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn
+                  color="warning"
+                  @click="leave(item)"
+                > 离开 </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </template>
+          <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
+        </v-list>
+      </v-col>
     </v-container>
     <v-row justify="center">
       <v-dialog
@@ -60,7 +72,6 @@
 
            <v-card-actions>
             <v-spacer></v-spacer>
-  
             <v-btn
               color="green darken-1"
               text
@@ -68,7 +79,6 @@
             >
               取消
             </v-btn>
-  
             <v-btn
               color="red darken-1"
               text
@@ -94,6 +104,7 @@ export default {
       search: '',
       filter: {},
       page: 1,
+      loading: true,
       currentPage: 1,
       itemsPerPage: 13,
       items: [],
@@ -107,7 +118,6 @@ export default {
       const filtered = this.items.filter(item =>
         item.group_name && item.group_name.toLowerCase().includes(this.search.toLowerCase())
       );
-      // console.log('Filtered Items:', filtered); // 调试输出
       return filtered;
     },
     currentPageItems() {
@@ -121,17 +131,18 @@ export default {
   },
   methods: {
     getJoinedGroups() {
-      this.$store
-        .dispatch("showJoinedGroups")
+      this.$store.dispatch("showJoinedGroups")
         .then((res) => {
-          this.items.splice(0, this.items.length, { header: '所有已加入的团队' }, ...res.groups); // 清空当前数组并插入新数据
-          console.log(this.items);
+          this.items.splice(0, this.items.length, ...res.groups);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {
             type: "error",
             message: e,
           });
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
     nextPage () {
@@ -154,7 +165,10 @@ export default {
         .dispatch("leaveGroup",{gid: this.curItem.gid})
         .then((res) => {
           if (flag) {
-            alert(`你选择了离开 ${this.curItem.group_name}`);
+            this.$store.commit("setAlert", {
+              type: "success",
+              message: `你离开了 ${this.curItem.group_name}`
+            })
             const index = this.items.findIndex(item => item.gid === this.curItem.gid);
             if (index !== -1) {
               this.items.splice(index, 1);

@@ -514,20 +514,21 @@ def modify_announcement(db, announcement:Announcement, user: User):
         )
 
 
-def get_announcements(db, max_announcements: int):
+def get_announcements(db, max_announcements: int, panel: int):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Announcements ORDER BY update_at DESC LIMIT %s", (max_announcements))
     announcements = cursor.fetchall()
     res = []
     for announcement in announcements:
-        res.append({
-            "aid": announcement[0],
-            "title": announcement[1],
-            "content": announcement[2],
-            "update_at": announcement[3],
-            "is_active": announcement[4],
-            "author": get_user_by_uid(db, announcement[5])[0],
-        })
+        if announcement[4] | panel:
+            res.append({
+                "aid": announcement[0],
+                "title": announcement[1],
+                "content": announcement[2],
+                "update_at": announcement[3],
+                "is_active": announcement[4],
+                "author": get_user_by_uid(db, announcement[5])[0],
+            })
     return {"announcements": res}
 
 
