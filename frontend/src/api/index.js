@@ -28,7 +28,7 @@ const api = {
     },
     getProblemById: async(pid) => {
       console.log("getProblemById");
-        return await router.get(path.baseUrl + path.getProblemById + '/' + pid);
+        return await router.get(path.baseUrl + path.getProblemById,{params:{pid :pid }});
     },
     showJoinedGroups: async() => {
       console.log("showJoinedGroups");
