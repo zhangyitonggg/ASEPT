@@ -239,6 +239,17 @@ export default new Vuex.Store({
           })
       })
     },
+    searchProblemByTag(context,tag) {
+      return new Promise((resolve, reject) => {
+        api.search_problem_by_tag(tag)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     showJoinedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showJoinedGroups()

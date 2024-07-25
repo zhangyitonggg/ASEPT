@@ -82,7 +82,8 @@ const api = {
     },
     search_problem_by_tag: async(tag) => {
       console.log("search_problem_by_tag");
-      return await router.get(path.baseUrl + path.search_problem_by_tag, {tag: tag});
+      console.log(tag);
+      return await router.get(path.baseUrl + path.search_problem_by_tag, {params: {tag: tag}});
     },
     get_my_problems: async() => {
       console.log("get_my_problems");
