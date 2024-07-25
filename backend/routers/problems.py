@@ -299,6 +299,79 @@ async def add_problem_tag(
     return {'status': 'success'}
 
 
+@router.get('/get_all_problems')
+async def get_all_problems(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取所有题目。
+    
+    返回格式：
+    ```
+    {
+        "problems": [
+            {
+                "pid": 1,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 'choice',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "A": "Choice A",
+                    "B": "Choice B"
+                },
+                "is_public": 0
+            },
+            {
+                "pid": 2,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 'blank_filling',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
+                "choices": null,
+                "answers": {
+                    "B": "Choice B"
+                },
+                "is_public": 1
+            }
+        ]
+    }   
+    '''
+    return database.get_all_problems(db, user)
+
+@router.get('/get_problem_tags')
+async def get_problem_tags(
+    pid: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取题目的标签。
+    
+    pid: str，题目 id
+    
+    返回格式：
+    
+    ```json
+    {
+        "tags": [
+            "tag1",
+            "tag2"
+        ]
+    }
+    ```
+    '''
+    return database.get_problem_tags(db, pid, user)
+
 @router.get('/search_problem_by_tag')
 async def search_problem_by_tag(
     tag: str,
@@ -308,9 +381,7 @@ async def search_problem_by_tag(
     '''
     根据标签搜索题目。
     
-    若tag为空，则返回所有有权限能看到的题目。
-    
-    tag: str，标签名称
+    tag: str，待搜索的标签，非空
     
     返回格式：
     ```

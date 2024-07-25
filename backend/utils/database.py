@@ -808,6 +808,44 @@ def add_problem_tag(db, pid: str, tag: str, user: User):
     cursor.execute("INSERT INTO ProblemTags (pid, tag) VALUES (%s, %s)", (pid, tag))
     db.commit()
 
+def get_all_problems(db, user: User):
+    problems_with_access = get_all_accessible_problems(db, user)
+    res = []
+    for problem in problems_with_access:
+        res.append({
+            "pid": problem[0],
+            "title": problem[1],
+            "content": problem[2],
+            "type": problem[3],
+            "author": problem[4],
+            "update_time": problem[5],
+            "choices": problem[6],
+            "answers": problem[7],
+            "is_public": problem[8],
+        })
+    return {"problems": res}
+
+def get_problem_tags(db, pid: str, user: User):
+    problems_with_access = get_all_accessible_problems(db, user)
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if not problem:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    if problem not in problems_with_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied."
+        )
+    cursor.execute("SELECT * FROM ProblemTags WHERE pid = %s", (pid))
+    tags = cursor.fetchall()
+    res = []
+    for tag in tags:
+        res.append(tag[1])
+    return {"tags": res}
 
 def search_problem_by_tag(db, tag: str, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
