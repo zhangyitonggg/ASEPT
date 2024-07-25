@@ -1164,3 +1164,21 @@ def get_problem_answer(db, pid):
             detail="Problem is in contest. Permission denied."
         )
     return problem[7]
+
+
+def modify_user_info(db, user: User, original_password: str, new_password: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Users WHERE uid = %s", (user.uid))
+    user = cursor.fetchone()
+    if user == None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found."
+        )
+    if user[2] != md5_passwd(original_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Original password incorrect."
+        )
+    cursor.execute("UPDATE Users SET password = %s WHERE uid = %s", (md5_passwd(new_password), user[1]))
+    db.commit()
