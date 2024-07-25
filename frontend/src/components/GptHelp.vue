@@ -125,7 +125,6 @@
     position: absolute;
     bottom: 0;
     width: 100%;
-    background: white; /* 背景色与卡片一致 */
     padding: 10px 0; /* 上下内边距 */
     display: flex;
     align-items: center;
@@ -138,8 +137,10 @@
   }
   
   .fixed-input-row .send-button {
-    width: 100px; /* 设置按钮宽度 */
+    margin-left: 20px;
+    width: 110px; /* 设置按钮宽度 */
     flex-shrink: 0; /* 防止按钮被压缩 */
   }
+  
   </style>
   
