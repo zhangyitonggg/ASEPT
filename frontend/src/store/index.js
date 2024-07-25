@@ -338,6 +338,17 @@ export default new Vuex.Store({
           })
       })
     },
+    userModify(context, {username, originalPassword, newPassword}) {
+      return new Promise((resolve, reject) => {
+        api.userModify(username, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    }
   },
   modules: {
   }
