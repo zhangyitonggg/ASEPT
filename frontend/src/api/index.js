@@ -91,7 +91,7 @@ const api = {
     },
     submit_problem: async(pid, answer) => {
       console.log("submit_problem");
-      return await router.post(path.baseUrl + path.submit_problem, {pid: pid, answer: answer});
+      return await router.get(path.baseUrl + path.submit_problem, {pid: pid, answer: answer});
     },
     get_user_statistics: async() => {
       console.log("get_user_statistics");

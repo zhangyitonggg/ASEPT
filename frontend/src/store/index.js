@@ -261,6 +261,17 @@ export default new Vuex.Store({
           })
       })
     },
+    submitAnswer(context,data) {
+      return new Promise((resolve, reject) => {
+        api.submit_problem(data.pid,data.answer)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     showJoinedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showJoinedGroups()
