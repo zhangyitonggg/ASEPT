@@ -9,11 +9,7 @@
       <v-col>
         <v-list three-line>
           <template v-for="(item, index) in currentPageItems">
-            <!-- <v-subheader
-              v-if="item.header"
-              :key="item.header"
-              v-text="item.header"
-            ></v-subheader> -->
+           
             <v-divider
               v-if="item.divider"
               :key="index"
@@ -126,19 +122,7 @@ export default {
         this.$store
         .dispatch('getMyProblem')
         .then(res => {
-          // this.items = response.problems.map(problem => {
-          //   return {
-          //     pid: problem.pid,
-          //     title: problem.title,
-          //     content: problem.content,
-          //     type: problem.type === 0 ? 'SINGLE_CHOICE' : 'MULTIPLE_CHOICE',
-          //     author: problem.author,
-          //     upload_time: problem.upload_time,
-          //     choices: problem.choices,
-          //     answers: problem.answers,
-          //     s_public: problem.is_public === 1,
-          //   }
-          // });
+         
           this.items.splice(0, this.items.length, { header: '我创建的题目' }, ...res.problems); // 清空当前数组并插入新数据
           console.log("我创建的：",this.items);
         })

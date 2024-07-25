@@ -118,7 +118,7 @@ const api = {
     },
     get_my_problem_groups: async() => {
       console.log("get_my_problem_groups");
-      return await router.post(path.baseUrl + path.get_my_problem_groups);
+      return await router.get(path.baseUrl + path.get_my_problem_groups);
     },
 };
 
