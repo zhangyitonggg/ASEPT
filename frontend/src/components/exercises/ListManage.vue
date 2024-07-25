@@ -310,7 +310,7 @@ export default {
   methods: {
     fetchItems() {
       this.$store
-        .dispatch('getProblemGroup')
+        .dispatch('getMyProblemGroup')
         .then((res) => {
           this.items = res.problem_groups;
         })

@@ -28,6 +28,7 @@ const base = {
     get_problem_group_problems: '/problems/get_problem_group_problems',
     get_problem_groups: '/problems/accessible_problem_groups',
     getProblemsRecommended: '/problems/get_problem_recommend',
+    get_my_problem_groups: '/problems/my_problem_groups',
 }
 
 export default base;

@@ -206,6 +206,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getMyProblemGroup(context) {
+      return new Promise((resolve, reject) => {
+        api.get_my_problem_groups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     getProblemsInList(context,pgid) {
       return new Promise((resolve, reject) => {
         api.get_problem_group_problems(pgid.pgid)
