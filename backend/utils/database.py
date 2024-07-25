@@ -761,14 +761,7 @@ def share_problem_group_to_user_group(db, pgid: str, gid: str, user: User):
     if not group:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Group not found."
-        )
-    # if the user is not in the problem group
-    cursor.execute("SELECT * FROM ProblemGroupMembers WHERE (pgid, pid) = (%s, %s)", (pgid, user.uid))
-    if not cursor.fetchone():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Permission denied. You are not in the group."
+            detail="Problem Group not found."
         )
     cursor.execute("SELECT * FROM UserGroups WHERE gid = %s", (gid))
     user_group = cursor.fetchone()
@@ -781,15 +774,12 @@ def share_problem_group_to_user_group(db, pgid: str, gid: str, user: User):
     if not cursor.fetchone():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Permission denied. User not in the group."
+            detail="Permission denied. User not in the user group."
         )
-    cursor.execute("SELECT * FROM ProblemGroupAccessibleGroups WHERE (pgid, gid) = (%s, %s)", (pgid, gid))
+    cursor.execute("SELECT * FROM ProblemGroupPerm WHERE (pgid, gid) = (%s, %s)", (pgid, gid))
     if cursor.fetchone():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User group already has access to the problem group."
-        )
-    cursor.execute("INSERT INTO ProblemGroupAccessibleGroups (pgid, gid) VALUES (%s, %s)", (pgid, gid))
+        return
+    cursor.execute("INSERT INTO ProblemGroupPerm (pgid, gid) VALUES (%s, %s)", (pgid, gid))
     db.commit()
 
 

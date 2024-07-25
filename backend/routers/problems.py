@@ -249,6 +249,8 @@ async def share_problem_group_to_user_group(
     pgid: str，题目组 id
     
     gid: str，用户组 id
+    
+    <font color="red">没有检查用户是否有权限访问题目组。</font>
     '''
     database.share_problem_group_to_user_group(db, pgid, gid, user)
     return {'status': 'success'}
@@ -564,7 +566,7 @@ async def set_problem_public_status(
     return {'status': 'success'}
 
 
-@router.post('/my_problem_groups')
+@router.get('/my_problem_groups')
 async def get_user_problem_groups(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
