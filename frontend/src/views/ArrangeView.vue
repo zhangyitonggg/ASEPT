@@ -1,62 +1,71 @@
 <template>
-    <v-container
-      class="spacing-playground pa-16"
-      fluid
-    > 
-    <v-layout>
-        <v-flex xs1>
-           <v-btn color="success" @click="getAgain">换一批</v-btn>
-        </v-flex>
-
-        <v-spacer/>
-        <v-flex xs24>
-          <searchbar v-model="search" searchBtnText='搜索推荐题目'/>
-        </v-flex>
-    </v-layout>
-
-    <v-col>
-        <v-list three-line>
-          <template v-for="(item, index) in filteredItems">
-            <v-subheader
-              v-if="item.header"
-              :key="item.header"
-              v-text="item.header"
-            ></v-subheader>
-            <v-divider
-              v-else-if="item.divider"
-              :key="index"
-              :inset="item.inset"
-            ></v-divider>
-            <v-list-item
-              v-else-if="item.title"
-              :key="item.pid"
-            >
-              <v-list-item-avatar>
-                <v-icon> mdi-help-circle-outline</v-icon>
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>
-                  <h4>
-                    {{ item.title }}
-                  </h4>
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  Tag: {{ item.tag }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn
-                  color="primary"
-                  @click="solveProblem(item)"
-                > 再刷一遍 </v-btn>
-              </v-list-item-action>
-
-            </v-list-item>
-          </template>
-        </v-list>
-      </v-col>
-
+  <div>
+    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
     </v-container>
+    <v-container
+    class="spacing-playground pa-16"
+    fluid
+    v-else
+  > 
+  <v-layout>
+      <v-flex xs1>
+         <v-btn color="success" @click="getAgain">换一批</v-btn>
+      </v-flex>
+
+      <v-spacer/>
+      <v-flex xs24>
+        <searchbar v-model="search" searchBtnText='搜索推荐题目'/>
+      </v-flex>
+  </v-layout>
+
+  <v-col>
+      <v-list three-line>
+        <template v-for="(item, index) in filteredItems">
+          <v-subheader
+            v-if="item.header"
+            :key="item.header"
+            v-text="item.header"
+          ></v-subheader>
+          <v-divider
+            v-else-if="item.divider"
+            :key="index"
+            :inset="item.inset"
+          ></v-divider>
+          <v-list-item
+            v-else-if="item.title"
+            :key="item.pid"
+          >
+            <v-list-item-avatar>
+              <v-icon> mdi-help-circle-outline</v-icon>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title>
+                <h4>
+                  {{ item.title }}
+                </h4>
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                Tag: {{ item.tag }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-btn
+                color="primary"
+                @click="solveProblem(item)"
+              > 再刷一遍 </v-btn>
+            </v-list-item-action>
+
+          </v-list-item>
+        </template>
+      </v-list>
+    </v-col>
+  </v-container>
+  </div>
 </template>
   
 <script> 
@@ -69,6 +78,7 @@ import searchbar from '../components/SearchBar.vue'
     data() {
       return {
         search: '',
+        loading: true,
         keys: [
             'Name',
             'Tag',
@@ -107,7 +117,10 @@ import searchbar from '../components/SearchBar.vue'
                 this.$store.commit("setAlert", {
                 type: "error",
                 message: error,
-            });
+              });
+            })
+            .finally(() => {
+                this.loading = false;
             });
         },
         solveProblem(item) {
