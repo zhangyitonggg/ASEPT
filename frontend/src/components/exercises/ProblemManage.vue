@@ -69,15 +69,15 @@
                 </template>
               </v-text-field>
 
-              <v-select v-if="newProblem.type === 'CHOICE'" v-model="newProblem.correctAnswer" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
+              <v-select v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
 
-              <v-select v-if="newProblem.type === 'MULTIPLE_CHOICE'" v-model="newProblem.correctAnswers" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+              <v-select v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
 
               <v-btn @click="addOption">添加选项</v-btn>
             </template>
 
             <!-- 填空题的答案输入 -->
-            <template v-if="newProblem.type === 'FILL_BLANK'">
+            <template v-if="newProblem.type === 'BLANK_FILLING'">
               <v-text-field v-for="(blank, index) in newProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="newProblem.fillBlanks[index]"></v-text-field>
               <v-btn @click="addFillBlank">添加答案</v-btn>
             </template>
@@ -169,9 +169,9 @@ export default {
       selectedList: null, // 选择的题单ID
       listOptions: [], // 题单选项，将从后端获取
       questionTypes: [ // 题目类型选项
-        { text: '单选', value: 'CHOICE' },
-        { text: '多选', value: 'MULTIPLE_CHOICE' },
-        { text: '填空', value: 'FILL_BLANK' },
+        { text: '单选', value: 'SINGLE_CHOICE' },
+        { text: '多选', value: 'MULTI_CHOICE' },
+        { text: '填空', value: 'BLANK_FILLING' },
       ],
       loading: true,
       items: [
@@ -239,7 +239,7 @@ export default {
         });
     },
     isMultipleChoice(type) {
-      return ['CHOICE', 'MULTIPLE_CHOICE'].includes(type);
+      return ['SINGLE_CHOICE', 'MULTI_CHOICE'].includes(type);
     },
     addOption() {
       this.newProblem.options.push('');
