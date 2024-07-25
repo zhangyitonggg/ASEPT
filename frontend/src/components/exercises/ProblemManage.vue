@@ -1,15 +1,10 @@
 <template>
   <div>
     <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     </v-container>
     <v-container fluid v-else>
       <v-layout>
-        <!-- 创建题目按钮 -->
         <v-flex xs1>
           <v-btn color="primary" @click="dialogCreate = true">创建题目</v-btn>
         </v-flex>
@@ -21,47 +16,26 @@
       <v-col>
         <v-list three-line>
           <template v-for="(item, index) in currentPageItems">
-            <v-subheader
-              v-if="item.header"
-              :key="item.header"
-              v-text="item.header"
-            ></v-subheader>
-            <v-divider
-              v-else-if="item.divider"
-              :key="index"
-              :inset="item.inset"
-            ></v-divider>
-            <v-list-item
-              v-else-if="item.title"
-              :key="item.pid"
-            >
+            <v-subheader v-if="item.header" :key="item.header" v-text="item.header"></v-subheader>
+            <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
+            <v-list-item v-else-if="item.title" :key="item.pid">
               <v-list-item-avatar>
                 <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link" }}</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
-                  <h4>
-                    {{ item.title }}
-                  </h4>
+                  <h4>{{ item.title }}</h4>
                 </v-list-item-title>
-                <v-list-item-subtitle>
-                  Tag: {{ item.tag }}
-                </v-list-item-subtitle>
+                <v-list-item-subtitle>Tag: {{ item.tag }}</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
                 <v-btn color="primary" @click="openAddTagDialog(item)">增加 Tag</v-btn>
               </v-list-item-action>
               <v-list-item-action>
-                <v-btn
-                  color="primary"
-                  @click="addToList(item)"
-                > 加入题单 </v-btn>
+                <v-btn color="primary" @click="addToList(item)">加入题单</v-btn>
               </v-list-item-action>
               <v-list-item-action>
-                <v-btn
-                  color="primary"
-                  @click="changeProblem(item)"
-                > 修改问题 </v-btn>
+                <v-btn color="primary" @click="changeProblem(item)">修改问题</v-btn>
               </v-list-item-action>
             </v-list-item>
           </template>
@@ -80,34 +54,14 @@
             </v-btn>
           </v-card-title>
           <v-card-text>
-            <v-text-field
-              v-model="newProblem.name"
-              label="题目名称"
-              required
-            ></v-text-field>
-            <v-textarea
-              v-model="newProblem.content"
-              label="题目内容"
-              rows="4"
-              required
-            ></v-textarea>
-            <v-text-field
-              v-model="newProblem.tag"
-              label="标签"
-            ></v-text-field>
-            <v-select
-              v-model="newProblem.type"
-              :items="questionTypes"
-              label="题目类型"
-              required
-            ></v-select>
+            <v-text-field v-model="newProblem.name" label="题目名称" required></v-text-field>
+            <v-textarea v-model="newProblem.content" label="题目内容" rows="4" required></v-textarea>
+            <v-text-field v-model="newProblem.tag" label="标签"></v-text-field>
+            <v-select v-model="newProblem.type" :items="questionTypes" label="题目类型" required></v-select>
+
+            <!-- 单选和多选题的选项输入 -->
             <template v-if="isMultipleChoice(newProblem.type)">
-              <v-text-field
-                v-for="(option, index) in newProblem.options"
-                :key="index"
-                :label="'选项 ' + (index + 1)"
-                v-model="newProblem.options[index]"
-              >
+              <v-text-field v-for="(option, index) in newProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="newProblem.options[index]">
                 <template v-slot:append>
                   <v-btn icon @click="removeOption(index)">
                     <v-icon>mdi-close</v-icon>
@@ -115,22 +69,16 @@
                 </template>
               </v-text-field>
 
-              <v-select
-                v-model="newProblem.correctAnswer"
-                :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
-                label="选择正确答案"
-                required
-              ></v-select>
+              <v-select v-if="newProblem.type === 'CHOICE'" v-model="newProblem.correctAnswer" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
+
+              <v-select v-if="newProblem.type === 'MULTIPLE_CHOICE'" v-model="newProblem.correctAnswers" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
 
               <v-btn @click="addOption">添加选项</v-btn>
             </template>
+
+            <!-- 填空题的答案输入 -->
             <template v-if="newProblem.type === 'FILL_BLANK'">
-              <v-text-field
-                v-for="(blank, index) in newProblem.fillBlanks"
-                :key="index"
-                :label="'填空答案 ' + (index + 1)"
-                v-model="newProblem.fillBlanks[index]"
-              ></v-text-field>
+              <v-text-field v-for="(blank, index) in newProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="newProblem.fillBlanks[index]"></v-text-field>
               <v-btn @click="addFillBlank">添加答案</v-btn>
             </template>
           </v-card-text>
@@ -153,14 +101,7 @@
           </v-card-title>
           <v-card-text>
             请选择要添加到的题单:
-            <v-select
-              v-model="selectedList"
-              :items="listOptions"
-              label="选择题单"
-              item-text="name"
-              item-value="pgid"
-              required
-            ></v-select>
+            <v-select v-model="selectedList" :items="listOptions" label="选择题单" item-text="name" item-value="pgid" required></v-select>
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="confirmAddToList">确认添加</v-btn>
@@ -180,18 +121,8 @@
             </v-btn>
           </v-card-title>
           <v-card-text>
-            <v-text-field
-              v-model="currentProblem.name"
-              label="题目名称"
-              required
-            ></v-text-field>
-            <v-textarea
-              v-model="currentProblem.content"
-              label="题目内容"
-              rows="4"
-              required
-            ></v-textarea>
-            <!-- 可以添加其他题目信息的输入框 -->
+            <v-text-field v-model="currentProblem.name" label="题目名称" required></v-text-field>
+            <v-textarea v-model="currentProblem.content" label="题目内容" rows="4" required></v-textarea>
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="confirmChangeProblem">保存修改</v-btn>
@@ -211,11 +142,7 @@
             </v-btn>
           </v-card-title>
           <v-card-text>
-            <v-text-field
-              v-model="newTag"
-              label="输入 Tag"
-              required
-            ></v-text-field>
+            <v-text-field v-model="newTag" label="输入 Tag" required></v-text-field>
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="confirmAddTag">确认增加</v-btn>
@@ -223,7 +150,6 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-
     </v-container>
   </div>
 </template>
@@ -337,6 +263,17 @@ export default {
     openAddTagDialog(item) {
       this.currentProblem = item;
       this.dialogAddTag = true;
+    },
+    resetNewProblem() {
+      this.newProblem = {
+        name: '',
+        content: '',
+        tag: '',
+        type: '',
+        options: [''],
+        fillBlanks: [''],
+        correctAnswers: [],
+      };
     },
     confirmAddTag() {
       if (this.newTag.trim() === '') {
