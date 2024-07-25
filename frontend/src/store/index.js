@@ -340,7 +340,7 @@ export default new Vuex.Store({
     },
     userModify(context, {username, originalPassword, newPassword}) {
       return new Promise((resolve, reject) => {
-        api.userModify(username, password)
+        api.userModify(username, originalPassword, newPassword)
           .then(response => {
             resolve(response.data);
           })

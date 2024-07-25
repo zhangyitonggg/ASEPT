@@ -13,7 +13,6 @@ router = APIRouter(
 )
 
 class ModifyUserInfo(BaseModel):
-    username: str
     originalPassword: str = Query(min_length=1, max_length=20)
     newPassword: str = Query(min_length=1, max_length=20)
 
@@ -21,8 +20,8 @@ class ModifyUserInfo(BaseModel):
 @router.post("/modify")
 async def set_permission(
     info: ModifyUserInfo,
-    user: User = Depends(security.get_admin),
+    user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
-    # database.modify_user_info(db, info.username, info.originalPassword, info.newPassword)
+    database.modify_user_info(db, user, info.originalPassword, info.newPassword)
     return {"status": "success"}

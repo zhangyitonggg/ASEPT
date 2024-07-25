@@ -122,7 +122,7 @@ const api = {
       return await router.get(path.baseUrl + path.get_my_problem_groups);
     },
     userModify: async(username, originalPassword, newPassword) => {
-      return await router.post(path.baseUrl + path.userModify, {username: username, originalPassword: originalPassword, newPassword: newPassword});
+      return await router.post(path.baseUrl + path.userModify, {originalPassword: originalPassword, newPassword: newPassword});
     },
 };
 

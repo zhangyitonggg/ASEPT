@@ -125,26 +125,23 @@ export default {
   },
   methods: {
     handleUserModify() {
-      this.loading = true;
       if (this.password !== this.confirm_password) {
         this.$store.commit('setAlert', { message: '两次密码不一致', type: 'error' });
-        this.loading = false;
         return;
       } else if (this.password === this.original_password) {
         this.$store.commit('setAlert', { message: '新密码不能与原密码相同', type: 'error' });
-        this.loading = false;
         return;
       } else if (this.password.length < 9 || this.password.length > 20) {
-        this.$store.commit('setAlert', { message: '密码长度应在9-20字符之间', type: 'error' });
-        this.loading = false;
+        this.$store.commit('setAlert', { message: '密码长度应在 9 - 20 字符之间', type: 'error' });
         return;
       }
+      this.loading = true;
       this.$store.dispatch('userModify', {username: this.$store.getters.username, originalPassword: this.original_password, newPassword: this.password})
         .then(() => {
           this.$store.commit('setAlert', { message: '用户信息修改成功。', type: 'success' });
         })
         .catch((e) => {
-          this.$store.commit('setAlert', { message: e.response.data.message, type: 'error' });
+          this.$store.commit('setAlert', { message: e, type: 'error' });
         })
         .finally(() => {
           this.loading = false;
