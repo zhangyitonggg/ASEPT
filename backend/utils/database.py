@@ -935,9 +935,9 @@ def search_problem_by_tag(db, tag: str, user: User):
         if problem in problems_with_access:
             problems.append(problem)
     # print(problems)
-    final_problems = list(set(problems) & set(problems_with_access))
+    # final_problems = list(set(problems) & set(problems_with_access))
     res = []
-    for problem in final_problems:
+    for problem in problems:
         res.append({
             "pid": problem[0],
             "title": problem[1],
