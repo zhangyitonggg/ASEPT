@@ -20,6 +20,7 @@ const api = {
     },
     createProblem: async(problemData) => {
       console.log("createProblem");
+      console.log('create: ',problemData);
       return await router.post(path.baseUrl + path.createProblem,problemData);
     },
     getMyProblem: async() => {
@@ -32,6 +33,7 @@ const api = {
     },
     getProblemById: async(pid) => {
       console.log("getProblemById");
+      
       return await router.get(path.baseUrl + path.getProblemById,{params:{pid :pid }});
     },
     createProblemList: async(list) => {
