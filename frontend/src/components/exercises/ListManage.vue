@@ -1,95 +1,103 @@
-
 <template>
-  <v-container fluid>
-    <v-layout>
-      <!-- 创建题单按钮 -->
-      <v-flex xs1>
-        <v-btn color="primary" @click="showCreateDialog = true">创建题单</v-btn>
-      </v-flex>
-      <v-spacer/>
-      <v-flex xs24>
-        <searchbar v-model="search" searchBtnText='搜索题单'/>
-      </v-flex>
-    </v-layout>
-    
-    <v-col>
-      <v-list three-line>
-        <template v-for="(item, index) in currentPageItems">
-          <v-subheader v-if="item.header" :key="item.header" v-text="item.header"></v-subheader>
-          <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
-          <v-list-item v-else-if="item.pgid" :key="item.pgid">
-            <v-list-item-avatar>
-              <v-icon>{{ item.locked ? 'mdi-link-lock' : 'mdi-link' }}</v-icon>
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title>
-                <h4>{{ item.name }}</h4>
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                Tag: {{ item.tag }}
-              </v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-btn color="primary" @click="openShareDialog(item)"> 分享题单 </v-btn>
-            </v-list-item-action>
-          </v-list-item>
-        </template>
-        <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
-      </v-list>
-    </v-col>
-
-    <!-- 创建题单弹窗 -->
-    <v-dialog v-model="showCreateDialog" max-width="500px">
-      <v-card>
-        <v-card-title>
-          创建新题单
-          <v-spacer></v-spacer>
-          <v-btn icon @click="showCreateDialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-form @submit.prevent="createList">
-            <v-text-field v-model="newListName" label="题单名称" required></v-text-field>
-            <v-textarea v-model="newListDescription" label="描述"></v-textarea>
-            <v-card-actions>
-              <v-btn color="primary" type="submit">创建</v-btn>
-              <v-btn text @click="showCreateDialog = false">取消</v-btn>
-            </v-card-actions>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-
-    <!-- 分享题单弹窗 -->
-    <v-dialog v-model="showShareDialog" max-width="500px">
-      <v-card>
-        <v-card-title>
-          分享题单
-          <v-spacer></v-spacer>
-          <v-btn icon @click="showShareDialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-form @submit.prevent="shareList">
-            <v-select
-              v-model="selectedGroup"
-              :items="groups"
-              item-text="group_name"
-              item-value="gid"
-              label="选择群组"
-              required
-            ></v-select>
-            <v-card-actions>
-              <v-btn color="primary" type="submit">分享</v-btn>
-              <v-btn text @click="showShareDialog = false">取消</v-btn>
-            </v-card-actions>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-  </v-container>
+  <div>
+    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
+    </v-container>
+    <v-container fluid v-else>
+      <v-layout>
+        <!-- 创建题单按钮 -->
+        <v-flex xs1>
+          <v-btn color="primary" @click="showCreateDialog = true">创建题单</v-btn>
+        </v-flex>
+        <v-spacer/>
+        <v-flex xs24>
+          <searchbar v-model="search" searchBtnText='搜索题单'/>
+        </v-flex>
+      </v-layout>
+      
+      <v-col>
+        <v-list three-line>
+          <template v-for="(item, index) in currentPageItems">
+            <v-subheader v-if="item.header" :key="item.header" v-text="item.header"></v-subheader>
+            <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
+            <v-list-item v-else-if="item.pgid" :key="item.pgid">
+              <v-list-item-avatar>
+                <v-icon>{{ item.locked ? 'mdi-link-lock' : 'mdi-link' }}</v-icon>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>
+                  <h4>{{ item.name }}</h4>
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  Tag: {{ item.tag }}
+                </v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn color="primary" @click="openShareDialog(item)"> 分享题单 </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </template>
+          <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
+        </v-list>
+      </v-col>
+  
+      <!-- 创建题单弹窗 -->
+      <v-dialog v-model="showCreateDialog" max-width="500px">
+        <v-card>
+          <v-card-title>
+            创建新题单
+            <v-spacer></v-spacer>
+            <v-btn icon @click="showCreateDialog = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-form @submit.prevent="createList">
+              <v-text-field v-model="newListName" label="题单名称" required></v-text-field>
+              <v-textarea v-model="newListDescription" label="描述"></v-textarea>
+              <v-card-actions>
+                <v-btn color="primary" type="submit">创建</v-btn>
+                <v-btn text @click="showCreateDialog = false">取消</v-btn>
+              </v-card-actions>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+  
+      <!-- 分享题单弹窗 -->
+      <v-dialog v-model="showShareDialog" max-width="500px">
+        <v-card>
+          <v-card-title>
+            分享题单
+            <v-spacer></v-spacer>
+            <v-btn icon @click="showShareDialog = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-form @submit.prevent="shareList">
+              <v-select
+                v-model="selectedGroup"
+                :items="groups"
+                item-text="group_name"
+                item-value="gid"
+                label="选择群组"
+                required
+              ></v-select>
+              <v-card-actions>
+                <v-btn color="primary" type="submit">分享</v-btn>
+                <v-btn text @click="showShareDialog = false">取消</v-btn>
+              </v-card-actions>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </v-container>
+  </div>
 </template>
 <!-- <script>
 import searchbar from '../SearchBar.vue';
@@ -215,6 +223,7 @@ export default {
       items: [],
       currentPage: 1,
       groups: [],
+      loading: true,
       selectedGroup: null,
       selectedItem: null, // 用于保存当前选中的题单
     };
@@ -257,6 +266,9 @@ export default {
             type: 'error',
             message: error,
           });
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
     fetchGroups() {

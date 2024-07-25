@@ -895,11 +895,11 @@ def get_user_statistics(db, user: User):
     for submit in submits:
         if get_problem_type(submit[2]) == "CHOICE":
             choice_submit += 1
-            if submit[5]:
+            if submit[4]:
                 choice_correct += 1
         else:
             blank_submit += 1
-            if submit[5]:
+            if submit[4]:
                 blank_correct += 1
     return {
         "choice_submit": choice_submit,
@@ -918,7 +918,7 @@ def get_problem_recommend(db, user: User):
         submits = cursor.fetchall()
         correct = 0
         for submit in submits:
-            if submit[5]:
+            if submit[4]:
                 correct += 1
         res.append((problem[0], correct / len(submits) if len(submits) != 0 else 0))
     res = sorted(res, key=lambda x: x[1])
@@ -1035,3 +1035,20 @@ def get_user_problem_groups(db, user: User):
             "owner": group[3],
         })
     return {"problem_groups": res}
+
+
+def get_problem_answer(db, pid):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if problem == None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    if problem[9]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Problem is in contest. Permission denied."
+        )
+    return problem[7]

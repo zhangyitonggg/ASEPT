@@ -1,5 +1,13 @@
 <template>
-  <v-container fluid>
+  <div>
+    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
+    </v-container>
+    <v-container fluid v-else>
       <v-layout>
         <v-spacer/>
         <v-flex xs24>
@@ -45,6 +53,7 @@
         </v-list>
       </v-col>
   </v-container>
+  </div>
 </template>
 
 <script>
@@ -58,6 +67,7 @@ export default {
       filter: {},
       sortDesc: false,
       page: 1,
+      loading: true,
       itemsPerPage: 13,
       currentPage: 1,
       sortBy: 'name',
@@ -132,6 +142,9 @@ export default {
             message: error,
           });
           }).finally(() => {
+          this.loading = false;
+        })
+        .finally(() => {
           this.loading = false;
         });
     },

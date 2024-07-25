@@ -45,6 +45,7 @@
                     {{ item.founder }}
                   </strong>
                   <br>
+                  Description:
                   {{ item.description }}
                 </v-list-item-subtitle>
               </v-list-item-content>
