@@ -162,6 +162,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getCorrectAnswersById(context,pid) {
+      return new Promise((resolve, reject) => {
+        api.getProblemById(pid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     addProblemToList(context,data) {
       return new Promise((resolve, reject) => {
         api.add_problem_to_group(data.pgid,data.pid)
