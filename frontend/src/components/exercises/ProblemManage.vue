@@ -297,35 +297,7 @@ export default {
       this.currentProblem = item;
       this.dialogEdit = true;
     },
-    // createProblem() {
-      
-    //   const newProblemData = {
-    //     title: this.newProblem.name,
-    //     content: this.newProblem.content,
-    //     tag: this.newProblem.tag,
-    //     type: this.newProblem.type,
-    //     choices: this.newProblem.options,
-    //     answer: this.newProblem.correctAnswer,
-    //     fillBlanks: this.newProblem.fillBlanks,
-    //   };
-    //   console.log(newProblemData);
-    //   this.$store
-    //     .dispatch('createProblem', newProblemData)
-    //     .then(() => {
-    //       this.$store.commit('setAlert', {
-    //         type: 'success',
-    //         message: '题目创建成功！',
-    //       });
-    //       this.dialogCreate = false;
-    //       this.fetchProblems(); // 重新获取题目列表
-    //     })
-    //     .catch((error) => {
-    //       this.$store.commit('setAlert', {
-    //         type: 'error',
-    //         message: error,
-    //       });
-    //     });
-    // },
+   
     confirmAddToList() {
       let proid = this.currentProblem.pid;
       let listid = this.selectedList;
