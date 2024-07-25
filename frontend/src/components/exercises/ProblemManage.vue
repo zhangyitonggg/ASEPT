@@ -41,7 +41,7 @@
                   </v-checkbox-group>
                 </template>
               </template>
-              <template v-else-if="question.type === 'BLANK_FILLING'">
+              <template v-else-if="question.type === 'FILL_BLANK'">
                 <v-text-field
                   v-for="(blank, index) in question.answers"
                   :key="index"
@@ -70,7 +70,7 @@
                   <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
                 </ul>
               </div>
-              <div v-else-if="question.type === 'BLANK_FILLING'">
+              <div v-else-if="question.type === 'FILL_BLANK'">
                 <p>Correct Answers:</p>
                 <ul>
                   <li v-for="(answer, index) in correctAnswers" :key="index">{{ `Blank ${index + 1}: ${answer}` }}</li>
@@ -179,7 +179,7 @@ export default {
           // 单选题的答案处理
           formattedAnswer[this.answer] = this.question.choices[this.answer];
         }
-      } else if (this.question.type === 'BLANK_FILLING') {
+      } else if (this.question.type === 'FILL_BLANK') {
         // 填空题的答案处理
         formattedAnswer = this.answer;
       }

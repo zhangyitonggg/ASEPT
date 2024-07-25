@@ -81,8 +81,7 @@ const api = {
       return await router.post(path.baseUrl + path.add_problem_tag,{}, {params: {pid: pid, tag: tag}});
     },
     search_problem_by_tag: async(tag) => {
-      console.log("search_problem_by_tag");
-      console.log(tag);
+      console.log("search_problem_by_tag");;
       return await router.get(path.baseUrl + path.search_problem_by_tag, {params: {tag: tag}});
     },
     get_my_problems: async() => {
@@ -91,7 +90,8 @@ const api = {
     },
     submit_problem: async(pid, answer) => {
       console.log("submit_problem");
-      return await router.get(path.baseUrl + path.submit_problem, {pid: pid, answer: answer});
+      console.log('sub: ',pid,answer);
+      return await router.get(path.baseUrl + path.submit_problem,{params: {pid: pid, answer: answer}});
     },
     get_user_statistics: async() => {
       console.log("get_user_statistics");
