@@ -919,10 +919,22 @@ def get_problem_tags(db, pid: str, user: User):
 
 def search_problem_by_tag(db, tag: str, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
+    print(problems_with_access)
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemTags")
-    problems = cursor.fetchall()
-    problems = [problem for problem in problems if tag in problem[1]]
+    problem_tags = cursor.fetchall()
+    # print(tag)
+    # print(problem_tags)
+    problem_tags = [problem for problem in problem_tags if tag in problem[1]]
+    # print(problem_tags)
+    pids = [problem[0] for problem in problem_tags]
+    problems = []
+    for pid in pids:
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+        problem = cursor.fetchone()
+        if problem in problems_with_access:
+            problems.append(problem)
+    # print(problems)
     final_problems = list(set(problems) & set(problems_with_access))
     res = []
     for problem in final_problems:
