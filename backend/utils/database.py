@@ -501,17 +501,10 @@ def open_announcement(db, announcement:Announcement, user: User):
 
 
 def modify_announcement(db, announcement:Announcement, user: User):
+    print(announcement)
     cursor = db.cursor()
-    try:
-        cursor.execute("UPDATE Announcements SET title = %s, content = %s, is_active = %s WHERE aid = %s", (announcement.title, announcement.content, 1 if announcement.is_active else 0 ,announcement.aid))
-        db.commit()
-    except Exception as e:
-        print("Error modifying announcement: ", e)
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Error modifying announcement. Maybe the announcement does not exist.",
-        )
+    cursor.execute("UPDATE Announcements SET title = %s, content = %s, is_active = %s WHERE aid = %s", (announcement.title, announcement.content, 1 if announcement.is_active else 0 ,announcement.aid))
+    db.commit()
 
 def get_all_users(db):
     cursor = db.cursor()

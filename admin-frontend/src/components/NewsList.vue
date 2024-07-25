@@ -64,6 +64,7 @@
                       label="公告内容"
                       filled
                       outlined
+                      rows="20"
                       v-model="announcementContent"
                     ></v-textarea>
                     <v-switch
@@ -100,7 +101,6 @@
     </template>
     <v-dialog
       v-model="dialog_openannouncement"
-      persistent
       width="50%"
     >
       <v-card>
@@ -115,6 +115,7 @@
           ></v-text-field>
           <v-textarea
             label="公告内容"
+            rows="20"
             v-model="announcementContent"
           ></v-textarea>
         </v-card-text>
