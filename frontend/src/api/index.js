@@ -103,7 +103,8 @@ const api = {
     },
     get_problem: async(pid) => {
       console.log("get_problem");
-      return await router.get(path.baseUrl + path.get_problem, {pid: pid});
+      console.log(pid);
+      return await router.get(path.baseUrl + path.get_problem, {params:{pid: pid}});
     },
     get_problem_group_info: async(pgid) => {
       console.log("get_problem_group_info");
