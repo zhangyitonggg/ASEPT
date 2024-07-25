@@ -250,6 +250,17 @@ export default new Vuex.Store({
           })
       })
     },
+    addTagToProblem(context,data) {
+      return new Promise((resolve, reject) => {
+        api.add_problem_tag(data.pid,data.tag)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     showJoinedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showJoinedGroups()

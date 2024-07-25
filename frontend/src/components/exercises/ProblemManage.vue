@@ -49,6 +49,9 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
+                <v-btn color="primary" @click="openAddTagDialog(item)">增加 Tag</v-btn>
+              </v-list-item-action>
+              <v-list-item-action>
                 <v-btn
                   color="primary"
                   @click="addToList(item)"
@@ -65,7 +68,7 @@
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
       </v-col>
-  
+
       <!-- 创建题目对话框 -->
       <v-dialog v-model="dialogCreate" max-width="600px">
         <v-card>
@@ -111,14 +114,14 @@
                   </v-btn>
                 </template>
               </v-text-field>
-  
+
               <v-select
                 v-model="newProblem.correctAnswer"
                 :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
                 label="选择正确答案"
                 required
               ></v-select>
-  
+
               <v-btn @click="addOption">添加选项</v-btn>
             </template>
             <template v-if="newProblem.type === 'FILL_BLANK'">
@@ -137,7 +140,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-  
+
       <!-- 添加题单对话框 -->
       <v-dialog v-model="dialogAdd" max-width="600px">
         <v-card>
@@ -165,7 +168,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-  
+
       <!-- 修改题目对话框 -->
       <v-dialog v-model="dialogEdit" max-width="600px">
         <v-card>
@@ -196,6 +199,31 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <!-- 增加Tag对话框 -->
+      <v-dialog v-model="dialogAddTag" max-width="400px">
+        <v-card>
+          <v-card-title>
+            增加 Tag
+            <v-spacer></v-spacer>
+            <v-btn icon @click="dialogAddTag = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <v-text-field
+              v-model="newTag"
+              label="输入 Tag"
+              required
+            ></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" @click="confirmAddTag">确认增加</v-btn>
+            <v-btn text @click="dialogAddTag = false">取消</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
     </v-container>
   </div>
 </template>
@@ -208,8 +236,10 @@ export default {
       dialogCreate: false, // 控制“创建题目”对话框的显示
       dialogAdd: false, // 控制“添加题单”对话框的显示
       dialogEdit: false, // 控制“修改问题”对话框的显示
+      dialogAddTag: false, // 控制“增加Tag”对话框的显示
       currentProblem: {}, // 当前正在修改的题目
       newProblem: { name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] }, // 新创建的题目
+      newTag: '', // 新的 Tag
       selectedList: null, // 选择的题单ID
       listOptions: [], // 题单选项，将从后端获取
       questionTypes: [ // 题目类型选项
@@ -304,7 +334,39 @@ export default {
       this.currentProblem = item;
       this.dialogEdit = true;
     },
-   
+    openAddTagDialog(item) {
+      this.currentProblem = item;
+      this.dialogAddTag = true;
+    },
+    confirmAddTag() {
+      if (this.newTag.trim() === '') {
+        this.$store.commit('setAlert', {
+          type: 'error',
+          message: 'Tag 不能为空！',
+        });
+        return;
+      }
+
+      this.$store
+        .dispatch('addTagToProblem', {
+          pid: this.currentProblem.pid,
+          tag: this.newTag,
+        })
+        .then(() => {
+          this.$store.commit('setAlert', {
+            type: 'success',
+            message: 'Tag 增加成功！',
+          });
+          this.dialogAddTag = false;
+          this.fetchProblems(); // 刷新题目列表
+        })
+        .catch((error) => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        });
+    },
     confirmAddToList() {
       let proid = this.currentProblem.pid;
       let listid = this.selectedList;
@@ -327,58 +389,58 @@ export default {
           });
         });
     },
-     createProblem() {
-    // 构造 choices 对象
-    const choices = this.newProblem.options.reduce((acc, choice, index) => {
-      const key = String.fromCharCode(65 + index); // 生成键名，如 'A', 'B', 'C' 等
-      if (choice.trim()) {
-        acc[key] = choice;
+    createProblem() {
+      // 构造 choices 对象
+      const choices = this.newProblem.options.reduce((acc, choice, index) => {
+        const key = String.fromCharCode(65 + index); // 生成键名，如 'A', 'B', 'C' 等
+        if (choice.trim()) {
+          acc[key] = choice;
+        }
+        return acc;
+      }, {});
+
+      // 将 choices 对象转换为 JSON 字符串
+      const choicesJson = JSON.stringify(choices);
+
+      // 构造 answer 对象
+      const answer = {};
+      const correctAnswerKey = this.newProblem.correctAnswer;
+      if (correctAnswerKey && choices[correctAnswerKey]) {
+        answer[correctAnswerKey] = choices[correctAnswerKey];
       }
-      return acc;
-    }, {});
 
-    // 将 choices 对象转换为 JSON 字符串
-    const choicesJson = JSON.stringify(choices);
+      // 将 answer 对象转换为 JSON 字符串
+      const answerJson = JSON.stringify(answer);
 
-    // 构造 answer 对象
-    const answer = {};
-    const correctAnswerKey = this.newProblem.correctAnswer;
-    if (correctAnswerKey && choices[correctAnswerKey]) {
-      answer[correctAnswerKey] = choices[correctAnswerKey];
-    }
-
-    // 将 answer 对象转换为 JSON 字符串
-    const answerJson = JSON.stringify(answer);
-
-    // 准备新的题目数据
-    const newProblemData = {
-      title: this.newProblem.name,
-      content: this.newProblem.content,
-      tag: this.newProblem.tag,
-      type: this.newProblem.type,
-      choices: choicesJson, // 转换为 JSON 字符串
-      answer: answerJson, // 转换为 JSON 字符串
-      fillBlanks: this.newProblem.fillBlanks, // 假设 fillBlanks 可以直接发送
-    };
-  console.log(newProblemData);
-    // 发送请求创建题目
-    this.$store
-      .dispatch('createProblem', newProblemData)
-      .then(() => {
-        this.$store.commit('setAlert', {
-          type: 'success',
-          message: '题目创建成功！',
+      // 准备新的题目数据
+      const newProblemData = {
+        title: this.newProblem.name,
+        content: this.newProblem.content,
+        tag: this.newProblem.tag,
+        type: this.newProblem.type,
+        choices: choicesJson, // 转换为 JSON 字符串
+        answer: answerJson, // 转换为 JSON 字符串
+        fillBlanks: this.newProblem.fillBlanks, // 假设 fillBlanks 可以直接发送
+      };
+      console.log(newProblemData);
+      // 发送请求创建题目
+      this.$store
+        .dispatch('createProblem', newProblemData)
+        .then(() => {
+          this.$store.commit('setAlert', {
+            type: 'success',
+            message: '题目创建成功！',
+          });
+          this.dialogCreate = false;
+          this.fetchProblems(); // 刷新题目列表
+        })
+        .catch((error) => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
         });
-        this.dialogCreate = false;
-        this.fetchProblems(); // 刷新题目列表
-      })
-      .catch((error) => {
-        this.$store.commit('setAlert', {
-          type: 'error',
-          message: error,
-        });
-      });
-  },
+    },
     confirmChangeProblem() {
       this.$store
         .dispatch('updateProblem', this.currentProblem)
