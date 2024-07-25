@@ -895,11 +895,11 @@ def get_user_statistics(db, user: User):
     for submit in submits:
         if get_problem_type(submit[2]) == "CHOICE":
             choice_submit += 1
-            if submit[5]:
+            if submit[4]:
                 choice_correct += 1
         else:
             blank_submit += 1
-            if submit[5]:
+            if submit[4]:
                 blank_correct += 1
     return {
         "choice_submit": choice_submit,
@@ -918,7 +918,7 @@ def get_problem_recommend(db, user: User):
         submits = cursor.fetchall()
         correct = 0
         for submit in submits:
-            if submit[5]:
+            if submit[4]:
                 correct += 1
         res.append((problem[0], correct / len(submits) if len(submits) != 0 else 0))
     res = sorted(res, key=lambda x: x[1])
