@@ -69,12 +69,12 @@ const api = {
     },
     add_problem_to_group: async(ppgid, ppid) => {
       console.log("add_problem_to_group");
-      
       return await router.post(path.baseUrl + path.add_problem_to_group,{},{ params: {pid: ppid,pgid: ppgid}});
     },
     share_problem_group_to_user_group: async(pgid, gid) => {
       console.log("share_problem_group_to_user_group");
-      return await router.post(path.baseUrl + path.share_problem_group_to_user_group, {pgid: pgid, gid: gid});
+      console.log(pgid,gid);
+      return await router.post(path.baseUrl + path.share_problem_group_to_user_group,{}, {params: {pgid: pgid, gid: gid}});
     },
     add_problem_tag: async(pid, tag) => {
       console.log("add_problem_tag");

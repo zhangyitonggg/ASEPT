@@ -217,6 +217,17 @@ export default new Vuex.Store({
           })
       })
     },
+    shareProblemList(context,data) {
+      return new Promise((resolve, reject) => {
+        api.share_problem_group_to_user_group(data.pgid, data.gid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     showJoinedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showJoinedGroups()
