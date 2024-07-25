@@ -513,6 +513,68 @@ def modify_announcement(db, announcement:Announcement, user: User):
             detail="Error modifying announcement. Maybe the announcement does not exist.",
         )
 
+def get_all_users(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Users")
+    users = cursor.fetchall()
+    res = []
+    for user in users:
+        res.append({
+            "name": user[0],
+            "uid": user[1],
+            "is_admin": user[3],
+            "blocked": user[4],
+        })
+    return {"users": res}
+
+def admin_get_all_problems(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems")
+    problems = cursor.fetchall()
+    res = []
+    for problem in problems:
+        res.append({
+            "pid": problem[0],
+            "title": problem[1],
+            "content": problem[2],
+            "type": problem[3],
+            "author": problem[4],
+            "update_time": problem[5],
+            "choices": problem[6],
+            "answers": problem[7],
+            "is_public": problem[8],
+        })
+    return {"problems": res}
+
+def get_all_groups(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM UserGroups")
+    groups = cursor.fetchall()
+    res = []
+    for group in groups:
+        res.append({
+            "gid": group[0],
+            "name": group[1],
+            "description": group[2],
+            "owner": group[3],
+            "is_open": group[4],
+            "password": group[5],
+        })
+    return {"groups": res}
+
+def get_all_problem_groups(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM ProblemGroups")
+    groups = cursor.fetchall()
+    res = []
+    for group in groups:
+        res.append({
+            "pgid": group[0],
+            "name": group[1],
+            "description": group[2],
+            "owner": group[3],
+        })
+    return {"problem_groups": res}
 
 def get_announcements(db, max_announcements: int, panel: int):
     cursor = db.cursor()
@@ -567,6 +629,10 @@ def create_problem_group(db, group_name: str, description: str, owner: User):
 
 def get_pgids_user_can_access(db, user: User):
     cursor = db.cursor()
+    if user.permissions.get("IS_ADMIN") == True:
+        cursor.execute("SELECT * FROM ProblemGroups")
+        groups = cursor.fetchall()
+        return [group[0] for group in groups]
     cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
     groups = cursor.fetchall()
     gids = [group[1] for group in groups]
@@ -584,12 +650,16 @@ def get_pgids_user_can_access(db, user: User):
     return list(set(all_pgids))
 
 def get_all_accessible_problems(db, user: User):
+    cursor = db.cursor()
+    if user.permissions.get("IS_ADMIN") == True:
+        cursor.execute("SELECT * FROM Problems")
+        problems = cursor.fetchall()
+        return problems
     # get problem groups that user has access to
     # print('problems')
     all_pgids = get_pgids_user_can_access(db, user)
     # print('pgids:', all_pgids)
     # get the problems owned by the user
-    cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE author = %s", (user.uid))
     all_pids = cursor.fetchall()
     all_pids = [pid[0] for pid in all_pids]
@@ -714,7 +784,7 @@ def change_problem_group_info(db, pgid: str, group_name: str, description: str, 
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Group not found."
         )
-    if group[3] != owner.uid:
+    if group[3] != owner.uid and owner.permissions.get("IS_ADMIN") == False:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permission denied. You are not the owner of this group."
@@ -732,7 +802,7 @@ def add_problem_to_group(db, pid: str, pgid: str, user: User):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Group not found."
         )
-    if group[3] != user.uid:
+    if group[3] != user.uid and user.permissions.get("IS_ADMIN") == False:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permission denied. You are not the owner of this group."
@@ -771,7 +841,7 @@ def share_problem_group_to_user_group(db, pgid: str, gid: str, user: User):
             detail="User group not found."
         )
     cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (gid, user.uid))
-    if not cursor.fetchone():
+    if (not cursor.fetchone()) and user.permissions.get("IS_ADMIN") == False:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied. User not in the user group."
@@ -793,7 +863,7 @@ def add_problem_tag(db, pid: str, tag: str, user: User):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Problem not found."
         )
-    if problem[4] != user.uid:
+    if problem[4] != user.uid and user.permissions.get("IS_ADMIN") == False:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permission denied."
@@ -1051,7 +1121,7 @@ def set_problem_public_status(db, pid: str, is_public: bool, user: User):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Problem not found."
         )
-    if problem[4] != user.uid:
+    if problem[4] != user.uid and user.permissions.get("IS_ADMIN") == False:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permission denied."

@@ -119,3 +119,154 @@ async def modify_announcement(
         )
     database.modify_announcement(db, announcement, user)
     return {"status": "success"}
+
+@router.get('/get_all_users')
+async def get_all_users(
+    user: User = Depends(security.get_admin),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取所有用户的信息，只有管理员可以获取。
+    
+    返回格式：
+    
+    ```
+    {
+        "users": [
+            {
+                "name": "用户名",
+                "uid": "xxxx",(uuid)
+                "is_admin": 'True'/'False',
+                "blocked": 0/1,
+            },
+            ...
+        ]
+    }
+    ```
+    '''
+    if user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are not an admin."
+        )
+    return database.get_all_users(db)
+
+@router.get('/get_all_problems')
+async def get_all_problems(
+    user: User = Depends(security.get_admin),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取所有题目的信息，只有管理员可以获取。
+    
+    返回格式：
+    
+    ```
+    {
+        "problems": [
+            {
+                "pid": 1,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 'choice',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
+                "choices": {
+                    "A": "Choice A",
+                    "B": "Choice B",
+                    "C": "Choice C",
+                    "D": "Choice D"
+                },
+                "answers": {
+                    "A": "Choice A",
+                    "B": "Choice B"
+                },
+                "is_public": 0
+            },
+            {
+                "pid": 2,
+                "title": "Problem Title",
+                "content": "Problem Content",
+                "type": 'blank_filling',
+                “author”: "xxx",(uuid)
+                "update_time": "2021-10-01 12:00:00",
+                "choices": null,
+                "answers": {
+                    "B": "Choice B"
+                },
+                "is_public": 1
+            }
+        ]
+    }
+    ```
+    '''
+    if user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are not an admin."
+        )
+    return database.admin_get_all_problems(db)
+
+@router.get('/get_all_groups')
+async def get_all_groups(
+    user: User = Depends(security.get_admin),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取所有用户组的信息，只有管理员可以获取。
+    
+    格式如下：
+
+    ```
+    {
+        "groups": [
+            {
+                "gid": "xxx",(uuid)
+                "name": "xxx",
+                "description": "xxx",
+                "owner": "xxx", (uuid)
+                "is_open": 'True'/'False',
+                "password": "xxx"
+            },
+            ...
+        ]
+    }
+    ```
+    '''
+    if user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are not an admin."
+        )
+    return database.get_all_groups(db)
+
+@router.get('/get_all_problem_groups')
+async def get_all_problem_groups(
+    user: User = Depends(security.get_admin),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取所有题目与用户组的关联信息，只有管理员可以获取。
+    
+    返回格式：
+
+    ```
+    {
+        "problem_groups": [
+            {
+                "pgid": "xxx",(uuid)
+                "name": "xxx",
+                "description": "xxx",
+                "owner": "xxx" (uuid)
+            },
+            ...
+        ]
+    }
+    ```
+    '''
+    if user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are not an admin."
+        )
+    return database.get_all_problem_groups(db)
