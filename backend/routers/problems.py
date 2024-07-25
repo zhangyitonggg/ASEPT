@@ -56,7 +56,7 @@ async def add_problem(
     }
     ```
     
-    for blank filling problem, DO NOT provide choices.
+    for blank filling problem, **DO NOT** provide choices.
     '''
     if not user.permissions.get("UPLOAD_PROBLEM"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')

@@ -501,7 +501,6 @@ def open_announcement(db, announcement:Announcement, user: User):
 
 
 def modify_announcement(db, announcement:Announcement, user: User):
-    print(announcement)
     cursor = db.cursor()
     cursor.execute("UPDATE Announcements SET title = %s, content = %s, is_active = %s WHERE aid = %s", (announcement.title, announcement.content, 1 if announcement.is_active else 0 ,announcement.aid))
     db.commit()

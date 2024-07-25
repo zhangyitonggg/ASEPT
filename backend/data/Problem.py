@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from enum import Enum, auto
 
 class ProblemType(Enum):
+    SINGLE_CHOICE = "SINGLE_CHOICE"
+    MULTI_CHOICE = "MULTI_CHOICE"
     CHOICE = "CHOICE"
     BLANK_FILLING = "BLANK_FILLING"
     PROGRAM = "PROGRAM"
