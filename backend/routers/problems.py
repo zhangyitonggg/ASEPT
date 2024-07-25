@@ -256,6 +256,31 @@ async def share_problem_group_to_user_group(
     return {'status': 'success'}
 
 
+@router.get("/get_problem_answer")
+async def get_problem_answer(
+    pid: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取题目答案。
+    
+    pid: str，题目 id
+    
+    返回格式：
+    
+    ```json
+    {
+        "A": "Choice A",
+        "B": "Choice B"
+    }
+    ```
+    
+    <font color="red">没有检查用户是否有权限访问题目。</font>
+    '''
+    return database.get_problem_answer(db, pid)
+
+
 @router.post('/add_problem_tag')
 async def add_problem_tag(
     pid: str,

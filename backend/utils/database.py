@@ -1035,3 +1035,20 @@ def get_user_problem_groups(db, user: User):
             "owner": group[3],
         })
     return {"problem_groups": res}
+
+
+def get_problem_answer(db, pid):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if problem == None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    if problem[9]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Problem is in contest. Permission denied."
+        )
+    return problem[7]
