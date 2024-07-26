@@ -95,7 +95,6 @@ const api = {
       return await router.get(path.baseUrl + path.submit_problem,{params: {pid: pid, answer: answer}});
     },
     get_user_statistics: async() => {
-      console.log("get_user_statistics");
       return await router.get(path.baseUrl + path.get_user_statistics);
     },
     get_problem_recommend: async() => {

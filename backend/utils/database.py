@@ -1018,7 +1018,7 @@ def get_user_statistics(db, user: User):
     blank_submit = 0
     blank_correct = 0
     for submit in submits:
-        if get_problem_type(submit[2]) == "CHOICE":
+        if "choice" in get_problem_type(submit[1]):
             choice_submit += 1
             if submit[4]:
                 choice_correct += 1
@@ -1032,7 +1032,7 @@ def get_user_statistics(db, user: User):
         "blank_submit": blank_submit,
         "blank_correct": blank_correct,
     }
-    
+
 
 def get_problem_recommend(db, user: User):
     problems = get_all_accessible_problems(db, user)

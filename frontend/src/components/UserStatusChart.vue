@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <Pie :data="datacollection" :options="options"></Pie>
-  </div>
+  <Pie :data="datacollection" :options="options" />
 </template>
 
 <script>
@@ -15,53 +13,61 @@ export default {
     Pie
   },
   props: {
-    passedQuestions: {
-      type: Number,
+    data: {
+      type: Array,
       required: true
     },
-    failedQuestions: {
-      type: Number,
+    labels: {
+      type: Array,
       required: true
+    },
+    backgroundColor: {
+      type: Array,
+      required: true
+    },
+    title: {
+      type: String,
+      required: true,
     }
   },
   data() {
     return {
       datacollection: {
-        labels: ['Passed Questions', 'Failed Questions'],
+        labels: this.labels,
         datasets: [
           {
-            backgroundColor: [
-              '#4CAF50',
-              '#FF0000'
-            ],
-            data: [
-              this.passedQuestions,
-              this.failedQuestions
-            ]
+            backgroundColor: this.backgroundColor,
+            data: this.data
           }
         ]
       },
       options: {
+        plugins: {
+          title: {
+            display: true,
+            text: this.title, // 使用 prop 传入的 title
+            font: {
+              size: 16, // 新 API 用 font.size 替代 fontSize
+              family: 'Arial' // 新 API 用 font.family 替代 fontFamily
+            },
+            padding: 20,
+            position: 'top'
+          },
+          legend: {
+            display: true,
+            position: 'bottom'
+          }
+        },
         responsive: true,
         maintainAspectRatio: false
       }
     }
   },
   watch: {
-    passedQuestions() {
-      this.updateChart()
-    },
-    failedQuestions() {
-      this.updateChart()
-    }
   },
   methods: {
-    updateChart() {
-      this.datacollection.datasets[0].data = [this.passedQuestions, this.failedQuestions]
-    }
   },
   mounted() {
-    this.updateChart()
   }
 }
 </script>
