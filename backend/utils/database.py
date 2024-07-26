@@ -169,7 +169,7 @@ def get_user_by_uid(db, uid: str):
 def varify_user(db, username: str, password: str) -> User:
     user = get_user(db, username)
     if user:
-        if user[2] == md5_passwd(password) and user[4] == b'\x00':
+        if user[2] == md5_passwd(password):
             return User(username, user[1], user[3], get_user_permissions(user[1]))
     return None
 
@@ -214,7 +214,7 @@ def get_admin_permissions(uid: str):
     cursor.execute("SELECT * FROM Users WHERE uid = %s", (uid))
     user_status = cursor.fetchone()
     print(user_status[3] == 'True')
-    if user_status[4] == b'\x01' or user_status[3] != 'True':
+    if user_status[3] != 'True':
         raise HTTPException(
             status_code=401,
             detail="Permission denied. You are not an admin."
@@ -225,7 +225,7 @@ def get_admin_permissions(uid: str):
     return permissions
 
 
-def set_permission(db, target_user_name: str, perm: PermissionType):
+def set_permission(db, target_user_name: str, perm: PermissionType, cancel: bool):
     target_user = get_user(db, target_user_name)
     if not target_user:
         raise HTTPException(
@@ -233,17 +233,11 @@ def set_permission(db, target_user_name: str, perm: PermissionType):
             detail="User name not found.",
         )
     target_uid = target_user[1]
-    if PermissionType.is_permission(perm) == False:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Permission not found.",
-        )
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM Permissions WHERE uid = %s", (target_uid))
-    perms = cursor.fetchone()
-    old_perm = perms[PermissionType[perm].value + 1]
-    cmd = f"UPDATE Permissions SET {perm.lower()} = %s WHERE uid = %s"
-    cursor.execute(cmd, ('True' if old_perm == 'False' else 'False', target_uid))
+    cmd = f"UPDATE Permissions SET {perm.name.lower()} = %s WHERE uid = %s"
+    cursor.execute(cmd, (not cancel, target_uid))
+    if perm.name == "IS_ADMIN":
+        cursor.execute("UPDATE Users SET is_admin = %s WHERE uid = %s", (not cancel, target_uid))
     db.commit()
 
 

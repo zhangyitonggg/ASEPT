@@ -84,7 +84,13 @@ def get_user(token: str, user_name: str) -> User:
             status_code=401,
             detail="Permission denied. We can't get your permissions as a user."
         )
-    return User(user_name, uid, False, get_permission_from_cache(uid).to_list())
+    user = User(user_name, uid, False, get_permission_from_cache(uid).to_list())
+    if user.permissions.get('BLOCKED'):
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are blocked."
+        )
+    return user
 
 
 def get_permission_from_cache(uid: str) -> Permissions:
@@ -127,7 +133,13 @@ def get_admin(token: str, user_name: str) -> User:
             status_code=401,
             detail="Permission denied. We can't get your permissions as a user."
         )
-    return User(user_name, uid, True, get_admin_permissions_from_cache(uid).to_list())
+    user = User(user_name, uid, True, get_admin_permissions_from_cache(uid).to_list())
+    if user.permissions.get('BLOCKED'):
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are blocked."
+        )
+    return user
 
 
 def get_admin_permissions_from_cache(uid: str) -> Permissions:

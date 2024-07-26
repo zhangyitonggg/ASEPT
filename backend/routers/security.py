@@ -19,6 +19,12 @@ async def login(
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
     user = database.varify_user(db, message.username, message.password)
+    if user.permissions.get('BLOCKED'):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are blocked",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -44,6 +50,12 @@ async def login(
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
     user = database.varify_user(db, message.username, message.password)
+    if user.permissions.get('BLOCKED'):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are blocked",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

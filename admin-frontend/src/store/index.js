@@ -305,6 +305,28 @@ export default new Vuex.Store({
           })
       })
     },
+    showAllUsers(context) {                               // new
+      return new Promise((resolve, reject) => {
+        api.showAllUsers()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    addAdmin(context, {username}) {
+      return new Promise((resolve, reject) => {
+        api.addAdmin(username)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     createGroup(context, {group_name, description, password}) {
       return new Promise((resolve, reject) => {
         api.createGroup(group_name, description, password)
