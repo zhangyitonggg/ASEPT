@@ -199,7 +199,7 @@ async def modify_group(
     return {"status": "success"}
 
 
-@router.get("/delete_group")
+@router.delete("/delete_group")
 async def delete_group(
     gid: str,
     user: User = Depends(security.get_user),
