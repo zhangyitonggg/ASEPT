@@ -94,10 +94,51 @@
           查看您的状态
         </h2>
       </v-card-title>
-      <v-card-text>
+      <v-container fluid class="d-flex justify-center align-center" v-if="status_loading">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+          size="64"
+        ></v-progress-circular>
+      </v-container>
+      <v-card-text v-else>
         <v-row class="pl-3 pr-3">
-          <v-col>
-            <user_status :passedQuestions="passedQuestions" :failedQuestions="failedQuestions"></user_status>
+          <v-col v-if="choicePassedQuestions+choiceFailedQuestions != 0">
+            <user_status
+              :data="[choicePassedQuestions, choiceFailedQuestions]"
+              :labels="['通过次数', '错误次数']"
+              :backgroundColor="['#4FCF95FF', '#D30B0BFF']"
+              :title="'选择题统计'"
+            ></user_status>
+          </v-col>
+          <v-col v-if="choicePassedQuestions+blankPassedQuestions+choiceFailedQuestions+blankFailedQuestions != 0">
+            <user_status
+              :data="[choicePassedQuestions, blankPassedQuestions, choiceFailedQuestions, blankFailedQuestions]"
+              :labels="['选择通过次数', '填空通过次数', '选择错误次数', '填空错误次数']"
+              :backgroundColor="['#4FCF95FF', '#4FCF95FF', '#D30B0BFF', '#D30B0BFF']"
+              :title="'总计'"
+            ></user_status>
+          </v-col>
+          <template v-else>
+            <v-col>
+              <v-banner
+                outlined
+                type="info"
+                icon="mdi-gauge-empty"
+              >
+                <h2>
+                  您还没有做过题目。去做点题吧。
+                </h2>
+              </v-banner>
+            </v-col>
+          </template>
+          <v-col v-if="blankPassedQuestions+blankFailedQuestions != 0">
+            <user_status
+              :data="[blankPassedQuestions, blankFailedQuestions]"
+              :labels="['通过次数', '错误次数']"
+              :backgroundColor="['#4FCF95FF', '#D30B0BFF']"
+              :title="'填空题统计'"
+            ></user_status>
           </v-col>
         </v-row>
       </v-card-text>
@@ -113,15 +154,31 @@ export default {
   data() {
     return {
       loading: false,
+      status_loading: true,
       original_password: null,
       password: null,
       confirm_password: null,
-      passedQuestions: 20,
-      failedQuestions: 5
+      choicePassedQuestions: 0,
+      choiceFailedQuestions: 0,
+      blankPassedQuestions: 0,
+      blankFailedQuestions: 0,
     }
   },
   mounted() {
     this.$store.commit('setAppTitle', "个人信息");
+    this.$store.dispatch('getUserStatus')
+      .then((res) => {
+        this.choicePassedQuestions = res.choice_correct;
+        this.choiceFailedQuestions = res.choice_submit - res.choice_correct;
+        this.blankPassedQuestions = res.blank_correct;
+        this.blankFailedQuestions = res.blank_submit - res.blank_correct;
+      })
+      .catch((e) => {
+        this.$store.commit('setAlert', { message: e, type: 'error' });
+      })
+      .finally(() => {
+        this.status_loading = false;
+      });
   },
   methods: {
     handleUserModify() {

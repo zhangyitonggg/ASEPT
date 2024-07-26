@@ -213,7 +213,6 @@ def get_admin_permissions(uid: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Users WHERE uid = %s", (uid))
     user_status = cursor.fetchone()
-    print(user_status[3] == 'True')
     if user_status[3] != 'True':
         raise HTTPException(
             status_code=401,
@@ -235,9 +234,9 @@ def set_permission(db, target_user_name: str, perm: PermissionType, cancel: bool
     target_uid = target_user[1]
     cursor = db.cursor()
     cmd = f"UPDATE Permissions SET {perm.name.lower()} = %s WHERE uid = %s"
-    cursor.execute(cmd, (not cancel, target_uid))
+    cursor.execute(cmd, (str(not cancel), target_uid))
     if perm.name == "IS_ADMIN":
-        cursor.execute("UPDATE Users SET is_admin = %s WHERE uid = %s", (not cancel, target_uid))
+        cursor.execute("UPDATE Users SET is_admin = %s WHERE uid = %s", (str(not cancel), target_uid))
     db.commit()
 
 
@@ -263,34 +262,23 @@ def join_group(db, gid: str, uid: str, password: str | None = None):
     db.commit()
 
 
-def leave_group(db, group_name: str, name: str, acter: User):
-    if name == acter.name:
-        uid = acter.uid
-    else:
-        user_left = get_user(db, name)
-        if not user_left:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User not found.",
-            )
-        uid = user_left[1]
-    group = get_group(db, group_name)
+def leave_group(db, gid: str, user: User):
+    group = get_group_by_gid(db, gid)
     if not group:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Group not found.",
         )
-    if group[3] == uid:
+    if group[3] == user.uid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Owner cannot leave group.",
         )
     cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+        cursor.execute("DELETE FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], user.uid))
         db.commit()
     except Exception as e:
-        print("Error leaving group: ", e)
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -509,7 +497,7 @@ def get_all_users(db):
             "name": user[0],
             "uid": user[1],
             "is_admin": user[3],
-            "blocked": user[4],
+            "blocked": get_user_permissions(user[1])[8],
         })
     return {"users": res}
 
@@ -540,7 +528,7 @@ def get_all_groups(db):
     for group in groups:
         res.append({
             "gid": group[0],
-            "name": group[1],
+            "group_name": group[1],
             "description": group[2],
             "owner": get_user_by_uid(db, group[3])[0],
             "is_open": group[4],
@@ -922,7 +910,6 @@ def get_problem_tags(db, pid: str, user: User):
 
 def search_problem_by_tag(db, tag: str, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
-    print(problems_with_access)
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemTags")
     problem_tags = cursor.fetchall()
@@ -1016,7 +1003,7 @@ def get_user_statistics(db, user: User):
     blank_submit = 0
     blank_correct = 0
     for submit in submits:
-        if get_problem_type(submit[2]) == "CHOICE":
+        if "choice" in get_problem_type(submit[1]):
             choice_submit += 1
             if submit[4]:
                 choice_correct += 1
@@ -1030,7 +1017,7 @@ def get_user_statistics(db, user: User):
         "blank_submit": blank_submit,
         "blank_correct": blank_correct,
     }
-    
+
 
 def get_problem_recommend(db, user: User):
     problems = get_all_accessible_problems(db, user)

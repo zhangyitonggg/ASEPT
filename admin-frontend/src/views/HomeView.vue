@@ -19,10 +19,6 @@
         <span>水吧</span>
         <v-icon>mdi-hand-clap</v-icon>
       </v-btn>
-      <v-btn value="gpt">
-        <span>AI助教</span>
-        <v-icon>mdi-chat-processing</v-icon>
-      </v-btn>
       <v-btn value="money">
         <span>支持我们</span>
         <v-icon>mdi-hand-coin</v-icon>

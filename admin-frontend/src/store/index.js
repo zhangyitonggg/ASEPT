@@ -131,7 +131,7 @@ export default new Vuex.Store({
     },
     getMyProblem(context) {
       return new Promise((resolve, reject) => {
-        api.getMyProblem()
+        api.getAllProblem()
           .then(response => {
             resolve(response.data);
           })
@@ -208,7 +208,7 @@ export default new Vuex.Store({
     },
     getMyProblemGroup(context) {
       return new Promise((resolve, reject) => {
-        api.get_my_problem_groups()
+        api.get_all_problem_groups()
           .then(response => {
             resolve(response.data);
           })
@@ -272,17 +272,6 @@ export default new Vuex.Store({
           })
       })
     },
-    showJoinedGroups(context) {
-      return new Promise((resolve, reject) => {
-        api.showJoinedGroups()
-          .then(response => {
-            resolve(response.data);
-          })
-          .catch(error => {
-            reject(error);
-          })
-      })
-    },
     leaveGroup(context, {gid}) {
       return new Promise((resolve, reject) => {
         api.leaveGroup(gid)
@@ -294,11 +283,12 @@ export default new Vuex.Store({
           })
       })
     },
-    showAllGroups(context) {                               // new
+    showJoinedGroups(context) {                               // new
       return new Promise((resolve, reject) => {
         api.showAllGroups()
           .then(response => {
             resolve(response.data);
+            console.log(response.data);
           })
           .catch(error => {
             reject(error);
@@ -316,14 +306,14 @@ export default new Vuex.Store({
           })
       })
     },
-    addAdmin(context, {username}) {
+    setPermission(context, {username, permission, cancel}) {
       return new Promise((resolve, reject) => {
-        api.addAdmin(username)
+        api.setPermission(username, permission, cancel)
           .then(response => {
             resolve(response.data);
           })
-          .catch(error => {
-            reject(error);
+          .catch(e => {
+            reject(e);
           })
       })
     },

@@ -44,7 +44,7 @@
                       </v-list-item-subtitle>
                       <v-list-item-subtitle>
                         状态:
-                          {{ item.blocked !== "\u0000" ? "已封禁" : "正常" }}
+                          {{ item.blocked === "True" ? "已封禁" : "正常" }}
                       </v-list-item-subtitle>
                     </v-list-item-content>
                     
@@ -59,7 +59,7 @@
                         </v-icon>
                     </v-list-item-action>
 
-                    <v-list-item-action v-if="item.blocked !== '\u0000'">
+                    <v-list-item-action v-if="item.blocked === 'True'">
                         <v-icon color="green" @click="delete_block(item)">
                             {{ "mdi-login" }}
                         </v-icon>
@@ -133,13 +133,59 @@
             })
         },
         add_admin(item) {
-            this.$store.dispatch("addAdmin", {username: item.name})
+            this.$store.dispatch("setPermission", {username: item.name, permission: 0,cancel:"false"})
             .then((res) => {
                 this.$store.commit("setAlert", {
                 type: "success",
+                message: "设置成功",
+                });
+                item.is_admin = "true";
+            })
+            .catch((e) => {
+                this.$store.commit("setAlert", {
+                type: "error",
+                message: res,
+                });
+            })
+        },
+        delete_admin(item) {
+          if (item.name === this.$store.getters.username) {
+            this.$store.commit("setAlert", {
+              type: "error",
+              message: "我们都认为您不能取消自己的管理员权限",
+            });
+            return;
+          }
+          this.$store.dispatch("setPermission", {username: item.name, permission: 0, cancel:"true"})
+            .then((res) => {
+                this.$store.commit("setAlert", {
+                type: "success",
+                message: "设置成功",
+                });
+                item.is_admin = "false";
+            })
+            .catch((e) => {
+                this.$store.commit("setAlert", {
+                type: "error",
                 message: e,
                 });
-                item.is_admin = "True";
+            })         
+        },
+        add_block(item) {
+          if (item.name === this.$store.getters.username) {
+            this.$store.commit("setAlert", {
+              type: "error",
+              message: "我们都认为您不能封禁自己",
+            });
+            return;
+          }
+          this.$store.dispatch("setPermission", {username: item.name, permission: 8,cancel:"false"})
+            .then((res) => {
+                item.blocked = "true";
+                this.$store.commit("setAlert", {
+                type: "success",
+                message: "设置成功",
+                });
             })
             .catch((e) => {
                 this.$store.commit("setAlert", {
@@ -148,14 +194,21 @@
                 });
             })
         },
-        delete_admin() {
-
-        },
-        add_block() {
-            console.log("add block");
-        },
-        delete_block() {
-            console.log("delete block");
+        delete_block(item) {
+          this.$store.dispatch("setPermission", {username: item.name, permission: 8,cancel:"true"})
+            .then((res) => {
+                this.$store.commit("setAlert", {
+                type: "success",
+                message: "设置成功",
+                });
+                item.blocked = "false";
+            })
+            .catch((e) => {
+                this.$store.commit("setAlert", {
+                type: "error",
+                message: e,
+                });
+            })
         }
     },
     components: {

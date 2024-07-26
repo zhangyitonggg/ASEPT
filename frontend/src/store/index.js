@@ -371,6 +371,17 @@ export default new Vuex.Store({
             reject(error);
           })
       })
+    },
+    getUserStatus(context) {
+      return new Promise((resolve, reject) => {
+        api.get_user_statistics()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
     }
   },
   modules: {

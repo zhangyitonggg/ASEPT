@@ -254,8 +254,11 @@ export default {
   
   methods: {
     getCreatedGroups() {
-      this.$store.dispatch("showAllGroups")
+      this.$store.dispatch("showJoinedGroups")
         .then((res) => {
+          res.groups.forEach(group => {
+            group.name = group.group_name;           
+          });
           this.items.splice(0, this.items.length, ...res.groups); // 清空当前数组并插入新数据
           console.log(this.items);
         })

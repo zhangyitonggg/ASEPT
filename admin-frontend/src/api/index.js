@@ -22,9 +22,9 @@ const api = {
       console.log("createProblem");
       return await router.post(path.baseUrl + path.createProblem,problemData);
     },
-    getMyProblem: async() => {
-      console.log("getMyProblem");
-      return await router.get(path.baseUrl + path.getMyProblem);
+    getAllProblem: async() => {
+      console.log("getAllProblem");
+      return await router.get(path.baseUrl + path.getAllProblem);
     },
     getProblemsRecommended: async() => {
       console.log("getProblemsRecommended");
@@ -118,9 +118,9 @@ const api = {
       console.log("get_problem_groups");
       return await router.get(path.baseUrl + path.get_problem_groups);
     },
-    get_my_problem_groups: async() => {
-      console.log("get_my_problem_groups");
-      return await router.get(path.baseUrl + path.get_my_problem_groups);
+    get_all_problem_groups: async() => {
+      console.log("get_all_problem_groups");
+      return await router.get(path.baseUrl + path.get_all_problem_groups);
     },
     userModify: async(username, originalPassword, newPassword) => {
       return await router.post(path.baseUrl + path.userModify, {originalPassword: originalPassword, newPassword: newPassword});
@@ -128,8 +128,8 @@ const api = {
     showAllUsers: async() => {
       return await router.get(path.baseUrl + path.showAllUsers);
     },
-    addAdmin: async(username) => {
-      return await router.post(path.baseUrl + path.addAdmin, {}, {params: {target_user_name: username, permission: 0}});
+    setPermission: async(username, permission, cancel) => {
+      return await router.post(path.baseUrl + path.setPermission, {target_user_name: username, permission: permission, cancel: cancel});
     }
 };
 
