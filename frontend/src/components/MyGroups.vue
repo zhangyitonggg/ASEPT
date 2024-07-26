@@ -19,7 +19,7 @@
       </v-col>
       <v-col v-else>
         <v-list three-line>
-          <template v-for="(item, index) in currentPageItems">
+          <div v-for="(item, index) in currentPageItems" :key="index">
             <v-divider inset></v-divider>
             <v-subheader
               v-if="item.header"
@@ -56,7 +56,7 @@
                 > 离开 </v-btn>
               </v-list-item-action>
             </v-list-item>
-          </template>
+          </div>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
       </v-col>

@@ -32,6 +32,7 @@ const base = {
     get_my_problem_groups: '/problems/my_problem_groups',
     get_problem_ans_by_id: '/problems/get_problem_answer',
     uploadFile: '/problem_file_upload',
+    getTime: '/news/current_time'
 }
 
 export default base;

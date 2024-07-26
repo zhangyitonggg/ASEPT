@@ -1180,3 +1180,10 @@ def modify_user_info(db, user: User, original_password: str, new_password: str):
         )
     cursor.execute("UPDATE Users SET password = %s WHERE uid = %s", (md5_passwd(new_password), user[1]))
     db.commit()
+
+
+def get_current_time(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT NOW()")
+    time = cursor.fetchone()
+    return time[0]
