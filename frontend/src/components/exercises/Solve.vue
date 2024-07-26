@@ -12,6 +12,29 @@
       </v-icon>
     </v-btn>
 
+    <!-- <v-btn
+    class="navigation-button"
+    fab
+    dark
+    color="primary"
+    @click="previousQuestion"
+    :disabled="!hasPrevious"
+  >
+    <v-icon dark>mdi-chevron-left</v-icon>
+  </v-btn> -->
+
+  <!-- 下一题按钮 -->
+  <!-- <v-btn
+    class="navigation-button"
+    fab
+    dark
+    color="primary"
+    @click="nextQuestion"
+    :disabled="!hasNext"
+  >
+    <v-icon dark>mdi-chevron-right</v-icon>
+  </v-btn> -->
+
     <v-row justify="center">
       <v-col cols="12">
         <v-form @submit.prevent="submitForm" v-if="question">
@@ -155,9 +178,13 @@ export default {
       resultType: '',
       correctAnswers: null,
       showAnswers: false,
+      hasPrevious: false,
+      hasNext: false,
+      //allQuestions: [], // 所有题目列表
     };
   },
   created() {
+   // this.fetchAllQuestions();
     this.fetchQuestion();
   },
   methods: {
@@ -177,6 +204,7 @@ export default {
             answers: [] // 初始时不包含答案
           };
           this.isSingleChoice = this.question.answers && Object.keys(this.question.answers).length === 1;
+         
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -185,6 +213,29 @@ export default {
           });
         });
     },
+    // fetchAllQuestions() {
+    //   console.log('qqq: ',this.$store.state.problems);
+    //   this.allQuestions =  this.$store.state.problems;
+    //   console.log(this.allQuestions);
+    //   this.updateNavigation();
+    // },
+    // updateNavigation() {
+    //   const currentIndex = this.allQuestions.findIndex(q => q.pid === this.pid);
+    //   this.hasPrevious = currentIndex > 0;
+    //   this.hasNext = currentIndex < this.allQuestions.length - 1;
+    // },
+    // previousQuestion() {
+    //   const currentIndex = this.allQuestions.findIndex(q => q.pid === this.pid);
+    //   if (this.hasPrevious) {
+    //     this.$router.push({ path: `/exercises/solve/${this.allQuestions[currentIndex - 1].pid}` });
+    //   }
+    // },
+    // nextQuestion() {
+    //   const currentIndex = this.allQuestions.findIndex(q => q.pid === this.pid);
+    //   if (this.hasNext) {
+    //     this.$router.push({ path: `/exercises/solve/${this.allQuestions[currentIndex + 1].pid}` });
+    //   }
+    // },
     parseChoices(choices) {
       if (choices) {
         return JSON.parse(choices);
@@ -272,6 +323,22 @@ export default {
   left: 3%;
   top: 15%;
   z-index: 5;
+}
+.navigation-button {
+  position: fixed;
+  bottom: 20%;
+  z-index: 5;
+  font-size: 30px;
+  width: 60px;
+  height: 60px;
+}
+
+.navigation-button:nth-of-type(1) {
+  left: 10%;
+}
+
+.navigation-button:nth-of-type(2) {
+  right: 10%;
 }
 
 .large-card {

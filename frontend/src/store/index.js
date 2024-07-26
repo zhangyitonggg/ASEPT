@@ -16,10 +16,12 @@ export default new Vuex.Store({
     _token_: null,
     _app_title_: "Test",
     _problem_id_:0,
+    questions: [],
   },
   getters: {
     username: state => state._user_name_ == null ? "UnauthorizedUser" : state._user_name_,
     problemid: state => state._problem_id_,
+    questions: state => state.questions,
     },
   mutations: {
     checkToken(state) {
@@ -65,6 +67,9 @@ export default new Vuex.Store({
     },
     setProblemid(state, id){
       state._problem_id_ = id;
+    },
+    setProblems(state,problems) {
+      state.questions = problems;
     },
     clearPersonalInfo(state) {
       state._user_name_ = null;

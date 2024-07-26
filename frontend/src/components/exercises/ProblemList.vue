@@ -192,6 +192,7 @@ export default {
         });
     },
     startProblem(problem) {
+      this.$store.commit('setProblems',this.currentItem.problems);
       this.$router.push({ path: 'solve/' + problem.pid, append: true });
     },
   },

@@ -165,6 +165,7 @@ export default {
       this.itemsPerPage = number;
     },
     solveProblem(item) {
+      this.$store.commit('setProblems',this.items);
       this.$router.push({ path: 'solve/' + item.pid, append: true });
     },
     searchProblems() {
