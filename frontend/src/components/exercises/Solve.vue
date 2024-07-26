@@ -42,10 +42,8 @@
               </template>
               <template v-else-if="question.type === 'BLANK_FILLING'">
                 <v-text-field
-                  v-for="(blank, index) in question.answers"
-                  :key="index"
-                  v-model="answer[index]"
-                  :label="`Blank ${index + 1}`"
+                  v-model="answer"
+                  label="填空"
                 ></v-text-field>
               </template>
             </v-card-text>
@@ -97,7 +95,7 @@ export default {
   data() {
     return {
       question: null,
-      answer: {}, // Modified to handle JSON conversion
+      answer: '', // Modified to handle JSON conversion
       isSingleChoice: true,
       resultMessage: '',
       resultType: '',
@@ -146,27 +144,7 @@ export default {
       }
       return [];
     },
-    // formatAnswerForSubmission() {
-    //   let formattedAnswer = {};
-    //   if (this.question.type === 'SINGLE_CHOICE') {
-    //     // 单选题
-    //     formattedAnswer = { [this.answer]: this.question.choices[this.answer] };
-    //   } else if (this.question.type === 'MULTI_CHOICE') {
-    //     console.log(this.answer);
-    //     // 多选题
-    //     formattedAnswer = this.answer.reduce((acc, answer) => {
-    //       acc[answer] = this.question.choices[answer];
-    //       return acc;
-    //     }, {});
-    //   } else if (this.question.type === 'BLANK_FILLING') {
-    //     // 填空题
-    //     formattedAnswer = this.answer.reduce((acc, answer, index) => {
-    //       acc[index] = answer;
-    //       return acc;
-    //     }, {});
-    //   }
-    //   return JSON.stringify(formattedAnswer);
-    // },
+    
     formatAnswerForSubmission() {
       let formattedAnswer = {};
       if (this.question.type === 'SINGLE_CHOICE') {
@@ -181,10 +159,10 @@ export default {
         }, {}) : {};
       } else if (this.question.type === 'BLANK_FILLING') {
         // 填空题
-        formattedAnswer = this.answer.reduce((acc, answer, index) => {
-          acc[index] = answer;
+        formattedAnswer = Array.isArray(this.answer) ? this.answer.reduce((acc, answer) => {
+          acc[answer] = this.question.choices[answer];
           return acc;
-        }, {});
+        }, {}) : {};
       }
       return JSON.stringify(formattedAnswer);
     },
