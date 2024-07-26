@@ -24,7 +24,7 @@ const api = {
     },
     getAllProblem: async() => {
       console.log("getAllProblem");
-      return await router.get(path.baseUrl + path.getMyProblem);
+      return await router.get(path.baseUrl + path.getAllProblem);
     },
     getProblemsRecommended: async() => {
       console.log("getProblemsRecommended");

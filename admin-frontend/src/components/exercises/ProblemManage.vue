@@ -250,7 +250,7 @@ export default {
     },
     fetchProblems() {
       this.$store
-        .dispatch('getAllProblem')
+        .dispatch('getMyProblem')
         .then((res) => {
           this.items.splice(0, this.items.length, { header: '我创建的题目' }, ...res.problems); // 清空当前数组并插入新数据
         })
