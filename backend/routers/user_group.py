@@ -204,7 +204,7 @@ async def modify_group(
     '''
     database.modify_group(
       db,
-      uid=user.uid,
+      user=user,
       gid=group_info.gid,
       group_name=group_info.group_name,
       description=group_info.description,
