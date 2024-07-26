@@ -348,7 +348,7 @@ export default {
   } else if (this.newProblem.type === 'BLANK_FILLING') {
     // 构造填空题答案对象
     answer = this.newProblem.fillBlanks.reduce((acc, blank, index) => {
-      acc[`Blank ${index + 1}`] = blank;
+      acc[`${index + 1}`] = blank;
       return acc;
     }, {});
   }
