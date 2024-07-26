@@ -20,7 +20,7 @@
             <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
             <v-list-item v-else-if="item.title" :key="item.pid">
               <v-list-item-avatar>
-                <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link" }}</v-icon>
+                <v-icon> mdi-help-circle-outline</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>

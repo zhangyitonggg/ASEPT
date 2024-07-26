@@ -26,7 +26,7 @@
             <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
             <v-list-item v-else-if="item.pgid" :key="item.pgid">
               <v-list-item-avatar>
-                <v-icon>{{ item.locked ? 'mdi-link-lock' : 'mdi-link' }}</v-icon>
+                <v-icon>mdi-invoice-list-outline</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
