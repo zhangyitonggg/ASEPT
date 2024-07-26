@@ -301,21 +301,20 @@ def create_group(
     db.commit()
 
 
-def delete_group(db, group_name: str, uid: str):
-    group = get_group(db, group_name)
+def delete_group(db, gid: str, user: User):
+    group = get_group_by_gid(db, gid)
     if not group:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Group not found.",
         )
-    if group[3] != uid:
+    if group[3] != user.uid and user.permissions.get("IS_ADMIN") == False:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied. You are not the owner of this group.",
         )
     cursor = db.cursor()
-    cursor.execute("DELETE FROM UserGroups WHERE name = %s", (group_name))
-    cursor.execute("DELETE FROM UserGroupMembers WHERE gid = %s", (group[0]))
+    cursor.execute("DELETE FROM UserGroups WHERE gid = %s", (gid))
     db.commit()
 
 
@@ -383,9 +382,14 @@ def show_unentered_groups(db, uid: str, search_key: str):
     for group in groups:
         cursor.execute("SELECT * FROM UserGroupMembers WHERE gid = %s AND uid = %s", (group[0], uid))
         if cursor.fetchone() == None:
+            founder = get_user_by_uid(db, group[3])
+            if founder:
+                founder = founder[0]
+            else:
+                founder = "Unknown"
             res.append({
                 "group_name": group[1],
-                "founder": get_user_by_uid(db, group[3])[0],
+                "founder": founder,
                 "need_password": group[5] != None,
                 "gid": group[0],
                 "description": group[2] if group[2] else "This group has no description."

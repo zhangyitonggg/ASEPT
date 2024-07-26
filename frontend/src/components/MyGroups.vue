@@ -113,7 +113,7 @@ export default {
   },
   computed: {
     numberOfPages () {
-      return Math.ceil(this.filteredItems.length / this.itemsPerPage)
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
     filteredItems() {
       const filtered = this.items.filter(item =>
@@ -187,6 +187,16 @@ export default {
   },
   components: {
     searchbar
+  },
+  watch: {
+    search() {
+      this.currentPage = 1;
+    },
+    numberOfPages(newVal) {
+      if (this.currentPage > newVal) {
+        this.currentPage = newVal;
+      }
+    }
   }
 }
 </script>

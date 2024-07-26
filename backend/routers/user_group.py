@@ -80,19 +80,6 @@ async def create_group(
     return {"status": "success"}
 
 
-@router.delete("/delete_group")
-async def delete_group(
-    group_name: str,
-    user: User = Depends(security.get_user),
-    db: pymysql.connections.Connection = Depends(database.connect)
-):
-    '''
-    DO NOT USE IT NOW
-    '''
-    database.delete_group(db, group_name, user.uid)
-    return {"status": "success"}
-
-
 @router.get("/show_unentered_groups")
 async def show_groups(
     sub_name: str | None = None,
@@ -209,6 +196,21 @@ async def modify_group(
       description=group_info.description,
       password=group_info.password
     )
+    return {"status": "success"}
+
+
+@router.get("/delete_group")
+async def delete_group(
+    gid: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    删除一个用户组。
+
+    gid: str，用户组 id
+    '''
+    database.delete_group(db, gid, user)
     return {"status": "success"}
 
 

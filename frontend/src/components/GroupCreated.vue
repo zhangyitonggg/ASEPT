@@ -9,7 +9,7 @@
     </v-container>
     <v-container fluid v-else>
       <template v-if="items.length == 0">
-        <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
+        <v-btn color="success" @click="openCreateDialog">创建团队</v-btn>
         <v-col class="d-flex justify-center align-center">
           <h2>
             没有你可以管理的团队。试着创建一个？
@@ -19,7 +19,7 @@
       <div v-else>
         <v-layout>
           <v-flex xs1>
-             <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
+             <v-btn color="success" @click="openCreateDialog">创建团队</v-btn>
           </v-flex>
           <v-spacer/>
           <v-flex xs24>
@@ -28,7 +28,7 @@
         </v-layout>
         <v-col>
           <v-list three-line>
-            <template v-for="(item, index) in currentPageItems">
+            <div v-for="(item, index) in currentPageItems" :key="index">
               <v-divider inset></v-divider>
               <v-subheader
                 v-if="item.header"
@@ -60,7 +60,7 @@
                   > 管理 </v-btn>
                 </v-list-item-action>
               </v-list-item>
-            </template>
+            </div>
           </v-list>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-col>
@@ -136,7 +136,7 @@
       >
         <v-card>
           <v-card-title>
-            <span class="text-h5">新建群聊</span>
+            <span class="text-h5">创建团队</span>
           </v-card-title>
           <v-card-text>
             <v-container>
@@ -147,6 +147,14 @@
                     required
                     v-model="newGroup.group_name"
                   ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-textarea
+                    label="描述"
+                    required
+                    auto-grow
+                    v-model="newGroup.description"
+                  ></v-textarea>
                 </v-col>
                 <v-col cols="12">
                   <v-checkbox
@@ -160,17 +168,23 @@
                     v-model="newGroup.password"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="12">
-                  <v-textarea
-                    label="描述"
-                    required
-                    auto-grow
-                    v-model="newGroup.description"
-                  ></v-textarea>
-                </v-col>
               </v-row>
             </v-container>
           </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="primary"
+              text
+              @click.stop="submitNewGroup"
+            > 保存 </v-btn>
+            <v-btn
+              color="error"
+              text
+              @click="createDialog = false"
+            > 取消 </v-btn>
+          </v-card-actions>
+<!-- 
           <v-card-actions>
             <v-btn
               color="blue darken-1"
@@ -186,7 +200,7 @@
             >
               创建
             </v-btn>
-          </v-card-actions>
+          </v-card-actions> -->
         </v-card>
       </v-dialog>
     </v-row>
@@ -231,14 +245,13 @@ export default {
       return filtered;
     },
     numberOfPages () {
-      return Math.ceil(this.filteredItems.length / this.itemsPerPage)
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
     currentPageItems() {
       const startIndex = (this.currentPage - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.filteredItems.slice(startIndex, endIndex);
     },
-
   },
   mounted() {
     this.getCreatedGroups();
@@ -247,8 +260,7 @@ export default {
     getCreatedGroups() {
       this.$store.dispatch("showCreatedGroups")
         .then((res) => {
-          this.items.splice(0, this.items.length, ...res.groups); // 清空当前数组并插入新数据
-          console.log(this.items);
+          this.items.splice(0, this.items.length, ...res.groups);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {
@@ -324,6 +336,16 @@ export default {
   },
   components: {
     searchbar
+  },
+  watch: {
+    search() {
+      this.currentPage = 1;
+    },
+    numberOfPages(newVal) {
+      if (this.currentPage > newVal) {
+        this.currentPage = newVal;
+      }
+    }
   }
 }
 </script>

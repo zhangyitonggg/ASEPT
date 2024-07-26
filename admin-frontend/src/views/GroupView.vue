@@ -10,7 +10,7 @@
       </v-container>
       <v-container fluid v-else>
         <template v-if="items.length == 0">
-          <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
+          <v-btn color="success" @click="openCreateDialog">创建团队</v-btn>
           <v-col class="d-flex justify-center align-center">
             <h2>
               没有你可以管理的团队。试着创建一个？
@@ -20,7 +20,7 @@
         <div v-else>
           <v-layout>
             <v-flex xs1>
-               <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
+               <v-btn color="success" @click="openCreateDialog">创建团队</v-btn>
             </v-flex>
             <v-spacer/>
             <v-flex xs24>
@@ -141,7 +141,7 @@
         >
           <v-card>
             <v-card-title>
-              <span class="text-h5">新建群聊</span>
+              <span class="text-h5">创建团队</span>
             </v-card-title>
             <v-card-text>
               <v-container>
