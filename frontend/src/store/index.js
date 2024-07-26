@@ -164,7 +164,7 @@ export default new Vuex.Store({
     },
     getCorrectAnswersById(context,pid) {
       return new Promise((resolve, reject) => {
-        api.getProblemById(pid)
+        api.getProblemAnsById(pid)
           .then(response => {
             resolve(response.data);
           })

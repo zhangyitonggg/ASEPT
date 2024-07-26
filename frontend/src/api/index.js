@@ -124,6 +124,10 @@ const api = {
       console.log("get_my_problem_groups");
       return await router.get(path.baseUrl + path.get_my_problem_groups);
     },
+    getProblemAnsById:async(pid) => {
+      console.log("get_problem_ans_by_id");
+      return await router.get(path.baseUrl + path.get_problem_ans_by_id,{params: {pid:pid}});
+    },
     userModify: async(username, originalPassword, newPassword) => {
       return await router.post(path.baseUrl + path.userModify, {originalPassword: originalPassword, newPassword: newPassword});
     },

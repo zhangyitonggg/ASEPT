@@ -189,7 +189,8 @@ export default {
       this.$store
         .dispatch('getCorrectAnswersById', this.pid)
         .then(res => {
-          this.correctAnswers = this.parseAnswers(res.data);
+          console.log('res',res)
+          this.correctAnswers = this.parseAnswers(res);
           this.showAnswers = true;
         })
         .catch(error => {
