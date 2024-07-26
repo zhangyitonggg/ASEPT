@@ -29,13 +29,15 @@
                 <v-list-item-subtitle>Tag: {{ item.tag }}</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
-                <v-btn color="primary" @click="openAddTagDialog(item)">增加 Tag</v-btn>
+                <v-btn class="butspace" color="primary" @click="openAddTagDialog(item)">增加 Tag</v-btn>
               </v-list-item-action>
+              
               <v-list-item-action>
-                <v-btn color="primary" @click="addToList(item)">加入题单</v-btn>
+                <v-btn  color="primary" @click="addToList(item)">加入题单</v-btn>
               </v-list-item-action>
+              
               <v-list-item-action>
-                <v-btn color="primary" @click="changeProblem(item)">修改问题</v-btn>
+                <v-btn class="butspace" color="primary" @click="changeProblem(item)">修改问题</v-btn>
               </v-list-item-action>
             </v-list-item>
             <v-divider v-if="index < currentPageItems.length - 1"></v-divider>
@@ -222,14 +224,7 @@ export default {
   methods: {
     
     handleFileUpload() {
-    // const fileInput = this.$refs.fileInput;
-    // if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-    //   this.$store.commit('setAlert', {
-    //     type: 'error',
-    //     message: '无法获取上传的文件。',
-    //   });
-    //   return;
-    // }
+    
       if (this.uploadedFile) {
           // let formData = new FormData();
           // formData.append('file', file);
@@ -473,3 +468,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.butspace {
+  margin-right: 18px; /* 或其他适当的间距 */
+}
+</style>
