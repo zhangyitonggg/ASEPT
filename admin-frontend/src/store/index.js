@@ -65,6 +65,14 @@ export default new Vuex.Store({
     },
     setProblemid(state, id){
       state._problem_id_ = id;
+    },
+    clearPersonalInfo(state) {
+      state._user_name_ = null;
+      state._token_ = null;
+      localStorage.removeItem('__token__');
+      localStorage.removeItem('__user_name__');
+      sessionStorage.removeItem('__token__');
+      sessionStorage.removeItem('__user_name__');
     }
   },
   actions: {
@@ -98,6 +106,172 @@ export default new Vuex.Store({
           })
       })
     },
+    register(context, {username, password}) {
+      return new Promise((resolve, reject) => {
+        api.register(username, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    createProblem(context,problemData) {
+      return new Promise((resolve, reject) => {
+        api.createProblem(problemData)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+            console.log(error);
+          })
+      })
+    },
+    getMyProblem(context) {
+      return new Promise((resolve, reject) => {
+        api.getMyProblem()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    getProblemsRecommended(context) {
+      return new Promise((resolve, reject) => {
+        api.getProblemsRecommended()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    getProblemById(context,pid) {
+      return new Promise((resolve, reject) => {
+        api.getProblemById(pid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    getCorrectAnswersById(context,pid) {
+      return new Promise((resolve, reject) => {
+        api.getProblemById(pid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    addProblemToList(context,data) {
+      return new Promise((resolve, reject) => {
+        api.add_problem_to_group(data.pgid,data.pid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    createProblemList(context,list) {
+      return new Promise((resolve, reject) => {
+        api.createProblemList(list)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    getProblemGroup(context) {
+      return new Promise((resolve, reject) => {
+        api.get_problem_groups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    getMyProblemGroup(context) {
+      return new Promise((resolve, reject) => {
+        api.get_my_problem_groups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    getProblemsInList(context,pgid) {
+      return new Promise((resolve, reject) => {
+        api.get_problem_group_problems(pgid.pgid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    shareProblemList(context,data) {
+      return new Promise((resolve, reject) => {
+        api.share_problem_group_to_user_group(data.pgid, data.gid)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    searchProblemByTag(context,tag) {
+      return new Promise((resolve, reject) => {
+        api.search_problem_by_tag(tag)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    addTagToProblem(context,data) {
+      return new Promise((resolve, reject) => {
+        api.add_problem_tag(data.pid,data.tag)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    submitAnswer(context,data) {
+      return new Promise((resolve, reject) => {
+        api.submit_problem(data.pid,data.answer)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     showJoinedGroups(context) {
       return new Promise((resolve, reject) => {
         api.showJoinedGroups()
@@ -109,9 +283,9 @@ export default new Vuex.Store({
           })
       })
     },
-    publishAnnouncement(context, { title, content }) {
+    leaveGroup(context, {gid}) {
       return new Promise((resolve, reject) => {
-        api.publishAnnouncement(title, content)
+        api.leaveGroup(gid)
           .then(response => {
             resolve(response.data);
           })
@@ -120,9 +294,64 @@ export default new Vuex.Store({
           })
       })
     },
-    modifyAnnouncement(context, { aid, title, content, is_active }) {
+    showAllGroups(context) {                               // new
       return new Promise((resolve, reject) => {
-        api.modifyAnnouncement(aid, title, content, is_active)
+        api.showAllGroups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    createGroup(context, {group_name, description, password}) {
+      return new Promise((resolve, reject) => {
+        api.createGroup(group_name, description, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    modifyGroup(context, {gid, group_name, description, password}) {
+      return new Promise((resolve, reject) => {
+        api.modifyGroup(gid, group_name, description, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    showUnGroups(context) {
+      return new Promise((resolve, reject) => {
+        api.showUnGroups()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    joinGroup(context, {gid, password}) {
+      return new Promise((resolve, reject) => {
+        api.joinGroup(gid, password)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    userModify(context, {username, originalPassword, newPassword}) {
+      return new Promise((resolve, reject) => {
+        api.userModify(username, originalPassword, newPassword)
           .then(response => {
             resolve(response.data);
           })

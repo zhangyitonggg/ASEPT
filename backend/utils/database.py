@@ -548,7 +548,7 @@ def get_all_groups(db):
             "gid": group[0],
             "name": group[1],
             "description": group[2],
-            "owner": group[3],
+            "owner": get_user_by_uid(db, group[3])[0],
             "is_open": group[4],
             "password": group[5],
         })

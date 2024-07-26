@@ -19,6 +19,10 @@
         <span>水吧</span>
         <v-icon>mdi-hand-clap</v-icon>
       </v-btn>
+      <v-btn value="gpt">
+        <span>AI助教</span>
+        <v-icon>mdi-chat-processing</v-icon>
+      </v-btn>
       <v-btn value="money">
         <span>支持我们</span>
         <v-icon>mdi-hand-coin</v-icon>
@@ -30,12 +34,14 @@
 <script>
 import news from '../components/NewsList.vue'
 import money from '../components/GiveMeMoney.vue'
+import gpt from '@/components/GptHelp.vue';
 
 export default {
   name: 'HomeView',
   components: {
     news,
-    money
+    money,
+    gpt
   },
   data() {
     return {
@@ -48,6 +54,8 @@ export default {
       switch (this.activeBtn) {
         case 'money':
           return 'money';
+        case 'gpt':
+          return "gpt";
         default:
           return 'news';
       }

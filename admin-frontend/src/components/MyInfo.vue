@@ -86,25 +86,11 @@
         </v-row>
       </v-card-text>
     </v-card>
-    <v-card>
-      <v-card-title>
-        <h2 class="mb-10">
-          查看您的状态
-        </h2>
-      </v-card-title>
-      <v-card-text>
-        <v-row class="pl-3 pr-3">
-          <v-col>
-            <user_status :passedQuestions="passedQuestions" :failedQuestions="failedQuestions"></user_status>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
+
   </v-container>
 </template>
 
 <script>
-import user_status from '@/components/UserStatusChart.vue';
 
 export default {
   name: 'MyInfo',
@@ -130,7 +116,6 @@ export default {
     }
   },
   components: {
-    user_status
   }
 }
 </script>

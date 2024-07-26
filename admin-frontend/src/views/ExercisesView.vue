@@ -12,14 +12,6 @@
       v-model="activeBtn"
       @change="handleNavigateClick"
     >
-      <v-btn value="problems">
-        <span>题目</span>
-        <v-icon>mdi-lightbulb-question</v-icon>
-      </v-btn>
-      <v-btn value="problemGroups">
-        <span>题单</span>
-        <v-icon>mdi-view-list</v-icon>
-      </v-btn>
       <v-btn value="manageProblemGroups">
         <span>管理题单</span>
         <v-icon>mdi-window-shutter-cog</v-icon>
@@ -33,19 +25,13 @@
 </template>
 
 <script>
-import SearchBar from '../components/SearchBar.vue'
-import Problem from '../components/exercises/Problem.vue'
-import ProblemList from '../components/exercises/ProblemList.vue'
 import ProblemManage from '../components/exercises/ProblemManage.vue'
 import ListManage from '../components/exercises/ListManage.vue'
 export default {
   name: 'HomeView',
   components: {
-    Problem,
-    ProblemList,
     ListManage,
     ProblemManage,
-    SearchBar
   },
   data() {
     return {
@@ -61,10 +47,6 @@ export default {
   computed: {
     currentComponent() {
       switch (this.activeBtn) {
-        case 'problems':
-          return 'Problem';
-        case 'problemGroups':
-          return 'ProblemList';
         case 'manageProblemGroups':
           return 'ListManage';
         default:
@@ -78,12 +60,8 @@ export default {
         switch (newValue) {
           case 'manageProblems':
             return '管理题目';
-          case 'problemGroups':
-            return '题单';
-          case 'manageProblemGroups':
+            default:
             return '管理题单';
-          default:
-            return '题目';
         }
       })());
     },
