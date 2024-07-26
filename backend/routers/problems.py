@@ -539,28 +539,6 @@ async def submit_problem(
     return {'status': 'success', 'is_correct': is_correct}
 
 
-@router.get('/get_user_statistics')
-async def get_user_statistics(
-    user: User = Depends(security.get_user),
-    db: pymysql.connections.Connection = Depends(database.connect)
-):
-    '''
-    获取用户题目统计信息。
-    
-    返回格式：
-    
-    ```
-    {
-        "choice_submit": 100,
-        "choice_correct": 80,
-        "blank_submit": 50,
-        "blank_correct": 40,
-    }
-    ```
-    '''
-    return database.get_user_statistics(db, user)
-
-
 @router.get('/get_problem_recommend')
 async def get_problem_recommend(
     user: User = Depends(security.get_user),

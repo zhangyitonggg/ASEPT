@@ -20,7 +20,7 @@ const base = {
     search_problem_by_tag: '/problems/search_problem_by_tag',
     get_my_problems: '/problems/get_my_problems',
     submit_problem: '/problems/submit_problem',
-    get_user_statistics: '/problems/get_user_statistics',
+    get_user_statistics: '/user/get_user_statistics',
     get_problem_recommend: '/problems/get_problem_recommend',
     get_problem: '/problems/get_problem',
     joinGroup: '/user_group/join_group',

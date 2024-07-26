@@ -25,3 +25,25 @@ async def set_permission(
 ):
     database.modify_user_info(db, user, info.originalPassword, info.newPassword)
     return {"status": "success"}
+
+
+@router.get('/get_user_statistics')
+async def get_user_statistics(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取用户题目统计信息。
+    
+    返回格式：
+    
+    ```
+    {
+        "choice_submit": 100,
+        "choice_correct": 80,
+        "blank_submit": 50,
+        "blank_correct": 40,
+    }
+    ```
+    '''
+    return database.get_user_statistics(db, user)
