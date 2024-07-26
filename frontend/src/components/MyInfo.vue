@@ -103,6 +103,13 @@
       </v-container>
       <v-card-text v-else>
         <v-row class="pl-3 pr-3">
+          <v-col>
+            <time_status
+              :lastUpdateTime="new Date().toLocaleString()"
+            />
+          </v-col>
+        </v-row>
+        <v-row>
           <v-col v-if="choicePassedQuestions+choiceFailedQuestions != 0">
             <user_status
               :data="[choicePassedQuestions, choiceFailedQuestions]"
@@ -148,6 +155,7 @@
 
 <script>
 import user_status from '@/components/UserStatusChart.vue';
+import time_status from '@/components/UserStatusChartByTime.vue';
 
 export default {
   name: 'MyInfo',
@@ -210,7 +218,8 @@ export default {
     }
   },
   components: {
-    user_status
+    user_status,
+    time_status,
   }
 }
 </script>

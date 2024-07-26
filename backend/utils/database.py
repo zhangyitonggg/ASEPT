@@ -877,6 +877,12 @@ def get_all_problems(db, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
     res = []
     for problem in problems_with_access:
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM ProblemTags WHERE pid = %s", (problem[0]))
+        tags = cursor.fetchall()
+        _tags_ = []
+        for tag in tags:
+            _tags_.append(tag[1])
         res.append({
             "pid": problem[0],
             "title": problem[1],
@@ -887,6 +893,7 @@ def get_all_problems(db, user: User):
             "choices": problem[6],
             "answers": problem[7],
             "is_public": problem[8],
+            "tags": _tags_,
         })
     return {"problems": res}
 
