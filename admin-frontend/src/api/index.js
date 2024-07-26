@@ -128,8 +128,8 @@ const api = {
     showAllUsers: async() => {
       return await router.get(path.baseUrl + path.showAllUsers);
     },
-    addAdmin: async(username) => {
-      return await router.post(path.baseUrl + path.addAdmin, {}, {params: {target_user_name: username, permission: 0}});
+    setPermission: async(username, permission, cancel) => {
+      return await router.post(path.baseUrl + path.setPermission, {target_user_name: username, permission: permission, cancel: cancel});
     }
 };
 

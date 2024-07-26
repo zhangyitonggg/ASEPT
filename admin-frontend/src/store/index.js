@@ -316,14 +316,14 @@ export default new Vuex.Store({
           })
       })
     },
-    addAdmin(context, {username}) {
+    setPermission(context, {username, permission, cancel}) {
       return new Promise((resolve, reject) => {
-        api.addAdmin(username)
+        api.setPermission(username, permission, cancel)
           .then(response => {
             resolve(response.data);
           })
-          .catch(error => {
-            reject(error);
+          .catch(e => {
+            reject(e);
           })
       })
     },

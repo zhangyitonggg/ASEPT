@@ -44,7 +44,7 @@
                       </v-list-item-subtitle>
                       <v-list-item-subtitle>
                         状态:
-                          {{ item.blocked !== "\u0000" ? "已封禁" : "正常" }}
+                          {{ item.blocked === "True" ? "已封禁" : "正常" }}
                       </v-list-item-subtitle>
                     </v-list-item-content>
                     
@@ -59,7 +59,7 @@
                         </v-icon>
                     </v-list-item-action>
 
-                    <v-list-item-action v-if="item.blocked !== '\u0000'">
+                    <v-list-item-action v-if="item.blocked === 'True'">
                         <v-icon color="green" @click="delete_block(item)">
                             {{ "mdi-login" }}
                         </v-icon>
@@ -133,13 +133,13 @@
             })
         },
         add_admin(item) {
-            this.$store.dispatch("addAdmin", {username: item.name})
+            this.$store.dispatch("setPermission", {username: item.name, permission: 0,cancel:"false"})
             .then((res) => {
                 this.$store.commit("setAlert", {
                 type: "success",
                 message: e,
                 });
-                item.is_admin = "True";
+                item.is_admin = "true";
             })
             .catch((e) => {
                 this.$store.commit("setAlert", {
@@ -148,14 +148,53 @@
                 });
             })
         },
-        delete_admin() {
-
+        delete_admin(item) {
+          this.$store.dispatch("setPermission", {username: item.name, permission: 0, cancel:"true"})
+            .then((res) => {
+                this.$store.commit("setAlert", {
+                type: "success",
+                message: e,
+                });
+                item.is_admin = "false";
+            })
+            .catch((e) => {
+                this.$store.commit("setAlert", {
+                type: "error",
+                message: e,
+                });
+            })         
         },
-        add_block() {
-            console.log("add block");
+        add_block(item) {
+          this.$store.dispatch("setPermission", {username: item.name, permission: 8,cancel:"false"})
+            .then((res) => {
+                this.$store.commit("setAlert", {
+                type: "success",
+                message: e,
+                });
+                item.blocked = "true";
+            })
+            .catch((e) => {
+                this.$store.commit("setAlert", {
+                type: "error",
+                message: e,
+                });
+            })
         },
-        delete_block() {
-            console.log("delete block");
+        delete_block(item) {
+          this.$store.dispatch("setPermission", {username: item.name, permission: 8,cancel:"true"})
+            .then((res) => {
+                this.$store.commit("setAlert", {
+                type: "success",
+                message: e,
+                });
+                item.blocked = "false";
+            })
+            .catch((e) => {
+                this.$store.commit("setAlert", {
+                type: "error",
+                message: e,
+                });
+            })
         }
     },
     components: {

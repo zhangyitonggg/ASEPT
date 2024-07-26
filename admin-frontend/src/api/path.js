@@ -31,7 +31,7 @@ const base = {
     getProblemsRecommended: '/problems/get_problem_recommend',
     get_my_problem_groups: '/problems/my_problem_groups',
     showAllUsers: '/admin/get_all_users',
-    addAdmin: '/admin/set_permission',
+    setPermission: '/admin/set_permission',
 }
 
 export default base;
