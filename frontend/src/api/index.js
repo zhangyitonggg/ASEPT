@@ -134,6 +134,9 @@ const api = {
       formData.append('file', file);
       return await router.post(path.baseUrl + path.uploadFile, formData, {useMultipart: true});
     },
+    getTime: async() => {
+      return await router.get(path.baseUrl + path.getTime);
+    },
 };
 
 export default api;
