@@ -50,6 +50,7 @@
         </v-list>
       </v-col>
   
+    
       <v-dialog v-model="dialog" max-width="800px">
         <v-card>
           <v-card-title>
@@ -62,28 +63,32 @@
           <v-card-subtitle>
             题单名称: {{ currentItem.name }}
           </v-card-subtitle>
-  
           <v-card-text>
-            <v-row>
-              <v-col v-for="(problem, index) in currentItem.problems" :key="index" cols="12" md="4">
-                <v-card class="mb-4">
-                  <v-card-title>
-                    题目 {{ index + 1 }}: {{problem.title}}
-                  </v-card-title>
-                  <v-card-subtitle>
-                    Tag: {{ problem.tag }}
-                  </v-card-subtitle>
-                  <v-card-text>
-                    {{ problem.description }}
-                  </v-card-text>
-                  <v-card-actions>
+            <v-list three-line>
+              <v-list-item-group v-for="(problem, index) in currentItem.problems" :key="index">
+                <v-list-item>
+                  <v-list-item-avatar>
+                    <v-icon>mdi-lightbulb-on-outline</v-icon>
+                  </v-list-item-avatar>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      题目 {{ index + 1 }}: {{ problem.title }}
+                    </v-list-item-title>
+                    <v-list-item-subtitle>
+                      Tag: {{ problem.tag }}
+                    </v-list-item-subtitle>
+                    <v-list-item-subtitle>
+                      {{ problem.description }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+                  <v-list-item-action>
                     <v-btn color="primary" @click="startProblem(problem)">去做题</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-col>
-            </v-row>
+                  </v-list-item-action>
+                </v-list-item>
+                <v-divider v-if="index < currentItem.problems.length - 1"></v-divider>
+              </v-list-item-group>
+            </v-list>
           </v-card-text>
-  
           <v-card-actions>
             <v-btn text @click="dialog = false">关闭</v-btn>
           </v-card-actions>
