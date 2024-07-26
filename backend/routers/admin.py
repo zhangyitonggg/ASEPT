@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Header
 import pymysql
+from pydantic import BaseModel
 
 from backend.utils import database, redis
 from backend.data.User import Permissions, User, PermissionType
@@ -11,11 +12,15 @@ router = APIRouter(
     prefix='/admin',
 )
 
+class setPermissionReq(BaseModel):
+    target_user_name: str
+    permission: PermissionType
+    cancel: bool
+
 
 @router.post("/set_permission")
 async def set_permission(
-    target_user_name: str,
-    permission: PermissionType,
+    requst: setPermissionReq,
     user: User = Depends(security.get_admin),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
@@ -34,6 +39,9 @@ async def set_permission(
     6. 给予上传题目权限
     7. 给予分享题目权限
     8. 搜索题目权限
+    9. 封禁用户
+    
+    cancel: bool 类型，是否取消权限。
     '''
     if user.permissions.get("IS_ADMIN") == False or \
         user.permissions.get("BLOCK_USER") == False or \
@@ -43,8 +51,7 @@ async def set_permission(
             status_code=401,
             detail="Permission denied. You have no full permissions."
         )
-    # database.set_permission(db, target_user_name, permission)
-    print(permission)
+    database.set_permission(db, requst.target_user_name, requst.permission, requst.cancel)
     return {"status": "success"}
 
 
