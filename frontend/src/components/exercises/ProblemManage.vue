@@ -345,6 +345,7 @@ export default {
             type: 'success',
             message: '题目成功加入题单！',
           });
+          this.selectedList=null;
           this.dialogAdd = false;
         })
         .catch((error) => {
@@ -428,6 +429,7 @@ export default {
         message: '题目创建成功！',
       });
       this.dialogCreate = false;
+      this.newProblem={ name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] };
       this.fetchProblems(); // 刷新题目列表
     })
     .catch((error) => {
