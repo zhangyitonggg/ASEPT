@@ -290,7 +290,7 @@ export default {
 }
 
 .correct-answer {
-  background-color: #d4edda;
+  background-color: #31bc51;
 }
 
 .wrong-answer {
@@ -328,8 +328,10 @@ export default {
 }
 
 .answer-card-large {
+  background-color: #28a745;
+  
   width: 100%;
-  max-width: 900px;
+  max-width: 1900px;
   margin: 0 auto;
   padding: 20px;
 }
