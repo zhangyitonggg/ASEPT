@@ -67,6 +67,12 @@
                 <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
               </ul>
             </div>
+            <div v-else-if="question.type === 'MULTI_CHOICE'">
+              <p>正确选项:</p>
+              <ul>
+                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
+              </ul>
+            </div>
             <div v-else-if="question.type === 'BLANK_FILLING'">
               <p>正确答案:</p>
               <ul>
@@ -140,17 +146,39 @@ export default {
       }
       return [];
     },
+    // formatAnswerForSubmission() {
+    //   let formattedAnswer = {};
+    //   if (this.question.type === 'SINGLE_CHOICE') {
+    //     // 单选题
+    //     formattedAnswer = { [this.answer]: this.question.choices[this.answer] };
+    //   } else if (this.question.type === 'MULTI_CHOICE') {
+    //     console.log(this.answer);
+    //     // 多选题
+    //     formattedAnswer = this.answer.reduce((acc, answer) => {
+    //       acc[answer] = this.question.choices[answer];
+    //       return acc;
+    //     }, {});
+    //   } else if (this.question.type === 'BLANK_FILLING') {
+    //     // 填空题
+    //     formattedAnswer = this.answer.reduce((acc, answer, index) => {
+    //       acc[index] = answer;
+    //       return acc;
+    //     }, {});
+    //   }
+    //   return JSON.stringify(formattedAnswer);
+    // },
     formatAnswerForSubmission() {
       let formattedAnswer = {};
       if (this.question.type === 'SINGLE_CHOICE') {
         // 单选题
         formattedAnswer = { [this.answer]: this.question.choices[this.answer] };
       } else if (this.question.type === 'MULTI_CHOICE') {
+        console.log(this.answer);
         // 多选题
-        formattedAnswer = this.answer.reduce((acc, answer) => {
+        formattedAnswer = Array.isArray(this.answer) ? this.answer.reduce((acc, answer) => {
           acc[answer] = this.question.choices[answer];
           return acc;
-        }, {});
+        }, {}) : {};
       } else if (this.question.type === 'BLANK_FILLING') {
         // 填空题
         formattedAnswer = this.answer.reduce((acc, answer, index) => {
@@ -191,6 +219,7 @@ export default {
         .then(res => {
           console.log('res',res)
           this.correctAnswers = this.parseAnswers(res);
+          console.log(this.correctAnswers);
           this.showAnswers = true;
         })
         .catch(error => {
