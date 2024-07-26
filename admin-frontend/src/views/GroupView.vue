@@ -292,7 +292,7 @@ export default {
       }
       this.$store.dispatch('modifyGroup', {
         gid: this.modified_group.gid,
-        name: this.modified_group.name,
+        group_name: this.modified_group.name,
         description: this.modified_group.description,
         password: password
       })
