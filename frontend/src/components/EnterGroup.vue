@@ -28,7 +28,7 @@
             ></v-subheader>
             <v-list-item
               v-else-if="item.group_name"
-              :key="item.group_name"
+              :key="item.gid"
             >
               <v-list-item-avatar>
                 <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>

@@ -18,7 +18,7 @@
             ></v-divider>
             <v-list-item
               v-else-if="item.name"
-              :key="item.name"
+              :key="item.gid"
             >
               <v-list-item-avatar>
                 <v-icon> {{ item.locked ? "mdi-link-lock" : "mdi-link"}}</v-icon>

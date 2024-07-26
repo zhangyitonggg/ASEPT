@@ -18,24 +18,18 @@
         <span>页面设置</span>
         <v-icon>mdi-cog</v-icon>
       </v-btn>
-      <v-btn value="feedback">
-        <span>反馈</span>
-        <v-icon>mdi-invoice</v-icon>
-      </v-btn>
     </v-bottom-navigation>
   </v-container>
 </template>
 
 <script>
 import myinfo from '../components/MyInfo.vue'
-import feedback from '../components/Feedback.vue'
 import config from '../components/FrontConfig.vue';
 
 export default {
   name: 'HomeView',
   components: {
     myinfo,
-    feedback,
     config,
   },
   data() {
@@ -52,8 +46,6 @@ export default {
         switch (newValue) {
           case 'config':
             return '页面设置';
-          case 'feedback':
-            return '反馈';
           default:
             return '个人信息';
         }
