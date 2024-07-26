@@ -22,8 +22,8 @@ const api = {
       console.log("createProblem");
       return await router.post(path.baseUrl + path.createProblem,problemData);
     },
-    getMyProblem: async() => {
-      console.log("getMyProblem");
+    getAllProblem: async() => {
+      console.log("getAllProblem");
       return await router.get(path.baseUrl + path.getMyProblem);
     },
     getProblemsRecommended: async() => {
@@ -118,9 +118,9 @@ const api = {
       console.log("get_problem_groups");
       return await router.get(path.baseUrl + path.get_problem_groups);
     },
-    get_my_problem_groups: async() => {
-      console.log("get_my_problem_groups");
-      return await router.get(path.baseUrl + path.get_my_problem_groups);
+    get_all_problem_groups: async() => {
+      console.log("get_all_problem_groups");
+      return await router.get(path.baseUrl + path.get_all_problem_groups);
     },
     userModify: async(username, originalPassword, newPassword) => {
       return await router.post(path.baseUrl + path.userModify, {originalPassword: originalPassword, newPassword: newPassword});

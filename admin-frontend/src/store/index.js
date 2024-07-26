@@ -129,7 +129,7 @@ export default new Vuex.Store({
           })
       })
     },
-    getMyProblem(context) {
+    getAllProblem(context) {
       return new Promise((resolve, reject) => {
         api.getMyProblem()
           .then(response => {
@@ -206,9 +206,9 @@ export default new Vuex.Store({
           })
       })
     },
-    getMyProblemGroup(context) {
+    getAllProblemGroup(context) {
       return new Promise((resolve, reject) => {
-        api.get_my_problem_groups()
+        api.get_all_problem_groups()
           .then(response => {
             resolve(response.data);
           })
@@ -272,9 +272,9 @@ export default new Vuex.Store({
           })
       })
     },
-    showJoinedGroups(context) {
+    showAllGroups(context) {
       return new Promise((resolve, reject) => {
-        api.showJoinedGroups()
+        api.showAllGroups()
           .then(response => {
             resolve(response.data);
           })

@@ -56,15 +56,6 @@ const routes: Array<RouteConfig> = [
     }
   },
   {
-    path: '/exercise/solve',
-    name: 'solves',
-    component: () => import('../components/exercises/Solve.vue'),
-    meta: {
-      requireAuth: true,
-      title: '去做题'
-    }
-  },
-  {
     path: '/me',
     name: 'me',
     component: PersonalCenter,
