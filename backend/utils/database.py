@@ -169,7 +169,7 @@ def get_user_by_uid(db, uid: str):
 def varify_user(db, username: str, password: str) -> User:
     user = get_user(db, username)
     if user:
-        if user[2] == md5_passwd(password) and user[4] == b'\x00':
+        if user[2] == md5_passwd(password):
             return User(username, user[1], user[3], get_user_permissions(user[1]))
     return None
 
@@ -214,7 +214,7 @@ def get_admin_permissions(uid: str):
     cursor.execute("SELECT * FROM Users WHERE uid = %s", (uid))
     user_status = cursor.fetchone()
     print(user_status[3] == 'True')
-    if user_status[4] == b'\x01' or user_status[3] != 'True':
+    if user_status[3] != 'True':
         raise HTTPException(
             status_code=401,
             detail="Permission denied. You are not an admin."

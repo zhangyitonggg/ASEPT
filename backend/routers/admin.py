@@ -43,7 +43,8 @@ async def set_permission(
             status_code=401,
             detail="Permission denied. You have no full permissions."
         )
-    database.set_permission(db, target_user_name, permission)
+    # database.set_permission(db, target_user_name, permission)
+    print(permission)
     return {"status": "success"}
 
 
@@ -120,6 +121,7 @@ async def modify_announcement(
     database.modify_announcement(db, announcement, user)
     return {"status": "success"}
 
+
 @router.get('/get_all_users')
 async def get_all_users(
     user: User = Depends(security.get_admin),
@@ -150,6 +152,7 @@ async def get_all_users(
             detail="Permission denied. You are not an admin."
         )
     return database.get_all_users(db)
+
 
 @router.get('/get_all_problems')
 async def get_all_problems(
@@ -207,6 +210,7 @@ async def get_all_problems(
         )
     return database.admin_get_all_problems(db)
 
+
 @router.get('/get_all_groups')
 async def get_all_groups(
     user: User = Depends(security.get_admin),
@@ -240,6 +244,7 @@ async def get_all_groups(
         )
     return database.get_all_groups(db)
 
+
 @router.get('/get_all_problem_groups')
 async def get_all_problem_groups(
     user: User = Depends(security.get_admin),
@@ -271,6 +276,7 @@ async def get_all_problem_groups(
         )
     return database.get_all_problem_groups(db)
 
+
 @router.post('/delete_admin')
 async def delete_admin(
     uid: str,
@@ -287,6 +293,7 @@ async def delete_admin(
         )
     database.delete_admin(db, uid)
     return {"status": "success"}
+
 
 @router.get('/get_all_admin')
 async def get_all_admin(

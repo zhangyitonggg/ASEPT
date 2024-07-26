@@ -16,6 +16,7 @@ class PermissionType(Enum):
     UPLOAD_PROBLEM = 5
     SHARE_PROBLEM = 6
     SEARCH_PROBLEM = 7
+    BLOCKED = 8
 
     @staticmethod
     def is_permission(permission: str) -> bool:
