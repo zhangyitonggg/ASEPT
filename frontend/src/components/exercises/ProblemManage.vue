@@ -38,6 +38,7 @@
                 <v-btn color="primary" @click="changeProblem(item)">修改问题</v-btn>
               </v-list-item-action>
             </v-list-item>
+            <v-divider v-if="index < currentPageItems.length - 1"></v-divider>
           </template>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
