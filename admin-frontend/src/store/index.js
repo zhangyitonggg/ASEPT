@@ -129,9 +129,9 @@ export default new Vuex.Store({
           })
       })
     },
-    getAllProblem(context) {
+    getMyProblem(context) {
       return new Promise((resolve, reject) => {
-        api.getMyProblem()
+        api.getAllProblem()
           .then(response => {
             resolve(response.data);
           })
@@ -206,7 +206,7 @@ export default new Vuex.Store({
           })
       })
     },
-    getAllProblemGroup(context) {
+    getMyProblemGroup(context) {
       return new Promise((resolve, reject) => {
         api.get_all_problem_groups()
           .then(response => {
@@ -272,17 +272,6 @@ export default new Vuex.Store({
           })
       })
     },
-    showAllGroups(context) {
-      return new Promise((resolve, reject) => {
-        api.showAllGroups()
-          .then(response => {
-            resolve(response.data);
-          })
-          .catch(error => {
-            reject(error);
-          })
-      })
-    },
     leaveGroup(context, {gid}) {
       return new Promise((resolve, reject) => {
         api.leaveGroup(gid)
@@ -294,11 +283,12 @@ export default new Vuex.Store({
           })
       })
     },
-    showAllGroups(context) {                               // new
+    showJoinedGroups(context) {                               // new
       return new Promise((resolve, reject) => {
         api.showAllGroups()
           .then(response => {
             resolve(response.data);
+            console.log(response.data);
           })
           .catch(error => {
             reject(error);

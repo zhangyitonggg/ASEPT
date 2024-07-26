@@ -155,9 +155,10 @@ export default {
   methods: {
     fetchItems() {
       this.$store
-        .dispatch('getAllProblemGroup')
+        .dispatch('getMyProblemGroup')
         .then((res) => {
           this.items = res.problem_groups;
+          console.log(res);
         })
         .catch((error) => {
           this.$store.commit('setAlert', {
@@ -171,7 +172,7 @@ export default {
     },
     fetchGroups() {
       this.$store
-        .dispatch('showAllGroups')
+        .dispatch('showJoinedGroups')
         .then((res) => {
           this.groups = res.groups;
         })

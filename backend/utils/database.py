@@ -542,7 +542,7 @@ def get_all_groups(db):
     for group in groups:
         res.append({
             "gid": group[0],
-            "name": group[1],
+            "group_name": group[1],
             "description": group[2],
             "owner": get_user_by_uid(db, group[3])[0],
             "is_open": group[4],

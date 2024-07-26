@@ -137,23 +137,30 @@
             .then((res) => {
                 this.$store.commit("setAlert", {
                 type: "success",
-                message: e,
+                message: "设置成功",
                 });
                 item.is_admin = "true";
             })
             .catch((e) => {
                 this.$store.commit("setAlert", {
                 type: "error",
-                message: e,
+                message: res,
                 });
             })
         },
         delete_admin(item) {
+          if (item.name === this.$store.getters.username) {
+            this.$store.commit("setAlert", {
+              type: "error",
+              message: "我们都认为您不能取消自己的管理员权限",
+            });
+            return;
+          }
           this.$store.dispatch("setPermission", {username: item.name, permission: 0, cancel:"true"})
             .then((res) => {
                 this.$store.commit("setAlert", {
                 type: "success",
-                message: e,
+                message: "设置成功",
                 });
                 item.is_admin = "false";
             })
@@ -165,13 +172,20 @@
             })         
         },
         add_block(item) {
+          if (item.name === this.$store.getters.username) {
+            this.$store.commit("setAlert", {
+              type: "error",
+              message: "我们都认为您不能封禁自己",
+            });
+            return;
+          }
           this.$store.dispatch("setPermission", {username: item.name, permission: 8,cancel:"false"})
             .then((res) => {
+                item.blocked = "true";
                 this.$store.commit("setAlert", {
                 type: "success",
-                message: e,
+                message: "设置成功",
                 });
-                item.blocked = "true";
             })
             .catch((e) => {
                 this.$store.commit("setAlert", {
@@ -185,7 +199,7 @@
             .then((res) => {
                 this.$store.commit("setAlert", {
                 type: "success",
-                message: e,
+                message: "设置成功",
                 });
                 item.blocked = "false";
             })
