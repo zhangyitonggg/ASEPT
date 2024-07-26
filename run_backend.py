@@ -25,12 +25,6 @@ app.include_router(news.router)
 app.include_router(problems.router)
 app.include_router(user.router)
 
-@app.get("/print/{info}")
-async def print_(info: str):
-    print(info)
-    return {"info": info}
-
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app='run_backend:app', host="localhost", port=8000, reload=True)

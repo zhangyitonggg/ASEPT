@@ -193,7 +193,6 @@ def md5_passwd(password: str) -> str:
 
 
 def get_user_permissions(uid: str):
-    print(uid)
     db = new_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Permissions WHERE uid = %s", (uid))
@@ -214,7 +213,6 @@ def get_admin_permissions(uid: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Users WHERE uid = %s", (uid))
     user_status = cursor.fetchone()
-    print(user_status[3] == 'True')
     if user_status[3] != 'True':
         raise HTTPException(
             status_code=401,
@@ -227,7 +225,6 @@ def get_admin_permissions(uid: str):
 
 
 def set_permission(db, target_user_name: str, perm: PermissionType, cancel: bool):
-    print(target_user_name, perm, cancel)
     target_user = get_user(db, target_user_name)
     if not target_user:
         raise HTTPException(
@@ -282,7 +279,6 @@ def leave_group(db, gid: str, user: User):
         cursor.execute("DELETE FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], user.uid))
         db.commit()
     except Exception as e:
-        print("Error leaving group: ", e)
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -914,7 +910,6 @@ def get_problem_tags(db, pid: str, user: User):
 
 def search_problem_by_tag(db, tag: str, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
-    print(problems_with_access)
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemTags")
     problem_tags = cursor.fetchall()
