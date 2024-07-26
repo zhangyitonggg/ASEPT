@@ -73,7 +73,7 @@
             <div v-else-if="question.type === 'BLANK_FILLING'">
               <p>正确答案:</p>
               <ul>
-                <li v-for="(answer, index) in correctAnswers" :key="index">{{ `Blank ${index + 1}: ${answer}` }}</li>
+                <li v-for="(answer, index) in correctAnswers" :key="index">{{ `${index}: ${answer}` }}</li>
               </ul>
             </div>
           </v-card-text>
