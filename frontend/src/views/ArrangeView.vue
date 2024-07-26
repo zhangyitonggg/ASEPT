@@ -124,7 +124,7 @@ import searchbar from '../components/SearchBar.vue'
             });
         },
         solveProblem(item) {
-            this.$router.push({ name: 'Problem', params: { pid: item.pid } });
+        this.$router.push({ path: 'solve/' + item.pid, append: true });
         },
     },
     watch: {
