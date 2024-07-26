@@ -59,6 +59,12 @@
                     @click="init_modified_group(item)"
                   > 管理 </v-btn>
                 </v-list-item-action>
+                <v-list-item-action>
+                  <v-btn
+                    color="error"
+                    @click="delete_group(item)"
+                  > 解散 </v-btn>
+                </v-list-item-action>
               </v-list-item>
             </div>
           </v-list>
@@ -285,6 +291,16 @@ export default {
       };
       this.changePassword = false;
       this.dialog = true;
+    },
+    delete_group(item) {
+      this.$store.dispatch('deleteGroup', {gid: item.gid})
+        .then(() => {
+          this.$store.commit("setAlert", {type: "success", message: `解散团队 ${item.group_name} 成功。`});
+          this.getCreatedGroups();
+        })
+        .catch((e) => {
+          this.$store.commit("setAlert", {type: "error", message: e});
+        });
     },
     submitModifyInfo() {
       let password = this.modified_group.password;

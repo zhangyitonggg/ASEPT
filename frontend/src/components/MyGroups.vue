@@ -156,6 +156,13 @@ export default {
       this.itemsPerPage = number
     },
     leave(item) {
+      if (item.founder === this.$store.getters.username) {
+        this.$store.commit("setAlert", {
+          type: "error",
+          message: "我们都认为您不能离开自己创建的团队，当然你可以选择解散它。",
+        });
+        return;
+      }
       this.curItem = item;
       this.dialog = true;
     },
