@@ -443,7 +443,7 @@ def show_joined_groups(db, uid: str):
     return {"groups": res}
 
 
-def modify_group(db, uid: str, gid: str, group_name: str | None = None, password: str | None = None, description: str | None = None):
+def modify_group(db, user: User, gid: str, group_name: str | None = None, password: str | None = None, description: str | None = None):
     group = get_group_by_gid(db, gid)
     if not group:
         raise HTTPException(
@@ -451,18 +451,19 @@ def modify_group(db, uid: str, gid: str, group_name: str | None = None, password
             detail="Group not found.",
         )
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], uid))
+    cursor.execute("SELECT * FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], user.uid))
     relation = cursor.fetchone()
-    if not relation:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Permission denied. You are not in this group.",
-        )
-    if relation[2] != 'True':
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Permission denied. You are not the admin of this group.",
-        )
+    if user.permissions.get("IS_ADMIN") == False:
+        if not relation:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Permission denied. You are not in this group.",
+            )
+        if relation[2] != 'True':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Permission denied. You are not the admin of this group.",
+            )
     if group_name != None:
         cursor.execute("UPDATE UserGroups SET name = %s WHERE gid = %s", (group_name, gid))
     if description != None:
@@ -471,7 +472,6 @@ def modify_group(db, uid: str, gid: str, group_name: str | None = None, password
         else:
             cursor.execute("UPDATE UserGroups SET description = %s WHERE gid = %s", (description, gid))
     if password != None:
-        print("password: ", password)
         if password == "":
             cursor.execute("UPDATE UserGroups SET password = NULL WHERE gid = %s", (gid))
         else:

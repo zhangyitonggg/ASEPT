@@ -30,6 +30,7 @@ const base = {
     get_problem_groups: '/problems/accessible_problem_groups',
     getProblemsRecommended: '/problems/get_problem_recommend',
     get_my_problem_groups: '/problems/my_problem_groups',
+    get_problem_ans_by_id: '/problems/get_problem_answer',
 }
 
 export default base;

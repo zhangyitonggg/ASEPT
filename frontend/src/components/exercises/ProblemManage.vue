@@ -332,7 +332,8 @@ export default {
 
     // 将 correctAnswers 数组转为对象
     if (this.newProblem.type === 'MULTI_CHOICE') {
-      answer = this.newProblem.correctAnswers.reduce((acc, key) => {
+      const sortedCorrectAnswers = this.newProblem.correctAnswers.slice().sort(); // 排序
+      answer = sortedCorrectAnswers.reduce((acc, key) => {
         if (choices[key]) {
           acc[key] = choices[key];
         }
@@ -375,7 +376,7 @@ export default {
   let newProblemData = {};
   if(this.newProblem.type === 'BLANK_FILLING') {
     newProblemData = newProblemDataBlankFilling;
-  }else {
+  } else {
     newProblemData = newProblemDataChoice;
   }
 
@@ -398,6 +399,7 @@ export default {
       });
     });
 },
+
     resetNewProblem() {
       this.newProblem = {
         name: '',
