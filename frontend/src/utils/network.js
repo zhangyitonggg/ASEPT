@@ -41,6 +41,9 @@ config => {
     if (config.useQs) {
       config.data = qs.stringify(config.data);
       config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    } else if (config.useMultipart) {
+      config.headers['Content-Type'] = 'multipart/form-data';
+      config.timeout = 60000;
     } else {
       config.headers['Content-Type'] = 'application/json';
     }

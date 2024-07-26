@@ -25,15 +25,14 @@ def problem_file_upload(
             status_code=401,
             detail="Permission denied."
         )
-    # file_path = conf.UPLOAD_DIRECTORY / convert.md5_filename(file.filename)
-    # with open(file_path, "wb") as buffer:
-    #     shutil.copyfileobj(file.file, buffer)
-    # res = convert.convert2text(file_path)
-    # if res == None:
-    #     raise HTTPException(
-    #         status_code=400,
-    #         detail="Only PDF and IMAGE files are allowed."
-    #     )
-    # else:
-    #     return {"text": res}
-    return {"text": "hhhhhhhh"}
+    file_path = conf.UPLOAD_DIRECTORY / convert.md5_filename(file.filename)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    res = convert.convert2text(file_path)
+    if res == None:
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF and IMAGE files are allowed."
+        )
+    else:
+        return {"text": res}

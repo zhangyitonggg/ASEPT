@@ -33,7 +33,6 @@ const api = {
     },
     getProblemById: async(pid) => {
       console.log("getProblemById");
-      
       return await router.get(path.baseUrl + path.getProblemById,{params:{pid :pid }});
     },
     createProblemList: async(list) => {
@@ -132,8 +131,9 @@ const api = {
       return await router.post(path.baseUrl + path.userModify, {originalPassword: originalPassword, newPassword: newPassword});
     },
     uploadFile: async(file) => {
-      console.log(file);
-      return await router.post(path.baseUrl + path.uploadFile, {file: file});
+      const formData = new FormData();
+      formData.append('file', file);
+      return await router.post(path.baseUrl + path.uploadFile, formData, {useMultipart: true});
     },
 };
 

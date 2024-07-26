@@ -229,28 +229,25 @@ export default {
     //   });
     //   return;
     // }
+      if (this.uploadedFile) {
+          // let formData = new FormData();
+          // formData.append('file', file);
+        console.log(this.uploadedFile);
+        // console.log(formData);
 
-    if (this.uploadedFile) {
-        const file = this.uploadedFile;
-        const formData = new FormData();
-        formData.append('file', file);
-      console.log(this.uploadedFile);
-      console.log(formData);
-
-    this.$store
-      .dispatch('uploadFile', formData)
-      .then(response => {
-        // 假设 response.data.text 是从 PDF 中提取的文本
-        this.newProblem.content = response.data.text;
-      })
-      .catch(error => {
-        this.$store.commit('setAlert', {
-          type: 'error',
-          message: error.message || '上传文件失败。',
+      this.$store.dispatch('uploadFile', this.uploadedFile)
+        .then(response => {
+          // 假设 response.data.text 是从 PDF 中提取的文本
+          console.log(response.text);
+        })
+        .catch(error => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error.message || '上传文件失败。',
+          });
         });
-      });
-    }
-  },
+      }
+    },
     fetchProblems() {
       this.$store
         .dispatch('getMyProblem')

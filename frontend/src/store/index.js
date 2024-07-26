@@ -117,7 +117,7 @@ export default new Vuex.Store({
           })
       })
     },
-    uploadFile(context,file) {
+    uploadFile(context, file) {
       return new Promise((resolve, reject) => {
         api.uploadFile(file)
           .then(response => {
