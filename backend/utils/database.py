@@ -568,6 +568,23 @@ def get_all_problem_groups(db):
         })
     return {"problem_groups": res}
 
+def delete_admin(db, uid):
+    cursor = db.cursor()
+    cursor.execute("UPDATE Users SET is_admin = 'False' WHERE uid = %s", (uid))
+    db.commit()
+
+def get_all_admin(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Users WHERE is_admin = 'True'")
+    admins = cursor.fetchall()
+    res = []
+    for admin in admins:
+        res.append({
+            "name": admin[0],
+            "uid": admin[1],
+        })
+    return {"admins": res}
+
 def get_announcements(db, max_announcements: int, panel: int):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Announcements ORDER BY update_at DESC LIMIT %s", (max_announcements))
