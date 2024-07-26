@@ -1,42 +1,85 @@
 <template>
   <v-container>
-    <!-- 省略其他部分 -->
-    <v-form @submit.prevent="submitForm" v-if="question">
-      <v-card>
-        <v-card-title>{{ question.title }}</v-card-title>
-        <v-card-text>
-          <p>{{ question.content }}</p>
-          <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
-            <v-radio-group v-model="answer">
-              <v-radio
-                v-for="(choice, key) in question.choices"
-                :key="key"
-                :label="`${key}. ${choice}`"
-                :value="key"
-              ></v-radio>
-            </v-radio-group>
-          </template>
-          <template v-else-if="question.type === 'MULTI_CHOICE' && question.choices">
-            <v-checkbox
-              v-for="(choice, key) in question.choices"
-              :key="key"
-              :label="`${key}. ${choice}`"
-              :value="key"
-              v-model="selectedAnswers"
-              @change="updateAnswers"
-            ></v-checkbox>
-          </template>
-          <template v-else-if="question.type === 'BLANK_FILLING'">
-            <v-text-field
-              v-model="answer"
-              label="填空"
-            ></v-text-field>
-          </template>
-        </v-card-text>
-      </v-card>
-      <v-btn type="submit" color="primary">提交</v-btn>
-    </v-form>
-    <!-- 省略其他部分 -->
+    <v-btn
+      class="fixed-button"
+      fab
+      dark
+      color="indigo"
+      @click="returnback"
+    >
+      <v-icon dark>
+        mdi-arrow-u-left-bottom-bold
+      </v-icon>
+    </v-btn>
+
+    <v-row justify="center">
+      <v-col cols="12" md="6">
+        <v-form @submit.prevent="submitForm" v-if="question">
+          <v-card>
+            <v-card-title>{{ question.title }}</v-card-title>
+            <v-card-text>
+              <p>{{ question.content }}</p>
+              <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
+                <v-radio-group v-model="answer">
+                  <v-radio
+                    v-for="(choice, key) in question.choices"
+                    :key="key"
+                    :label="`${key}. ${choice}`"
+                    :value="key"
+                  ></v-radio>
+                </v-radio-group>
+              </template>
+              <template v-else-if="question.type === 'MULTI_CHOICE' && question.choices">
+                <v-checkbox
+                  v-for="(choice, key) in question.choices"
+                  :key="key"
+                  :label="`${key}. ${choice}`"
+                  :value="key"
+                  v-model="selectedAnswers"
+                  @change="updateAnswers"
+                ></v-checkbox>
+              </template>
+              <template v-else-if="question.type === 'BLANK_FILLING'">
+                <v-text-field
+                  v-model="answer"
+                  label="填空"
+                ></v-text-field>
+              </template>
+            </v-card-text>
+          </v-card>
+          <v-btn type="submit" color="primary">提交</v-btn>
+        </v-form>
+        <v-alert v-if="resultMessage" :type="resultType" class="mt-4">
+          {{ resultMessage }}
+        </v-alert>
+        <v-btn v-if="resultMessage && !showAnswers" @click="fetchCorrectAnswers" color="secondary" class="mt-4">
+          显示答案
+        </v-btn>
+        <v-card v-if="correctAnswers && showAnswers" class="mt-4">
+          <v-card-title>正确答案</v-card-title>
+          <v-card-text>
+            <div v-if="question.type === 'SINGLE_CHOICE'">
+              <p>正确选项:</p>
+              <ul>
+                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
+              </ul>
+            </div>
+            <div v-else-if="question.type === 'MULTI_CHOICE'">
+              <p>正确选项:</p>
+              <ul>
+                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
+              </ul>
+            </div>
+            <div v-else-if="question.type === 'BLANK_FILLING'">
+              <p>正确答案:</p>
+              <ul>
+                <li v-for="(answer, index) in correctAnswers" :key="index">{{ `Blank ${index + 1}: ${answer}` }}</li>
+              </ul>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -51,8 +94,8 @@ export default {
   data() {
     return {
       question: null,
-      selectedAnswers: [], // 多选题选项
-      answer: '', // 单选题和填空题答案
+      selectedAnswers: [], // 用于多选题选项
+      answer: '', // 用于单选题和填空题答案
       isSingleChoice: true,
       resultMessage: '',
       resultType: '',
@@ -116,10 +159,11 @@ export default {
         }, {});
       } else if (this.question.type === 'BLANK_FILLING') {
         // 填空题
-        formattedAnswer = Array.isArray(this.answer) ? this.answer.reduce((acc, answer) => {
-          acc[answer] = this.question.choices[answer];
+        const answers = this.answer.split(' ').filter(a => a.trim() !== '');
+        formattedAnswer = answers.reduce((acc, answer, index) => {
+          acc[index + 1] = answer;
           return acc;
-        }, {}) : {};
+        }, {});
       }
       return JSON.stringify(formattedAnswer);
     },
@@ -168,3 +212,11 @@ export default {
 };
 </script>
 
+<style>
+.fixed-button {
+  position: fixed;
+  left: 3%;
+  top: 15%;
+  z-index: 5;
+}
+</style>
