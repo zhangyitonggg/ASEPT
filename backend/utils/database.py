@@ -227,6 +227,7 @@ def get_admin_permissions(uid: str):
 
 
 def set_permission(db, target_user_name: str, perm: PermissionType, cancel: bool):
+    print(target_user_name, perm, cancel)
     target_user = get_user(db, target_user_name)
     if not target_user:
         raise HTTPException(
@@ -236,9 +237,9 @@ def set_permission(db, target_user_name: str, perm: PermissionType, cancel: bool
     target_uid = target_user[1]
     cursor = db.cursor()
     cmd = f"UPDATE Permissions SET {perm.name.lower()} = %s WHERE uid = %s"
-    cursor.execute(cmd, (not cancel, target_uid))
+    cursor.execute(cmd, (str(not cancel), target_uid))
     if perm.name == "IS_ADMIN":
-        cursor.execute("UPDATE Users SET is_admin = %s WHERE uid = %s", (not cancel, target_uid))
+        cursor.execute("UPDATE Users SET is_admin = %s WHERE uid = %s", (str(not cancel), target_uid))
     db.commit()
 
 
