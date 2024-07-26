@@ -20,6 +20,7 @@ const api = {
     },
     createProblem: async(problemData) => {
       console.log("createProblem");
+      console.log('create: ',problemData);
       return await router.post(path.baseUrl + path.createProblem,problemData);
     },
     getMyProblem: async() => {
@@ -32,6 +33,7 @@ const api = {
     },
     getProblemById: async(pid) => {
       console.log("getProblemById");
+      
       return await router.get(path.baseUrl + path.getProblemById,{params:{pid :pid }});
     },
     createProblemList: async(list) => {
@@ -81,8 +83,7 @@ const api = {
       return await router.post(path.baseUrl + path.add_problem_tag,{}, {params: {pid: pid, tag: tag}});
     },
     search_problem_by_tag: async(tag) => {
-      console.log("search_problem_by_tag");
-      console.log(tag);
+      console.log("search_problem_by_tag");;
       return await router.get(path.baseUrl + path.search_problem_by_tag, {params: {tag: tag}});
     },
     get_my_problems: async() => {
@@ -91,7 +92,8 @@ const api = {
     },
     submit_problem: async(pid, answer) => {
       console.log("submit_problem");
-      return await router.post(path.baseUrl + path.submit_problem, {pid: pid, answer: answer});
+      console.log('sub: ',pid,answer);
+      return await router.get(path.baseUrl + path.submit_problem,{params: {pid: pid, answer: answer}});
     },
     get_user_statistics: async() => {
       console.log("get_user_statistics");
@@ -103,7 +105,8 @@ const api = {
     },
     get_problem: async(pid) => {
       console.log("get_problem");
-      return await router.get(path.baseUrl + path.get_problem, {pid: pid});
+      console.log(pid);
+      return await router.get(path.baseUrl + path.get_problem, {params:{pid: pid}});
     },
     get_problem_group_info: async(pgid) => {
       console.log("get_problem_group_info");

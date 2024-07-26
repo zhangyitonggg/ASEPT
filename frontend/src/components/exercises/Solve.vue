@@ -1,5 +1,4 @@
 
-
 <template>
   <v-container>
     <v-btn
@@ -22,28 +21,26 @@
             <v-card-text>
               <p>{{ question.content }}</p>
               <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
-                <template v-if="isSingleChoice">
-                  <v-radio-group v-model="answer">
-                    <v-radio
-                      v-for="(choice, key) in question.choices"
-                      :key="key"
-                      :label="`${key}. ${choice}`"
-                      :value="key"
-                    ></v-radio>
-                  </v-radio-group>
-                </template>
-                <template v-else>
-                  <v-checkbox-group v-model="answer">
-                    <v-checkbox
-                      v-for="(choice, key) in question.choices"
-                      :key="key"
-                      :label="`${key}. ${choice}`"
-                      :value="key"
-                    ></v-checkbox>
-                  </v-checkbox-group>
-                </template>
+                <v-radio-group v-model="answer">
+                  <v-radio
+                    v-for="(choice, key) in question.choices"
+                    :key="key"
+                    :label="`${key}. ${choice}`"
+                    :value="key"
+                  ></v-radio>
+                </v-radio-group>
               </template>
-              <template v-else-if="question.type === 'FILL_BLANK'">
+              <template v-else-if="question.type === 'MULTI_CHOICE' && question.choices">
+                <v-checkbox-group v-model="answer">
+                  <v-checkbox
+                    v-for="(choice, key) in question.choices"
+                    :key="key"
+                    :label="`${key}. ${choice}`"
+                    :value="key"
+                  ></v-checkbox>
+                </v-checkbox-group>
+              </template>
+              <template v-else-if="question.type === 'BLANK_FILLING'">
                 <v-text-field
                   v-for="(blank, index) in question.answers"
                   :key="index"
@@ -53,25 +50,25 @@
               </template>
             </v-card-text>
           </v-card>
-          <v-btn type="submit" color="primary">Submit</v-btn>
+          <v-btn type="submit" color="primary">提交</v-btn>
         </v-form>
-        <v-alert v-if="resultMessage" type="success" class="mt-4">
+        <v-alert v-if="resultMessage" :type="resultType" class="mt-4">
           {{ resultMessage }}
         </v-alert>
-        <v-alert v-if="errorMessage" type="error" class="mt-4">
-          {{ errorMessage }}
-        </v-alert>
-        <v-card v-if="correctAnswers" class="mt-4">
-          <v-card-title>Correct Answers</v-card-title>
+        <v-btn v-if="resultMessage && !showAnswers" @click="fetchCorrectAnswers" color="secondary" class="mt-4">
+          显示答案
+        </v-btn>
+        <v-card v-if="correctAnswers && showAnswers" class="mt-4">
+          <v-card-title>正确答案</v-card-title>
           <v-card-text>
             <div v-if="question.type === 'SINGLE_CHOICE'">
-              <p>Correct Choice(s):</p>
+              <p>正确选项:</p>
               <ul>
                 <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
               </ul>
             </div>
-            <div v-else-if="question.type === 'FILL_BLANK'">
-              <p>Correct Answers:</p>
+            <div v-else-if="question.type === 'BLANK_FILLING'">
+              <p>正确答案:</p>
               <ul>
                 <li v-for="(answer, index) in correctAnswers" :key="index">{{ `Blank ${index + 1}: ${answer}` }}</li>
               </ul>
@@ -94,11 +91,12 @@ export default {
   data() {
     return {
       question: null,
-      answer: {},
+      answer: {}, // Modified to handle JSON conversion
       isSingleChoice: true,
       resultMessage: '',
-      errorMessage: '',
+      resultType: '',
       correctAnswers: null,
+      showAnswers: false,
     };
   },
   created() {
@@ -142,33 +140,57 @@ export default {
       }
       return [];
     },
+    formatAnswerForSubmission() {
+      let formattedAnswer = {};
+      if (this.question.type === 'SINGLE_CHOICE') {
+        // 单选题
+        formattedAnswer = { [this.answer]: this.question.choices[this.answer] };
+      } else if (this.question.type === 'MULTI_CHOICE') {
+        // 多选题
+        formattedAnswer = this.answer.reduce((acc, answer) => {
+          acc[answer] = this.question.choices[answer];
+          return acc;
+        }, {});
+      } else if (this.question.type === 'BLANK_FILLING') {
+        // 填空题
+        formattedAnswer = this.answer.reduce((acc, answer, index) => {
+          acc[index] = answer;
+          return acc;
+        }, {});
+      }
+      return JSON.stringify(formattedAnswer);
+    },
     submitForm() {
+      const payload = {
+        pid: this.pid,
+        answer: this.formatAnswerForSubmission() // Convert answer to JSON string
+      };
+      console.log(payload);
       this.$store
-        .dispatch('getCorrectAnswersById', this.pid) // 请求正确答案
+        .dispatch('submitAnswer', payload)
         .then(res => {
-          const correctAnswers = this.parseAnswers(res.data);
-          let isCorrect = false;
-
-          if (this.question.type === 'SINGLE_CHOICE') {
-            if (this.isSingleChoice) {
-              isCorrect = Object.keys(correctAnswers)[0] === this.answer;
-            } else {
-              isCorrect = Array.isArray(this.answer) && this.answer.length === correctAnswers.length && this.answer.every(val => Object.values(correctAnswers).includes(val));
-            }
-          } else if (this.question.type === 'FILL_BLANK') {
-            isCorrect = Object.keys(this.answer).length === correctAnswers.length &&
-                        Object.keys(this.answer).every((key, index) => this.answer[key] === correctAnswers[index]);
-          }
-
-          if (isCorrect) {
+          if (res.is_correct) {
             this.resultMessage = '回答正确';
-            this.errorMessage = '';
+            this.resultType = 'success';
           } else {
-            this.resultMessage = '';
-            this.errorMessage = '回答错误';
+            this.resultMessage = '回答错误';
+            this.resultType = 'error';
           }
-
-          this.correctAnswers = correctAnswers;
+          this.showAnswers = false;
+        })
+        .catch(error => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        });
+    },
+    fetchCorrectAnswers() {
+      this.$store
+        .dispatch('getCorrectAnswersById', this.pid)
+        .then(res => {
+          this.correctAnswers = this.parseAnswers(res.data);
+          this.showAnswers = true;
         })
         .catch(error => {
           this.$store.commit('setAlert', {

@@ -179,6 +179,7 @@ export default {
       ],
       itemsPerPage: 13,
       currentPage: 1,
+      problems: [],
       search:'',
     };
   },
@@ -239,7 +240,7 @@ export default {
         });
     },
     isMultipleChoice(type) {
-      return ['SINGLE_CHOICE', 'MULTI_CHOICE'].includes(type);
+      return ['MULTI_CHOICE'].includes(type);
     },
     addOption() {
       this.newProblem.options.push('');
@@ -263,17 +264,6 @@ export default {
     openAddTagDialog(item) {
       this.currentProblem = item;
       this.dialogAddTag = true;
-    },
-    resetNewProblem() {
-      this.newProblem = {
-        name: '',
-        content: '',
-        tag: '',
-        type: '',
-        options: [''],
-        fillBlanks: [''],
-        correctAnswers: [],
-      };
     },
     confirmAddTag() {
       if (this.newTag.trim() === '') {
@@ -327,56 +317,84 @@ export default {
         });
     },
     createProblem() {
-      // 构造 choices 对象
-      const choices = this.newProblem.options.reduce((acc, choice, index) => {
-        const key = String.fromCharCode(65 + index); // 生成键名，如 'A', 'B', 'C' 等
-        if (choice.trim()) {
-          acc[key] = choice;
+  let choices = {};
+  let answer = {};
+
+  if (this.newProblem.type === 'SINGLE_CHOICE' || this.newProblem.type === 'MULTI_CHOICE') {
+    // 构造 choices 对象
+    choices = this.newProblem.options.reduce((acc, choice, index) => {
+      const key = String.fromCharCode(65 + index); // 生成键名，如 'A', 'B', 'C' 等
+      if (choice.trim()) {
+        acc[key] = choice;
+      }
+      return acc;
+    }, {});
+
+    // 将 correctAnswers 数组转为对象
+    if (this.newProblem.type === 'MULTI_CHOICE') {
+      answer = this.newProblem.correctAnswers.reduce((acc, key) => {
+        if (choices[key]) {
+          acc[key] = choices[key];
         }
         return acc;
       }, {});
-
-      // 将 choices 对象转换为 JSON 字符串
-      const choicesJson = JSON.stringify(choices);
-
-      // 构造 answer 对象
-      const answer = {};
+    } else if (this.newProblem.type === 'SINGLE_CHOICE') {
       const correctAnswerKey = this.newProblem.correctAnswer;
       if (correctAnswerKey && choices[correctAnswerKey]) {
         answer[correctAnswerKey] = choices[correctAnswerKey];
       }
+    }
+  } else if (this.newProblem.type === 'BLANK_FILLING') {
+    // 构造填空题答案对象
+    answer = this.newProblem.fillBlanks.reduce((acc, blank, index) => {
+      acc[`Blank ${index + 1}`] = blank;
+      return acc;
+    }, {});
+  }
 
-      // 将 answer 对象转换为 JSON 字符串
-      const answerJson = JSON.stringify(answer);
+  // 将对象转换为 JSON 字符串
+  const choicesJson = JSON.stringify(choices);
+  const answerJson = JSON.stringify(answer);
 
-      // 准备新的题目数据
-      const newProblemData = {
-        title: this.newProblem.name,
-        content: this.newProblem.content,
-        tag: this.newProblem.tag,
-        type: this.newProblem.type,
-        choices: choicesJson, // 转换为 JSON 字符串
-        answer: answerJson, // 转换为 JSON 字符串
-        fillBlanks: this.newProblem.fillBlanks, // 假设 fillBlanks 可以直接发送
+  // 准备新的题目数据
+  const newProblemData = {
+    title: this.newProblem.name,
+    type: this.newProblem.type,
+    content: this.newProblem.content,
+    choices: choicesJson,
+    answer: answerJson,
+    tag: this.newProblem.tag,
+  };
+
+  console.log(newProblemData);
+  // 发送请求创建题目
+  this.$store
+    .dispatch('createProblem', newProblemData)
+    .then(() => {
+      this.$store.commit('setAlert', {
+        type: 'success',
+        message: '题目创建成功！',
+      });
+      this.dialogCreate = false;
+      this.fetchProblems(); // 刷新题目列表
+    })
+    .catch((error) => {
+      this.$store.commit('setAlert', {
+        type: 'error',
+        message: error,
+      });
+    });
+},
+    resetNewProblem() {
+      this.newProblem = {
+        name: '',
+        content: '',
+        tag: '',
+        type: '',
+        options: [''],
+        fillBlanks: [''],
+        correctAnswers: [],
       };
-      console.log(newProblemData);
-      // 发送请求创建题目
-      this.$store
-        .dispatch('createProblem', newProblemData)
-        .then(() => {
-          this.$store.commit('setAlert', {
-            type: 'success',
-            message: '题目创建成功！',
-          });
-          this.dialogCreate = false;
-          this.fetchProblems(); // 刷新题目列表
-        })
-        .catch((error) => {
-          this.$store.commit('setAlert', {
-            type: 'error',
-            message: error,
-          });
-        });
     },
     confirmChangeProblem() {
       this.$store
