@@ -193,6 +193,7 @@ def md5_passwd(password: str) -> str:
 
 
 def get_user_permissions(uid: str):
+    print(uid)
     db = new_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Permissions WHERE uid = %s", (uid))
@@ -509,7 +510,7 @@ def get_all_users(db):
             "name": user[0],
             "uid": user[1],
             "is_admin": user[3],
-            "blocked": user[4],
+            "blocked": get_user_permissions(user[1])[8],
         })
     return {"users": res}
 
