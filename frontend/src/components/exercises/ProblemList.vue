@@ -184,7 +184,7 @@ export default {
         });
     },
     startProblem(problem) {
-      this.$router.push({ path: 'solve', append: true });
+      this.$router.push({ path: 'solve/' + problem.pid, append: true });
     },
   },
 };
