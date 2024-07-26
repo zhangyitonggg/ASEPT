@@ -168,6 +168,16 @@ export default {
   },
   components: {
     searchbar
+  },
+  watch: {
+    search() {
+      this.currentPage = 1;
+    },
+    numberOfPages(newVal) {
+      if (this.currentPage > newVal) {
+        this.currentPage = newVal;
+      }
+    }
   }
 }
 </script>

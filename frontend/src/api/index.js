@@ -11,6 +11,9 @@ const api = {
         });
         return response;
     },
+    deleteGroup: async(gid) => {
+      return await router.delete(path.baseUrl + path.deleteGroup,{params: {gid: gid}});
+    },
     getnews: async() => {
         const response = await router.get(path.baseUrl + path.news_getannouncements);
         return response;

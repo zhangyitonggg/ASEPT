@@ -18,6 +18,10 @@ const api = {
     register: async(username, password) => {
       return await router.post(path.baseUrl + path.logon, {}, {params: {username: username, password: password}});
     },
+    deleteGroup: async(gid) => {
+      console.log(gid)
+      return await router.delete(path.baseUrl + path.deleteGroup,{params: {gid: gid}});
+    },
     createProblem: async(problemData) => {
       console.log("createProblem");
       return await router.post(path.baseUrl + path.createProblem,problemData);

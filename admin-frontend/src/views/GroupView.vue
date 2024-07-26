@@ -10,7 +10,7 @@
       </v-container>
       <v-container fluid v-else>
         <template v-if="items.length == 0">
-          <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
+          <v-btn color="success" @click="openCreateDialog">创建团队</v-btn>
           <v-col class="d-flex justify-center align-center">
             <h2>
               没有你可以管理的团队。试着创建一个？
@@ -20,7 +20,7 @@
         <div v-else>
           <v-layout>
             <v-flex xs1>
-               <v-btn color="success" @click="openCreateDialog">新建群聊</v-btn>
+               <v-btn color="success" @click="openCreateDialog">创建团队</v-btn>
             </v-flex>
             <v-spacer/>
             <v-flex xs24>
@@ -63,6 +63,12 @@
                       color="secondary"
                       @click="init_modified_group(item)"
                     > 管理 </v-btn>
+                  </v-list-item-action>
+                  <v-list-item-action>
+                    <v-btn
+                      color="error"
+                      @click="delete_group(item)"
+                    > 解散 </v-btn>
                   </v-list-item-action>
                 </v-list-item>
               </template>
@@ -141,7 +147,7 @@
         >
           <v-card>
             <v-card-title>
-              <span class="text-h5">新建群聊</span>
+              <span class="text-h5">创建团队</span>
             </v-card-title>
             <v-card-text>
               <v-container>
@@ -285,6 +291,17 @@ export default {
       };
       this.changePassword = false;
       this.dialog = true;
+    },
+    delete_group(item) {
+      console.log(item);
+      this.$store.dispatch('deleteGroup', {gid: item.gid})
+        .then(() => {
+          this.$store.commit("setAlert", {type: "success", message: `解散团队 ${item.group_name} 成功。`});
+          this.getCreatedGroups();
+        })
+        .catch((e) => {
+          this.$store.commit("setAlert", {type: "error", message: e});
+        });
     },
     submitModifyInfo() {
       let password = this.modified_group.password;
