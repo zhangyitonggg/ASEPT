@@ -1098,7 +1098,7 @@ def get_problem(db, pid: str, user: User):
         )
     if problem[3] == "choice":
         if len(json.loads(problem[7])) > 1:
-            ptype = "MULTIPLE_CHOICE"
+            ptype = "MULTI_CHOICE"
         else:
             ptype = "SINGLE_CHOICE"
     else:
