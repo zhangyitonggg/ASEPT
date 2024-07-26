@@ -50,7 +50,6 @@ def join_group(
 @router.post("/leave_group")
 async def leave_group(
     gid: str,
-    user_name: str | None = None,
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
@@ -61,7 +60,7 @@ async def leave_group(
 
     **先别用**
     '''
-    database.leave_group(db, gid, user_name if user_name else user.name, user)
+    database.leave_group(db, gid, user)
     return {"status": "success"}
 
 
