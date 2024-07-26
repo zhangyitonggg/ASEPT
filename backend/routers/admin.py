@@ -270,3 +270,49 @@ async def get_all_problem_groups(
             detail="Permission denied. You are not an admin."
         )
     return database.get_all_problem_groups(db)
+
+@router.post('/delete_admin')
+async def delete_admin(
+    uid: str,
+    user: User = Depends(security.get_admin),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    删除管理员权限，只有管理员可以删除。
+    '''
+    if user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are not an admin."
+        )
+    database.delete_admin(db, uid)
+    return {"status": "success"}
+
+@router.get('/get_all_admin')
+async def get_all_admin(
+    user: User = Depends(security.get_admin),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取所有管理员信息，只有管理员可以获取。
+    
+    返回格式：
+
+    ```
+    {
+        "admins": [
+            {
+                "uid": "xxx",(uuid)
+                "name": "xxx",
+            },
+            ...
+        ]
+    }
+    ```
+    '''
+    if user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are not an admin."
+        )
+    return database.get_all_admin(db)
