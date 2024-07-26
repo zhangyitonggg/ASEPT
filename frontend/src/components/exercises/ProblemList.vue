@@ -53,15 +53,18 @@
     
       <v-dialog v-model="dialog" max-width="800px">
         <v-card>
-          <v-card-title>
+          <v-card-title class="titlebig">
             题单详情
             <v-spacer></v-spacer>
             <v-btn icon @click="dialog = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
-          </v-card-title>
-          <v-card-subtitle>
+          </v-card-title><br/>
+          <v-card-subtitle class="big">
             题单名称: {{ currentItem.name }}
+          </v-card-subtitle>
+          <v-card-subtitle class="big">
+            题目数量: {{ currentItem.problems.length }}
           </v-card-subtitle>
           <v-card-text>
             <v-list three-line>
@@ -235,6 +238,14 @@ export default {
   font-weight: 900;
   top: 15px;
   right: 20px;
+}
+
+.big {
+  font-size: 18px;
+}
+
+.titlebig {
+  font-size: 35px;
 }
 </style>
 
