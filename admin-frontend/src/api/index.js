@@ -125,6 +125,12 @@ const api = {
     userModify: async(username, originalPassword, newPassword) => {
       return await router.post(path.baseUrl + path.userModify, {originalPassword: originalPassword, newPassword: newPassword});
     },
+    showAllUsers: async() => {
+      return await router.get(path.baseUrl + path.showAllUsers);
+    },
+    addAdmin: async(username) => {
+      return await router.post(path.baseUrl + path.addAdmin, {}, {params: {target_user_name: username, permission: 0}});
+    }
 };
 
 export default api;

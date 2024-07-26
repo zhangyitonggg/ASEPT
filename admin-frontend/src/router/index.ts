@@ -74,6 +74,15 @@ const routes: Array<RouteConfig> = [
     }
   },
   {
+    path:'/users',
+    name: 'users',
+    component: () => import('../views/UserView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: '用户管理'
+    }
+  },
+  {
     path: '*',
     name: 'NotFound',
     component: NotFound,
