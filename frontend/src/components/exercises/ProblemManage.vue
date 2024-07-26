@@ -240,7 +240,7 @@ export default {
         });
     },
     isMultipleChoice(type) {
-      return ['MULTI_CHOICE'].includes(type);
+      return ['SINGLE_CHOICE','MULTI_CHOICE'].includes(type);
     },
     addOption() {
       this.newProblem.options.push('');
@@ -357,7 +357,7 @@ export default {
   const answerJson = JSON.stringify(answer);
 
   // 准备新的题目数据
-  const newProblemData = {
+  const newProblemDataChoice = {
     title: this.newProblem.name,
     type: this.newProblem.type,
     content: this.newProblem.content,
@@ -365,6 +365,19 @@ export default {
     answer: answerJson,
     tag: this.newProblem.tag,
   };
+  const newProblemDataBlankFilling = {
+    title: this.newProblem.name,
+    type: this.newProblem.type,
+    content: this.newProblem.content,
+    answer: answerJson,
+    tag: this.newProblem.tag,
+  };
+  let newProblemData = {};
+  if(this.newProblem.type === 'BLANK_FILLING') {
+    newProblemData = newProblemDataBlankFilling;
+  }else {
+    newProblemData = newProblemDataChoice;
+  }
 
   console.log(newProblemData);
   // 发送请求创建题目
