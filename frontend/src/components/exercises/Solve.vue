@@ -1,86 +1,42 @@
-
 <template>
   <v-container>
-    <v-btn
-      class="fixed-button"
-      fab
-      dark
-      color="indigo"
-      @click="returnback"
-    >
-      <v-icon dark>
-        mdi-arrow-u-left-bottom-bold
-      </v-icon>
-    </v-btn>
-
-    <v-row justify="center">
-      <v-col cols="12" md="6">
-        <v-form @submit.prevent="submitForm" v-if="question">
-          <v-card>
-            <v-card-title>{{ question.title }}</v-card-title>
-            <v-card-text>
-              <p>{{ question.content }}</p>
-              <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
-                <v-radio-group v-model="answer">
-                  <v-radio
-                    v-for="(choice, key) in question.choices"
-                    :key="key"
-                    :label="`${key}. ${choice}`"
-                    :value="key"
-                  ></v-radio>
-                </v-radio-group>
-              </template>
-              <template v-else-if="question.type === 'MULTI_CHOICE' && question.choices">
-                <v-checkbox-group v-model="answer">
-                  <v-checkbox
-                    v-for="(choice, key) in question.choices"
-                    :key="key"
-                    :label="`${key}. ${choice}`"
-                    :value="key"
-                  ></v-checkbox>
-                </v-checkbox-group>
-              </template>
-              <template v-else-if="question.type === 'BLANK_FILLING'">
-                <v-text-field
-                  v-model="answer"
-                  label="填空"
-                ></v-text-field>
-              </template>
-            </v-card-text>
-          </v-card>
-          <v-btn type="submit" color="primary">提交</v-btn>
-        </v-form>
-        <v-alert v-if="resultMessage" :type="resultType" class="mt-4">
-          {{ resultMessage }}
-        </v-alert>
-        <v-btn v-if="resultMessage && !showAnswers" @click="fetchCorrectAnswers" color="secondary" class="mt-4">
-          显示答案
-        </v-btn>
-        <v-card v-if="correctAnswers && showAnswers" class="mt-4">
-          <v-card-title>正确答案</v-card-title>
-          <v-card-text>
-            <div v-if="question.type === 'SINGLE_CHOICE'">
-              <p>正确选项:</p>
-              <ul>
-                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
-              </ul>
-            </div>
-            <div v-else-if="question.type === 'MULTI_CHOICE'">
-              <p>正确选项:</p>
-              <ul>
-                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
-              </ul>
-            </div>
-            <div v-else-if="question.type === 'BLANK_FILLING'">
-              <p>正确答案:</p>
-              <ul>
-                <li v-for="(answer, index) in correctAnswers" :key="index">{{ `Blank ${index + 1}: ${answer}` }}</li>
-              </ul>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+    <!-- 省略其他部分 -->
+    <v-form @submit.prevent="submitForm" v-if="question">
+      <v-card>
+        <v-card-title>{{ question.title }}</v-card-title>
+        <v-card-text>
+          <p>{{ question.content }}</p>
+          <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
+            <v-radio-group v-model="answer">
+              <v-radio
+                v-for="(choice, key) in question.choices"
+                :key="key"
+                :label="`${key}. ${choice}`"
+                :value="key"
+              ></v-radio>
+            </v-radio-group>
+          </template>
+          <template v-else-if="question.type === 'MULTI_CHOICE' && question.choices">
+            <v-checkbox
+              v-for="(choice, key) in question.choices"
+              :key="key"
+              :label="`${key}. ${choice}`"
+              :value="key"
+              v-model="selectedAnswers"
+              @change="updateAnswers"
+            ></v-checkbox>
+          </template>
+          <template v-else-if="question.type === 'BLANK_FILLING'">
+            <v-text-field
+              v-model="answer"
+              label="填空"
+            ></v-text-field>
+          </template>
+        </v-card-text>
+      </v-card>
+      <v-btn type="submit" color="primary">提交</v-btn>
+    </v-form>
+    <!-- 省略其他部分 -->
   </v-container>
 </template>
 
@@ -95,7 +51,8 @@ export default {
   data() {
     return {
       question: null,
-      answer: '', // Modified to handle JSON conversion
+      selectedAnswers: [], // 多选题选项
+      answer: '', // 单选题和填空题答案
       isSingleChoice: true,
       resultMessage: '',
       resultType: '',
@@ -122,7 +79,6 @@ export default {
             choices: this.parseChoices(res.choices),
             answers: [] // 初始时不包含答案
           };
-          console.log(this.question);
           this.isSingleChoice = this.question.answers && Object.keys(this.question.answers).length === 1;
         })
         .catch(error => {
@@ -144,19 +100,20 @@ export default {
       }
       return [];
     },
-    
+    updateAnswers() {
+      this.answer = this.selectedAnswers;
+    },
     formatAnswerForSubmission() {
       let formattedAnswer = {};
       if (this.question.type === 'SINGLE_CHOICE') {
         // 单选题
         formattedAnswer = { [this.answer]: this.question.choices[this.answer] };
       } else if (this.question.type === 'MULTI_CHOICE') {
-        console.log(this.answer);
         // 多选题
-        formattedAnswer = Array.isArray(this.answer) ? this.answer.reduce((acc, answer) => {
+        formattedAnswer = this.selectedAnswers.reduce((acc, answer) => {
           acc[answer] = this.question.choices[answer];
           return acc;
-        }, {}) : {};
+        }, {});
       } else if (this.question.type === 'BLANK_FILLING') {
         // 填空题
         formattedAnswer = Array.isArray(this.answer) ? this.answer.reduce((acc, answer) => {
@@ -171,7 +128,6 @@ export default {
         pid: this.pid,
         answer: this.formatAnswerForSubmission() // Convert answer to JSON string
       };
-      console.log(payload);
       this.$store
         .dispatch('submitAnswer', payload)
         .then(res => {
@@ -195,9 +151,7 @@ export default {
       this.$store
         .dispatch('getCorrectAnswersById', this.pid)
         .then(res => {
-          console.log('res',res)
           this.correctAnswers = this.parseAnswers(res);
-          console.log(this.correctAnswers);
           this.showAnswers = true;
         })
         .catch(error => {
@@ -214,11 +168,3 @@ export default {
 };
 </script>
 
-<style>
-.fixed-button {
-  position: fixed;
-  left: 3%;
-  top: 15%;
-  z-index: 5;
-}
-</style>
