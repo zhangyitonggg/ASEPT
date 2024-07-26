@@ -131,6 +131,10 @@ const api = {
     userModify: async(username, originalPassword, newPassword) => {
       return await router.post(path.baseUrl + path.userModify, {originalPassword: originalPassword, newPassword: newPassword});
     },
+    uploadFile: async(file) => {
+      console.log(file);
+      return await router.post(path.baseUrl + path.uploadFile, {file: file});
+    },
 };
 
 export default api;

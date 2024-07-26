@@ -44,50 +44,58 @@
       </v-col>
 
       <!-- 创建题目对话框 -->
-      <v-dialog v-model="dialogCreate" max-width="600px">
-        <v-card>
-          <v-card-title>
-            创建新题目
-            <v-spacer></v-spacer>
-            <v-btn icon @click="dialogCreate = false">
+<v-dialog v-model="dialogCreate" max-width="600px">
+  <v-card>
+    <v-card-title>
+      创建新题目
+      <v-spacer></v-spacer>
+      <v-btn icon @click="dialogCreate = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
+    <v-card-text>
+      <v-file-input
+        v-model="uploadedFile"
+        ref="fileInput"
+        label="上传 PDF 文件"
+        accept=".pdf"
+        @change="handleFileUpload"
+      ></v-file-input>
+      <v-text-field v-model="newProblem.name" label="题目名称" required></v-text-field>
+      <v-textarea v-model="newProblem.content" label="题目内容" rows="4" required></v-textarea>
+      <v-text-field v-model="newProblem.tag" label="标签"></v-text-field>
+      <v-select v-model="newProblem.type" :items="questionTypes" label="题目类型" required></v-select>
+
+      <!-- 单选和多选题的选项输入 -->
+      <template v-if="isMultipleChoice(newProblem.type)">
+        <v-text-field v-for="(option, index) in newProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="newProblem.options[index]">
+          <template v-slot:append>
+            <v-btn icon @click="removeOption(index)">
               <v-icon>mdi-close</v-icon>
             </v-btn>
-          </v-card-title>
-          <v-card-text>
-            <v-text-field v-model="newProblem.name" label="题目名称" required></v-text-field>
-            <v-textarea v-model="newProblem.content" label="题目内容" rows="4" required></v-textarea>
-            <v-text-field v-model="newProblem.tag" label="标签"></v-text-field>
-            <v-select v-model="newProblem.type" :items="questionTypes" label="题目类型" required></v-select>
+          </template>
+        </v-text-field>
 
-            <!-- 单选和多选题的选项输入 -->
-            <template v-if="isMultipleChoice(newProblem.type)">
-              <v-text-field v-for="(option, index) in newProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="newProblem.options[index]">
-                <template v-slot:append>
-                  <v-btn icon @click="removeOption(index)">
-                    <v-icon>mdi-close</v-icon>
-                  </v-btn>
-                </template>
-              </v-text-field>
+        <v-select v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
 
-              <v-select v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
+        <v-select v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
 
-              <v-select v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+        <v-btn @click="addOption">添加选项</v-btn>
+      </template>
 
-              <v-btn @click="addOption">添加选项</v-btn>
-            </template>
+      <!-- 填空题的答案输入 -->
+      <template v-if="newProblem.type === 'BLANK_FILLING'">
+        <v-text-field v-for="(blank, index) in newProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="newProblem.fillBlanks[index]"></v-text-field>
+        <v-btn @click="addFillBlank">添加答案</v-btn>
+      </template>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="primary" @click="createProblem">保存题目</v-btn>
+      <v-btn text @click="dialogCreate = false">取消</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
 
-            <!-- 填空题的答案输入 -->
-            <template v-if="newProblem.type === 'BLANK_FILLING'">
-              <v-text-field v-for="(blank, index) in newProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="newProblem.fillBlanks[index]"></v-text-field>
-              <v-btn @click="addFillBlank">添加答案</v-btn>
-            </template>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn color="primary" @click="createProblem">保存题目</v-btn>
-            <v-btn text @click="dialogCreate = false">取消</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
 
       <!-- 添加题单对话框 -->
       <v-dialog v-model="dialogAdd" max-width="600px">
@@ -178,6 +186,7 @@ export default {
         { header: '我创建的题目' },
       ],
       itemsPerPage: 13,
+      uploadedFile: null, // 上传的文件
       currentPage: 1,
       problems: [],
       search:'',
@@ -210,6 +219,38 @@ export default {
     searchbar,
   },
   methods: {
+    
+    handleFileUpload() {
+    // const fileInput = this.$refs.fileInput;
+    // if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+    //   this.$store.commit('setAlert', {
+    //     type: 'error',
+    //     message: '无法获取上传的文件。',
+    //   });
+    //   return;
+    // }
+
+    if (this.uploadedFile) {
+        const file = this.uploadedFile;
+        const formData = new FormData();
+        formData.append('file', file);
+      console.log(this.uploadedFile);
+      console.log(formData);
+
+    this.$store
+      .dispatch('uploadFile', formData)
+      .then(response => {
+        // 假设 response.data.text 是从 PDF 中提取的文本
+        this.newProblem.content = response.data.text;
+      })
+      .catch(error => {
+        this.$store.commit('setAlert', {
+          type: 'error',
+          message: error.message || '上传文件失败。',
+        });
+      });
+    }
+  },
     fetchProblems() {
       this.$store
         .dispatch('getMyProblem')

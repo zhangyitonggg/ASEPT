@@ -117,6 +117,18 @@ export default new Vuex.Store({
           })
       })
     },
+    uploadFile(context,file) {
+      return new Promise((resolve, reject) => {
+        api.uploadFile(file)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+            console.log(error);
+          })
+      })
+    },
     createProblem(context,problemData) {
       return new Promise((resolve, reject) => {
         api.createProblem(problemData)
