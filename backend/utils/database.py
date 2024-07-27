@@ -1000,33 +1000,56 @@ def submit_problem(db, pid: str, answer: str, user: User):
     db.commit()
     return is_correct
 
-
-def get_user_statistics(db, user: User):
+def get_user_statistics(db, user):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemSubmit WHERE uid = %s", (user.uid))
     submits = cursor.fetchall()
     def get_problem_type(pid):
-        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
-        problem = cursor.fetchone()
-        return problem[3]
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid,))
+        return cursor.fetchone()[3]
+    problem_pass_counts = {}
     choice_submit = 0
     choice_correct = 0
     blank_submit = 0
     blank_correct = 0
+    last_submit_time = None
     for submit in submits:
-        if "choice" in get_problem_type(submit[1]):
+        pid = submit[1]
+        correct = submit[4]
+        last_submit_time = submit[5]
+        problem_type = get_problem_type(pid)
+        if "choice" in problem_type:
             choice_submit += 1
-            if submit[4]:
+            if correct:
                 choice_correct += 1
         else:
             blank_submit += 1
-            if submit[4]:
+            if correct:
                 blank_correct += 1
+        if correct and pid not in problem_pass_counts:
+            problem_pass_counts[pid] = last_submit_time
+    total_passes = len(problem_pass_counts)
+    # # Calculate passes over regular intervals
+    start_time = min(submits, key=lambda x: x[5])[5] if submits else None
+    end_time = max(submits, key=lambda x: x[5])[5] if submits else None
+    interval_count = {}
+    label = {}
+    if start_time and end_time:
+        interval_duration = (end_time - start_time) / 7  # For example, 5 intervals
+        for i in range(8):
+            current_time = start_time + i * interval_duration
+            label[i] = str(current_time).replace('T', ' ')
+            interval_count[label[i]] = sum(1 for submit in submits if submit[4] and submit[5] <= current_time)
+
     return {
         "choice_submit": choice_submit,
         "choice_correct": choice_correct,
         "blank_submit": blank_submit,
         "blank_correct": blank_correct,
+        "total_passes": total_passes,
+        "last_submit_time": str(last_submit_time).replace('T', ' ') if last_submit_time else None,
+        "labels": [label[i][0:19] for i in range(8)],
+        "values": [interval_count[label[i]] for i in range(8)]
     }
 
 

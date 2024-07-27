@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Header
 import pymysql
+from openai import OpenAI
 import json
 
 from backend.utils import database, redis
@@ -21,6 +22,31 @@ router = APIRouter(
 - 个性化题目推荐
 - 题目敏感词
 '''
+
+GPT_KEY = "sk-du8ZeyDgmoxJVg24771dFfFf646445A289018dAaBeD4A2Fa"
+HINT = "检测以下内容是否包含敏感词：\n\n"
+
+client = OpenAI(
+    api_key=GPT_KEY
+)
+
+def detect_sensetive(problem: Choice_Problem | Blank_Filling_Problem):
+    stat = problem.title + '\n' + problem.content
+    if type(problem) == Choice_Problem:
+        stat += '\n' + problem.choices
+    stat += '\n' + problem.answer
+    chat = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": HINT + stat,
+            }
+        ],
+        model="gpt-3.5-turbo",
+    )
+    print(chat.choices[0].message)
+    return '不包含' not in chat.choices[0].message
+    
 
 @router.post('/upload_problem')
 async def add_problem(
@@ -61,6 +87,8 @@ async def add_problem(
     if not user.permissions.get("UPLOAD_PROBLEM"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
     check_problem_format(problem)
+    if detect_sensetive(problem):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Contains sensetive words')
     pid = database.add_problem(db, problem, user)
     return {'status': 'success', 'pid': pid}
 
@@ -537,28 +565,6 @@ async def submit_problem(
     '''
     is_correct = database.submit_problem(db, pid, answer, user)
     return {'status': 'success', 'is_correct': is_correct}
-
-
-@router.get('/get_user_statistics')
-async def get_user_statistics(
-    user: User = Depends(security.get_user),
-    db: pymysql.connections.Connection = Depends(database.connect)
-):
-    '''
-    获取用户题目统计信息。
-    
-    返回格式：
-    
-    ```
-    {
-        "choice_submit": 100,
-        "choice_correct": 80,
-        "blank_submit": 50,
-        "blank_correct": 40,
-    }
-    ```
-    '''
-    return database.get_user_statistics(db, user)
 
 
 @router.get('/get_problem_recommend')
