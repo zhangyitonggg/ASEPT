@@ -63,6 +63,20 @@ const api = {
     joinGroup: async(gid, password) => {
       return await router.post(path.baseUrl + path.joinGroup, {gid: gid, password: password});
     },
+    publishAnnouncement: async(title, content) => {
+      return await router.post(path.baseUrl + path.publishAnnouncement, {
+        title: title,
+        content: content
+      });
+    },
+    modifyAnnouncement: async(aid, title, content, is_active) => {
+      return await router.post(path.baseUrl + path.modifyAnnouncement, {
+        aid: aid,
+        title: title,
+        content: content,
+        is_active: is_active,
+      });
+    },
     createProblemGroup: async(group_name, description) => {
       console.log("createProblemGroup");
       return await router.post(path.baseUrl + path.createProblemGroup, {name: group_name, description: description});

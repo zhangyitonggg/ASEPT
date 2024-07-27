@@ -33,6 +33,8 @@ const base = {
     get_all_problem_groups: '/admin/get_all_problem_groups',
     showAllUsers: '/admin/get_all_users',
     setPermission: '/admin/set_permission',
+    publishAnnouncement: '/admin/open_announcement',
+    modifyAnnouncement: '/admin/modify_announcement',
 }
 
 export default base;

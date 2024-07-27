@@ -383,7 +383,29 @@ export default new Vuex.Store({
             reject(error);
           })
       })
-    }
+    },
+    publishAnnouncement(context, { title, content }) {
+      return new Promise((resolve, reject) => {
+        api.publishAnnouncement(title, content)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
+    modifyAnnouncement(context, { aid, title, content, is_active }) {
+      return new Promise((resolve, reject) => {
+        api.modifyAnnouncement(aid, title, content, is_active)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
   },
   modules: {
   }
