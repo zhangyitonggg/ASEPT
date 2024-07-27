@@ -139,7 +139,7 @@
                 type: "success",
                 message: "设置成功",
                 });
-                item.is_admin = "true";
+                this.getAllUsers();
             })
             .catch((e) => {
                 this.$store.commit("setAlert", {
@@ -162,7 +162,7 @@
                 type: "success",
                 message: "设置成功",
                 });
-                item.is_admin = "false";
+                this.getAllUsers();
             })
             .catch((e) => {
                 this.$store.commit("setAlert", {
@@ -181,11 +181,11 @@
           }
           this.$store.dispatch("setPermission", {username: item.name, permission: 8,cancel:"false"})
             .then((res) => {
-                item.blocked = "true";
                 this.$store.commit("setAlert", {
                 type: "success",
                 message: "设置成功",
                 });
+                this.getAllUsers();
             })
             .catch((e) => {
                 this.$store.commit("setAlert", {
@@ -201,8 +201,8 @@
                 type: "success",
                 message: "设置成功",
                 });
-                item.blocked = "false";
-            })
+                this.getAllUsers();
+              })
             .catch((e) => {
                 this.$store.commit("setAlert", {
                 type: "error",
