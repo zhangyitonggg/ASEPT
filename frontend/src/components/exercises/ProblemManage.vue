@@ -47,7 +47,7 @@
       </v-col>
 
       <!-- 创建题目对话框 -->
-<v-dialog v-model="dialogCreate" max-width="600px">
+<v-dialog v-model="dialogCreate" max-width="1900px">
   <v-card>
     <v-card-title>
       创建新题目
