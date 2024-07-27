@@ -56,7 +56,7 @@ config => {
       authorized_user_name: store.getters.username
     };
   }
-  console.log('con:',config);
+  
   return config;
 },
 error => {

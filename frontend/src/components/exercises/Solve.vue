@@ -11,30 +11,26 @@
         mdi-arrow-u-left-bottom-bold
       </v-icon>
     </v-btn>
-
-    <!-- <v-btn
+    <v-btn
     class="navigation-button"
     fab
     dark
-    color="primary"
-    @click="previousQuestion"
-    :disabled="!hasPrevious"
+    color="indigo"
+    @click="nextProblem"
   >
-    <v-icon dark>mdi-chevron-left</v-icon>
-  </v-btn> -->
+    <v-icon dark>mdi-arrow-right</v-icon>
+  </v-btn>
 
-  <!-- 下一题按钮 -->
-  <!-- <v-btn
+    <v-btn
     class="navigation-button"
     fab
     dark
-    color="primary"
-    @click="nextQuestion"
-    :disabled="!hasNext"
+    color="indigo"
+    @click="previousProblem"
   >
-    <v-icon dark>mdi-chevron-right</v-icon>
-  </v-btn> -->
-
+    <v-icon dark>mdi-arrow-left</v-icon>
+  </v-btn>
+  
     <v-row justify="center">
       <v-col cols="12">
         <v-form @submit.prevent="submitForm" v-if="question">
@@ -178,15 +174,17 @@ export default {
       resultType: '',
       correctAnswers: null,
       showAnswers: false,
-      hasPrevious: false,
-      hasNext: false,
-      //allQuestions: [], // 所有题目列表
+      
+     
     };
   },
   created() {
-   // this.fetchAllQuestions();
+  
     this.fetchQuestion();
   },
+  watch: {
+  '$route.params.pid': 'fetchQuestion',
+},
   methods: {
     fetchQuestion() {
       this.$store
@@ -213,29 +211,26 @@ export default {
           });
         });
     },
-    // fetchAllQuestions() {
-    //   console.log('qqq: ',this.$store.state.problems);
-    //   this.allQuestions =  this.$store.state.problems;
-    //   console.log(this.allQuestions);
-    //   this.updateNavigation();
-    // },
-    // updateNavigation() {
-    //   const currentIndex = this.allQuestions.findIndex(q => q.pid === this.pid);
-    //   this.hasPrevious = currentIndex > 0;
-    //   this.hasNext = currentIndex < this.allQuestions.length - 1;
-    // },
-    // previousQuestion() {
-    //   const currentIndex = this.allQuestions.findIndex(q => q.pid === this.pid);
-    //   if (this.hasPrevious) {
-    //     this.$router.push({ path: `/exercises/solve/${this.allQuestions[currentIndex - 1].pid}` });
-    //   }
-    // },
-    // nextQuestion() {
-    //   const currentIndex = this.allQuestions.findIndex(q => q.pid === this.pid);
-    //   if (this.hasNext) {
-    //     this.$router.push({ path: `/exercises/solve/${this.allQuestions[currentIndex + 1].pid}` });
-    //   }
-    // },
+    previousProblem() {
+    const currentIndex = this.getCurrentProblemIndex();
+    if (currentIndex > 0) {
+      const previousProblem = this.$store.state.currentProblemGroup.problems[currentIndex - 1];
+      this.$router.push({ path: '' + previousProblem.pid });
+    }
+  },
+  nextProblem() {
+    const currentIndex = this.getCurrentProblemIndex();
+    if (currentIndex < this.$store.state.currentProblemGroup.problems.length - 1) {
+      const nextProblem = this.$store.state.currentProblemGroup.problems[currentIndex + 1];
+      this.$router.push({ path: '' + nextProblem.pid });
+    }
+  },
+  getCurrentProblemIndex() {
+    return this.$store.state.currentProblemGroup.problems.findIndex(
+      (problem) => problem.pid === this.pid
+    );
+  },
+   
     parseChoices(choices) {
       if (choices) {
         return JSON.parse(choices);
