@@ -7,3 +7,4 @@ PyJWT==2.8.0
 PyMySQL==1.1.1
 pytesseract==0.3.10
 uvicorn==0.30.3
+openai==1.37.1
