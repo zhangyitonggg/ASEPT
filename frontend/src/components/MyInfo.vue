@@ -129,7 +129,15 @@
               :title="'总计'"
             ></user_status>
           </v-col>
-          <template v-else>
+          <v-col v-if="blankPassedQuestions+blankFailedQuestions != 0">
+            <user_status
+              :data="[blankPassedQuestions, blankFailedQuestions]"
+              :labels="['通过次数', '错误次数']"
+              :backgroundColor="['#4FCF95FF', '#D30B0BFF']"
+              :title="'填空题统计'"
+            ></user_status>
+          </v-col>
+          <template v-if="choicePassedQuestions+blankPassedQuestions+choiceFailedQuestions+blankFailedQuestions == 0">
             <v-col>
               <v-banner
                 outlined
@@ -142,14 +150,6 @@
               </v-banner>
             </v-col>
           </template>
-          <v-col v-if="blankPassedQuestions+blankFailedQuestions != 0">
-            <user_status
-              :data="[blankPassedQuestions, blankFailedQuestions]"
-              :labels="['通过次数', '错误次数']"
-              :backgroundColor="['#4FCF95FF', '#D30B0BFF']"
-              :title="'填空题统计'"
-            ></user_status>
-          </v-col>
         </v-row>
       </v-card-text>
     </v-card>
@@ -194,7 +194,6 @@ export default {
         this.values = res.values;
       })
       .catch((e) => {
-        this.$store.commit('setAlert', { message: e, type: 'error' });
       })
       .finally(() => {
         this.status_loading = false;
