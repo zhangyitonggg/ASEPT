@@ -14,6 +14,19 @@
    
     <v-row justify="center">
       <v-col cols="12">
+
+        <v-card class="progress-card">
+          <v-card-text>
+            <div class="progress-text text-h4">当前进度：{{ currentProblemIndex + 1 }}/{{ totalProblems }}</div>
+            <v-progress-linear
+              :value="progressValue"
+              color="green"
+              height="10"
+              class="progress-bar"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+
         <v-form @submit.prevent="submitForm" v-if="question">
           <v-card class="large-card">
             <v-card-title class="text-h3">{{ question.title }}</v-card-title>
@@ -174,6 +187,19 @@ export default {
      
     };
   },
+  computed: {
+    currentProblemIndex() {
+      return this.$store.state.currentProblemGroup.problems.findIndex(
+        (problem) => problem.pid === this.pid
+      );
+    },
+    totalProblems() {
+      return this.$store.state.currentProblemGroup.problems.length;
+    },
+    progressValue() {
+      return ((this.currentProblemIndex + 1) / this.totalProblems) * 100;
+    },
+  },
   created() {
   
     this.fetchQuestion();
@@ -208,19 +234,33 @@ export default {
         });
     },
     previousProblem() {
-    const currentIndex = this.getCurrentProblemIndex();
-    if (currentIndex > 0) {
-      const previousProblem = this.$store.state.currentProblemGroup.problems[currentIndex - 1];
-      this.$router.push({ path: '' + previousProblem.pid });
-    }
-  },
-  nextProblem() {
-    const currentIndex = this.getCurrentProblemIndex();
-    if (currentIndex < this.$store.state.currentProblemGroup.problems.length - 1) {
-      const nextProblem = this.$store.state.currentProblemGroup.problems[currentIndex + 1];
-      this.$router.push({ path: '' + nextProblem.pid });
-    }
-  },
+      const currentIndex = this.currentProblemIndex;
+      if (currentIndex > 0) {
+        const previousProblem =
+          this.$store.state.currentProblemGroup.problems[
+            currentIndex - 1
+          ];
+        this.$router.push({ path: '' + previousProblem.pid });
+      } else {
+        this.$store.commit('setAlert', {
+          type: 'warning',
+          message: '现在已经是第一题',
+        });
+      }
+    },
+    nextProblem() {
+      const currentIndex = this.currentProblemIndex;
+      if (currentIndex < this.totalProblems - 1) {
+        const nextProblem =
+          this.$store.state.currentProblemGroup.problems[currentIndex + 1];
+        this.$router.push({ path: '' + nextProblem.pid });
+      } else {
+        this.$store.commit('setAlert', {
+          type: 'warning',
+          message: '现在已经是最后一题',
+        });
+      }
+    },
   getCurrentProblemIndex() {
     return this.$store.state.currentProblemGroup.problems.findIndex(
       (problem) => problem.pid === this.pid
@@ -329,6 +369,22 @@ export default {
   margin: 0 auto;
   padding: 20px;
 }
+.progress-card {
+  width: 100%;
+  max-width: 1900px;
+  margin: 0 auto 20px;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+.progress-text {
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  height: 10px;
+}
+
 
 .option-box {
   display: flex;
