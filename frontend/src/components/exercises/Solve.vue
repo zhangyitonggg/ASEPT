@@ -11,26 +11,7 @@
         mdi-arrow-u-left-bottom-bold
       </v-icon>
     </v-btn>
-    <v-btn
-    class="navigation-button"
-    fab
-    dark
-    color="indigo"
-    @click="nextProblem"
-  >
-    <v-icon dark>mdi-arrow-right</v-icon>
-  </v-btn>
-
-    <v-btn
-    class="navigation-button"
-    fab
-    dark
-    color="indigo"
-    @click="previousProblem"
-  >
-    <v-icon dark>mdi-arrow-left</v-icon>
-  </v-btn>
-  
+   
     <v-row justify="center">
       <v-col cols="12">
         <v-form @submit.prevent="submitForm" v-if="question">
@@ -121,6 +102,21 @@
                 class="green-button"
               >
                 显示答案
+              </v-btn>
+              <v-spacer></v-spacer>
+              <v-btn
+                @click="previousProblem"
+                color="white"
+                class="navigation-button"
+              >
+                <span class="green-text">上一题</span>
+              </v-btn>
+              <v-btn
+                @click="nextProblem"
+                color="white"
+                class="navigation-button"
+              >
+                <span class="green-text">下一题</span>
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -320,20 +316,11 @@ export default {
   z-index: 5;
 }
 .navigation-button {
-  position: fixed;
-  bottom: 20%;
-  z-index: 5;
-  font-size: 30px;
-  width: 60px;
-  height: 60px;
-}
-
-.navigation-button:nth-of-type(1) {
-  left: 10%;
-}
-
-.navigation-button:nth-of-type(2) {
-  right: 10%;
+  background-color: transparent;
+  color: #4caf50;
+  border: none;
+  font-size: 1.5em;
+  box-shadow: none;
 }
 
 .large-card {
