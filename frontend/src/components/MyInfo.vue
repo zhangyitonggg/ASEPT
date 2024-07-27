@@ -105,7 +105,10 @@
         <v-row class="pl-3 pr-3">
           <v-col>
             <time_status
-              :lastUpdateTime="new Date().toLocaleString()"
+              :lastUpdateTime="last_submit_time"
+              :labels="labels"
+              :values="values"
+              :total_passed="total_passed"
             />
           </v-col>
         </v-row>
@@ -170,16 +173,25 @@ export default {
       choiceFailedQuestions: 0,
       blankPassedQuestions: 0,
       blankFailedQuestions: 0,
+      total_passed: 0,
+      last_submit_time: new Date().toLocaleString(),
+      labels: null,
+      values: null,
     }
   },
   mounted() {
     this.$store.commit('setAppTitle', "个人信息");
     this.$store.dispatch('getUserStatus')
       .then((res) => {
+        console.log(res);
         this.choicePassedQuestions = res.choice_correct;
         this.choiceFailedQuestions = res.choice_submit - res.choice_correct;
         this.blankPassedQuestions = res.blank_correct;
         this.blankFailedQuestions = res.blank_submit - res.blank_correct;
+        this.total_passed = res.total_passes;
+        this.last_submit_time = res.last_submit_time;
+        this.labels = res.labels;
+        this.values = res.values;
       })
       .catch((e) => {
         this.$store.commit('setAlert', { message: e, type: 'error' });
