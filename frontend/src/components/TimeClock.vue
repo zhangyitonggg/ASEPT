@@ -24,6 +24,9 @@ export default {
           console.log(response);
           this.serverTime = new Date(response.data.current_time);
           this.formattedTime = this.formatDateTime(this.serverTime);
+        })
+        .catch(() => {
+          this.$store.commit('setAlert', { message: '无法获取服务器时间。', type: 'error' });
         });
     },
     updateTime() {
