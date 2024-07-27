@@ -33,7 +33,7 @@
                   <h4>{{ item.name }}</h4>
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                  Tag: {{ item.tag }}
+                  Description: {{ item.description }}
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
