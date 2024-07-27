@@ -236,10 +236,10 @@ export default {
     previousProblem() {
       const currentIndex = this.currentProblemIndex;
       if (currentIndex > 0) {
-        const previousProblem =
-          this.$store.state.currentProblemGroup.problems[
-            currentIndex - 1
-          ];
+        const previousProblem =this.$store.state.currentProblemGroup.problems[currentIndex - 1];
+          this.selectedAnswers = [];
+          this.showAnswers = false;
+          this.resultType = '';
         this.$router.push({ path: '' + previousProblem.pid });
       } else {
         this.$store.commit('setAlert', {
@@ -253,7 +253,10 @@ export default {
       if (currentIndex < this.totalProblems - 1) {
         const nextProblem =
           this.$store.state.currentProblemGroup.problems[currentIndex + 1];
-        this.$router.push({ path: '' + nextProblem.pid });
+          this.selectedAnswers = [];
+          this.showAnswers = false;
+          this.resultType = '';
+          this.$router.push({ path: '' + nextProblem.pid });
       } else {
         this.$store.commit('setAlert', {
           type: 'warning',
@@ -319,6 +322,7 @@ export default {
             this.resultType = 'error';
           }
           this.showAnswers = false;
+          this.hideAlertAfterDelay(); 
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -341,6 +345,12 @@ export default {
           });
         });
     },
+    hideAlertAfterDelay() {
+    setTimeout(() => {
+     
+      this.resultMessage = ''; // 清除提示信息
+    }, 4000); // 5秒后隐藏提示信息
+  },
     returnback() {
       this.$router.go(-1);
     },
