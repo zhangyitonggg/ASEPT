@@ -26,7 +26,7 @@
                 <v-list-item-title>
                   <h4>{{ item.title }}</h4>
                 </v-list-item-title>
-                <v-list-item-subtitle>Tag: {{ item.tag }}</v-list-item-subtitle>
+                <v-list-item-subtitle>Tag: {{ item.tagsString }}</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
                 <v-btn class="butspace" color="primary" @click="openAddTagDialog(item)">增加 Tag</v-btn>
@@ -215,7 +215,12 @@ export default {
     currentPageItems() {
       const startIndex = (this.currentPage - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.filteredItems.slice(startIndex, endIndex);
+      return this.filteredItems.slice(startIndex, endIndex).map(item => {
+        return {
+          ...item,
+          tagsString: item.tags.join(' '),
+        };
+      });
     },
   },
   components: {
