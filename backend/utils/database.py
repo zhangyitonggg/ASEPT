@@ -186,6 +186,12 @@ def add_user(db, username: str, password: str):
     return True
 
 
+def get_tag_by_tid(db, tid: str):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Tags WHERE tid = %s", (tid))
+    return cursor.fetchone()
+
+
 def md5_passwd(password: str) -> str:
     return hashlib.md5(password.encode()).hexdigest()
 
@@ -733,6 +739,11 @@ def get_problem_group_problems(db, pgid: str, user: User):
     for problem in problems:
         cursor.execute("SELECT * FROM Problems WHERE pid = %s", (problem[1]))
         problem_info = cursor.fetchone()
+        cursor.execute("SELECT * FROM ProblemTags WHERE pid = %s", (problem[0]))
+        tags = cursor.fetchall()
+        _tags_ = []
+        for tag in tags:
+            _tags_.append(get_tag_by_tid(db, tag[1])[1])
         res.append({
             "pid": problem_info[0],
             "title": problem_info[1],
@@ -743,6 +754,7 @@ def get_problem_group_problems(db, pgid: str, user: User):
             "choices": problem_info[6],
             "answers": problem_info[7],
             "is_public": problem_info[8],
+            "tags": _tags_,
         })
     return {"problems": res}
 
@@ -825,8 +837,7 @@ def share_problem_group_to_user_group(db, pgid: str, gid: str, user: User):
     db.commit()
 
 
-def add_problem_tag(db, pid: str, tag: str, user: User):
-    # check if user is the author of the problem
+def add_tag_to_problem(db, pid: str, tag_name: str, user: User):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
     problem = cursor.fetchone()
@@ -840,15 +851,48 @@ def add_problem_tag(db, pid: str, tag: str, user: User):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permission denied."
         )
-    # check if problem already has the tag
-    cursor.execute("SELECT * FROM ProblemTags WHERE (pid, tag) = (%s, %s)", (pid, tag))
-    if cursor.fetchone():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Tag already exists."
-        )
-    cursor.execute("INSERT INTO ProblemTags (pid, tag) VALUES (%s, %s)", (pid, tag))
+    cursor.execute("SELECT * FROM Tags WHERE (tag_name) = (%s)", (tag_name))
+    tag = cursor.fetchone()
+    if not tag:
+        tid = str(uuid.uuid4())
+        cursor.execute("INSERT INTO Tags (tid, tag_name) VALUES (%s, %s)", (tid, tag_name))
+        db.commit()
+    else:
+        tid = tag[0]
+        cursor.execute("SELECT * FROM ProblemTags WHERE (pid, tid) = (%s, %s)", (pid, tid))
+        if cursor.fetchone():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Tag already exists."
+            )
+    cursor.execute("INSERT INTO ProblemTags (pid, tid) VALUES (%s, %s)", (pid, tid))
     db.commit()
+
+
+def remove_tag_from_problem(db, pid: str, tid: str, user: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem = cursor.fetchone()
+    if not problem:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    if problem[4] != user.uid and user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied."
+        )
+    cursor.execute("SELECT * FROM ProblemTags WHERE (pid, tid) = (%s, %s)", (pid, tid))
+    tag = cursor.fetchone()
+    if not tag:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tag not found in this problem."
+        )
+    cursor.execute("DELETE FROM ProblemTags WHERE (pid, tid) = (%s, %s)", (pid, tid))
+    db.commit()
+
 
 def get_all_problems(db, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
@@ -859,7 +903,7 @@ def get_all_problems(db, user: User):
         tags = cursor.fetchall()
         _tags_ = []
         for tag in tags:
-            _tags_.append(tag[1])
+            _tags_.append(get_tag_by_tid(db, tag[1])[1])
         res.append({
             "pid": problem[0],
             "title": problem[1],
@@ -891,20 +935,25 @@ def get_problem_tags(db, pid: str, user: User):
         )
     cursor.execute("SELECT * FROM ProblemTags WHERE pid = %s", (pid))
     tags = cursor.fetchall()
-    res = []
+    tids = []
     for tag in tags:
-        res.append(tag[1])
+        tids.append(tag[1])
+    res = []
+    for tid in tids:
+        cursor.execute("SELECT * FROM Tags WHERE tid = %s", (tid))
+        tag = cursor.fetchone()
+        res.append({
+            "tid": tag[0],
+            "tag_name": tag[1],
+        })
     return {"tags": res}
 
-def search_problem_by_tag(db, tag: str, user: User):
+def search_problem_by_tag(db, tid: str, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemTags")
     problem_tags = cursor.fetchall()
-    # print(tag)
-    # print(problem_tags)
-    problem_tags = [problem for problem in problem_tags if tag in problem[1]]
-    # print(problem_tags)
+    problem_tags = [problem for problem in problem_tags if tid in problem[1]]
     pids = [problem[0] for problem in problem_tags]
     problems = []
     for pid in pids:
@@ -912,8 +961,6 @@ def search_problem_by_tag(db, tag: str, user: User):
         problem = cursor.fetchone()
         if problem in problems_with_access:
             problems.append(problem)
-    # print(problems)
-    # final_problems = list(set(problems) & set(problems_with_access))
     res = []
     for problem in problems:
         res.append({
@@ -929,12 +976,30 @@ def search_problem_by_tag(db, tag: str, user: User):
         })
     return {"problems": res}
 
+
+def get_all_tags(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Tags")
+    tags = cursor.fetchall()
+    res = []
+    for tag in tags:
+        res.append({
+            "tid": tag[0],
+            "tag_name": tag[1],
+        })
+    return {"tags": res}
+
 def get_my_problems(db, user: User):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Problems WHERE author = %s", (user.uid))
     problems = cursor.fetchall()
     res = []
     for problem in problems:
+        cursor.execute("SELECT * FROM ProblemTags WHERE pid = %s", (problem[0]))
+        tags = cursor.fetchall()
+        _tags_ = []
+        for tag in tags:
+            _tags_.append(get_tag_by_tid(db, tag[1])[1])
         res.append({
             "pid": problem[0],
             "title": problem[1],
@@ -945,6 +1010,7 @@ def get_my_problems(db, user: User):
             "choices": problem[6],
             "answers": problem[7],
             "is_public": problem[8],
+            "tags": _tags_,
         })
     return {"problems": res}
 
@@ -1051,6 +1117,11 @@ def get_problem_recommend(db, user: User):
     for problem in res:
         cursor.execute("SELECT * FROM Problems WHERE pid = %s", (problem[0]))
         problem = cursor.fetchone()
+        cursor.execute("SELECT * FROM ProblemTags WHERE pid = %s", (problem[0]))
+        tags = cursor.fetchall()
+        _tags_ = []
+        for tag in tags:
+            _tags_.append(get_tag_by_tid(db, tag[1])[1])
         final_res.append({
             "pid": problem[0],
             "title": problem[1],
@@ -1061,6 +1132,7 @@ def get_problem_recommend(db, user: User):
             "choices": problem[6],
             "answers": problem[7],
             "is_public": problem[8],
+            "tags": _tags_,
         })
     return {"problems": final_res}
     

@@ -309,10 +309,10 @@ async def get_problem_answer(
     return database.get_problem_answer(db, pid)
 
 
-@router.post('/add_problem_tag')
-async def add_problem_tag(
+@router.post('/add_tag_to_problem')
+async def add_tag_to_problem(
     pid: str,
-    tag: str,
+    tag_name: str,
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
@@ -321,9 +321,27 @@ async def add_problem_tag(
     
     pid: str，题目 id
     
-    tag: str，标签名称
+    tag: str，标签名称。如果已经有同名标签，则不会重复添加。
     '''
-    database.add_problem_tag(db, pid, tag, user)
+    database.add_tag_to_problem(db, pid, tag_name, user)
+    return {'status': 'success'}
+
+
+@router.post('/remove_tag_from_problem')
+async def remove_tag_from_problem(
+    pid: str,
+    tid: str,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    为题目删除标签。
+    
+    pid: str，题目 id
+    
+    tid: str，标签 id
+    '''
+    database.remove_tag_from_problem(db, pid, tid, user)
     return {'status': 'success'}
 
 
@@ -376,6 +394,7 @@ async def get_all_problems(
     '''
     return database.get_all_problems(db, user)
 
+
 @router.get('/get_problem_tags')
 async def get_problem_tags(
     pid: str,
@@ -392,24 +411,31 @@ async def get_problem_tags(
     ```json
     {
         "tags": [
-            "tag1",
-            "tag2"
+            {
+                "tid": "xxx-xxx",
+                "tag_name": "tag1"
+            },
+            {
+                "tid": "xxx-xxx",
+                "tag_name": "tag2"
+            }
         ]
     }
     ```
     '''
     return database.get_problem_tags(db, pid, user)
 
+
 @router.get('/search_problem_by_tag')
 async def search_problem_by_tag(
-    tag: str,
+    tid: str,
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
     '''
     根据标签搜索题目。
     
-    tag: str，待搜索的标签，非空
+    tid: str，tag 的 id
     
     返回格式：
     ```
@@ -448,9 +474,37 @@ async def search_problem_by_tag(
                 "is_public": 1
             }
         ]
-    }   
+    }
     '''
-    return database.search_problem_by_tag(db, tag, user)
+    return database.search_problem_by_tag(db, tid, user)
+
+
+@router.get('/get_all_tags')
+async def get_all_tags(
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取所有标签。
+    
+    返回格式：
+    
+    ```json
+    {
+        "tags": [
+            {
+                "tid": "xxx-xxx",
+                "tag_name": "tag1"
+            },
+            {
+                "tid": "xxx-xxx",
+                "tag_name": "tag2"
+            }
+        ]
+    }
+    ```
+    '''
+    return database.get_all_tags(db)
 
 
 @router.get('/my_problems')
