@@ -8,8 +8,6 @@
       ></v-progress-circular>
     </v-container>
     <v-container fluid v-else>
-      
-      
       <v-layout>
         <!-- 查找题目按钮 -->
         <v-btn color="primary" @click="showSearchDialog = true">查找题目</v-btn>
@@ -40,7 +38,7 @@
                   </h4>
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                  Tag: {{ item.tag }}
+                  Tag: {{ item.tagsString }}
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
@@ -135,7 +133,12 @@ export default {
     currentPageItems() {
       const startIndex = (this.currentPage - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.filteredItems.slice(startIndex, endIndex);
+      return this.filteredItems.slice(startIndex, endIndex).map(item => {
+        return {
+          ...item,
+          tagsString: item.tags.join(' '),
+        };
+      });
     },
   },
   methods: {
@@ -165,7 +168,7 @@ export default {
       this.itemsPerPage = number;
     },
     solveProblem(item) {
-      this.$store.commit('setProblems',this.items);
+      this.$store.commit('setProblems', this.items);
       this.$router.push({ path: 'solve/' + item.pid, append: true });
     },
     searchProblems() {

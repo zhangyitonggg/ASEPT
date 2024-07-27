@@ -148,7 +148,7 @@ export default new Vuex.Store({
     },
     getMyProblem(context) {
       return new Promise((resolve, reject) => {
-        api.getMyProblem()
+        api.get_my_problems()
           .then(response => {
             resolve(response.data);
           })

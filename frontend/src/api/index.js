@@ -90,7 +90,11 @@ const api = {
     },
     get_my_problems: async() => {
       console.log("get_my_problems");
-      return await router.get(path.baseUrl + path.get_my_problems);
+      return await router.get(path.baseUrl + path.get_all_problems);
+    },
+    getAllProblems: async() => {
+      console.log("get_all_problems");
+      return await router.get(path.baseUrl + path.get_all_problems);
     },
     submit_problem: async(pid, answer) => {
       console.log("submit_problem");
