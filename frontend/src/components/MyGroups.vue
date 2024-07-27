@@ -19,7 +19,7 @@
       </v-col>
       <v-col v-else>
         <v-list three-line>
-          <template v-for="(item, index) in currentPageItems">
+          <div v-for="(item, index) in currentPageItems" :key="index">
             <v-divider inset></v-divider>
             <v-subheader
               v-if="item.header"
@@ -56,7 +56,7 @@
                 > 离开 </v-btn>
               </v-list-item-action>
             </v-list-item>
-          </template>
+          </div>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
       </v-col>
@@ -113,7 +113,7 @@ export default {
   },
   computed: {
     numberOfPages () {
-      return Math.ceil(this.filteredItems.length / this.itemsPerPage)
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
     filteredItems() {
       const filtered = this.items.filter(item =>
@@ -156,6 +156,13 @@ export default {
       this.itemsPerPage = number
     },
     leave(item) {
+      if (item.founder === this.$store.getters.username) {
+        this.$store.commit("setAlert", {
+          type: "error",
+          message: "我们都认为您不能离开自己创建的团队，当然你可以选择解散它。",
+        });
+        return;
+      }
       this.curItem = item;
       this.dialog = true;
     },
@@ -187,6 +194,16 @@ export default {
   },
   components: {
     searchbar
+  },
+  watch: {
+    search() {
+      this.currentPage = 1;
+    },
+    numberOfPages(newVal) {
+      if (this.currentPage > newVal) {
+        this.currentPage = newVal;
+      }
+    }
   }
 }
 </script>

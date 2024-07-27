@@ -11,6 +11,9 @@ const api = {
         });
         return response;
     },
+    deleteGroup: async(gid) => {
+      return await router.delete(path.baseUrl + path.deleteGroup,{params: {gid: gid}});
+    },
     getnews: async() => {
         const response = await router.get(path.baseUrl + path.news_getannouncements);
         return response;
@@ -133,6 +136,9 @@ const api = {
       const formData = new FormData();
       formData.append('file', file);
       return await router.post(path.baseUrl + path.uploadFile, formData, {useMultipart: true});
+    },
+    getTime: async() => {
+      return await router.get(path.baseUrl + path.getTime);
     },
 };
 

@@ -9,18 +9,13 @@
       fixed
       color="primary"
       v-model="activeBtn"
-      @change="handleNavigateClick"
     >
       <v-btn value="news">
         <span>公告</span>
         <v-icon>mdi-message-alert-outline</v-icon>
       </v-btn>
-      <v-btn value="waterbar">
-        <span>水吧</span>
-        <v-icon>mdi-hand-clap</v-icon>
-      </v-btn>
       <v-btn value="gpt">
-        <span>AI助教</span>
+        <span>AI 助教</span>
         <v-icon>mdi-chat-processing</v-icon>
       </v-btn>
       <v-btn value="money">
@@ -41,7 +36,7 @@ export default {
   components: {
     news,
     money,
-    gpt
+    gpt,
   },
   data() {
     return {
@@ -51,25 +46,10 @@ export default {
   },
   computed: {
     currentComponent() {
-      switch (this.activeBtn) {
-        case 'money':
-          return 'money';
-        case 'gpt':
-          return "gpt";
-        default:
-          return 'news';
-      }
+      return this.activeBtn;
     }
   },
   methods: {
-    handleNavigateClick(newValue) {
-      if (newValue == 'waterbar') {
-        this.$nextTick(() => {
-          this.activeBtn = 'news';
-          this.$store.commit("setAlert", {"type": "info", "message": "coming soon..."})
-        });
-      }
-    },
   },
   watch: {
   }

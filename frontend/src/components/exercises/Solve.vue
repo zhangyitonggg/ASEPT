@@ -12,13 +12,36 @@
       </v-icon>
     </v-btn>
 
+    <!-- <v-btn
+    class="navigation-button"
+    fab
+    dark
+    color="primary"
+    @click="previousQuestion"
+    :disabled="!hasPrevious"
+  >
+    <v-icon dark>mdi-chevron-left</v-icon>
+  </v-btn> -->
+
+  <!-- 下一题按钮 -->
+  <!-- <v-btn
+    class="navigation-button"
+    fab
+    dark
+    color="primary"
+    @click="nextQuestion"
+    :disabled="!hasNext"
+  >
+    <v-icon dark>mdi-chevron-right</v-icon>
+  </v-btn> -->
+
     <v-row justify="center">
-      <v-col cols="12" md="6">
+      <v-col cols="12">
         <v-form @submit.prevent="submitForm" v-if="question">
-          <v-card>
-            <v-card-title>{{ question.title }}</v-card-title>
+          <v-card class="large-card">
+            <v-card-title class="text-h3">{{ question.title }}</v-card-title>
             <v-card-text>
-              <p>{{ question.content }}</p>
+              <p class="text-h5">{{ question.content }}</p>
               <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
                 <v-radio-group v-model="answer">
                   <v-radio
@@ -26,7 +49,27 @@
                     :key="key"
                     :label="`${key}. ${choice}`"
                     :value="key"
-                  ></v-radio>
+                    class="option-box"
+                    :class="{
+                      'correct-answer': resultType === 'success' && answer === key,
+                      'wrong-answer': resultType === 'error' && answer === key,
+                      'disabled': resultMessage // 禁用选项交互
+                    }"
+                  >
+                    <template v-slot:label>
+                      <v-icon
+                        v-if="resultType === 'success' && answer === key"
+                        class="correct-icon"
+                        color="green"
+                      >mdi-check-circle</v-icon>
+                      <v-icon
+                        v-if="resultType === 'error' && answer === key"
+                        class="wrong-icon"
+                        color="red"
+                      >mdi-close-circle</v-icon>
+                      {{ key }}. {{ choice }}
+                    </template>
+                  </v-radio>
                 </v-radio-group>
               </template>
               <template v-else-if="question.type === 'MULTI_CHOICE' && question.choices">
@@ -37,43 +80,77 @@
                   :value="key"
                   v-model="selectedAnswers"
                   @change="updateAnswers"
-                ></v-checkbox>
+                  class="option-box"
+                  :class="{
+                    'correct-answer': resultType === 'success' && selectedAnswers.includes(key),
+                    'wrong-answer': resultType === 'error' && selectedAnswers.includes(key),
+                    'disabled': resultMessage // 禁用选项交互
+                  }"
+                >
+                  <template v-slot:label>
+                    <v-icon
+                      v-if="resultType === 'success' && selectedAnswers.includes(key)"
+                      class="correct-icon"
+                      color="green"
+                    >mdi-check-circle</v-icon>
+                    <v-icon
+                      v-if="resultType === 'error' && selectedAnswers.includes(key)"
+                      class="wrong-icon"
+                      color="red"
+                    >mdi-close-circle</v-icon>
+                    {{ key }}. {{ choice }}
+                  </template>
+                </v-checkbox>
               </template>
               <template v-else-if="question.type === 'BLANK_FILLING'">
                 <v-text-field
                   v-model="answer"
                   label="填空"
+                  class="text-field-large"
                 ></v-text-field>
               </template>
             </v-card-text>
+            <v-card-actions>
+              <v-btn
+                type="submit"
+                color="success"
+                class="green-button"
+              >
+                提交
+              </v-btn>
+              <v-btn
+                v-if="resultMessage && !showAnswers"
+                @click="fetchCorrectAnswers"
+                color="success"
+                class="green-button"
+              >
+                显示答案
+              </v-btn>
+            </v-card-actions>
           </v-card>
-          <v-btn type="submit" color="primary">提交</v-btn>
         </v-form>
-        <v-alert v-if="resultMessage" :type="resultType" class="mt-4">
+        <v-alert v-if="resultMessage" :type="resultType" class="mt-4 alert-large">
           {{ resultMessage }}
         </v-alert>
-        <v-btn v-if="resultMessage && !showAnswers" @click="fetchCorrectAnswers" color="secondary" class="mt-4">
-          显示答案
-        </v-btn>
-        <v-card v-if="correctAnswers && showAnswers" class="mt-4">
-          <v-card-title>正确答案</v-card-title>
+        <v-card v-if="correctAnswers && showAnswers" class="mt-4 answer-card-large">
+          <v-card-title class="text-h3">正确答案</v-card-title>
           <v-card-text>
             <div v-if="question.type === 'SINGLE_CHOICE'">
-              <p>正确选项:</p>
+              <p class="text-h5">正确选项:</p>
               <ul>
-                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
+                <li v-for="(value, key) in correctAnswers" :key="key" class="text-h5">{{ `${key}. ${value}` }}</li>
               </ul>
             </div>
             <div v-else-if="question.type === 'MULTI_CHOICE'">
-              <p>正确选项:</p>
+              <p class="text-h5">正确选项:</p>
               <ul>
-                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
+                <li v-for="(value, key) in correctAnswers" :key="key" class="text-h5">{{ `${key}. ${value}` }}</li>
               </ul>
             </div>
             <div v-else-if="question.type === 'BLANK_FILLING'">
-              <p>正确答案:</p>
+              <p class="text-h5">正确答案:</p>
               <ul>
-                <li v-for="(answer, index) in correctAnswers" :key="index">{{ `${index}: ${answer}` }}</li>
+                <li v-for="(answer, index) in correctAnswers" :key="index" class="text-h5">{{ `${index}: ${answer}` }}</li>
               </ul>
             </div>
           </v-card-text>
@@ -101,9 +178,13 @@ export default {
       resultType: '',
       correctAnswers: null,
       showAnswers: false,
+      hasPrevious: false,
+      hasNext: false,
+      //allQuestions: [], // 所有题目列表
     };
   },
   created() {
+   // this.fetchAllQuestions();
     this.fetchQuestion();
   },
   methods: {
@@ -123,6 +204,7 @@ export default {
             answers: [] // 初始时不包含答案
           };
           this.isSingleChoice = this.question.answers && Object.keys(this.question.answers).length === 1;
+         
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -131,6 +213,29 @@ export default {
           });
         });
     },
+    // fetchAllQuestions() {
+    //   console.log('qqq: ',this.$store.state.problems);
+    //   this.allQuestions =  this.$store.state.problems;
+    //   console.log(this.allQuestions);
+    //   this.updateNavigation();
+    // },
+    // updateNavigation() {
+    //   const currentIndex = this.allQuestions.findIndex(q => q.pid === this.pid);
+    //   this.hasPrevious = currentIndex > 0;
+    //   this.hasNext = currentIndex < this.allQuestions.length - 1;
+    // },
+    // previousQuestion() {
+    //   const currentIndex = this.allQuestions.findIndex(q => q.pid === this.pid);
+    //   if (this.hasPrevious) {
+    //     this.$router.push({ path: `/exercises/solve/${this.allQuestions[currentIndex - 1].pid}` });
+    //   }
+    // },
+    // nextQuestion() {
+    //   const currentIndex = this.allQuestions.findIndex(q => q.pid === this.pid);
+    //   if (this.hasNext) {
+    //     this.$router.push({ path: `/exercises/solve/${this.allQuestions[currentIndex + 1].pid}` });
+    //   }
+    // },
     parseChoices(choices) {
       if (choices) {
         return JSON.parse(choices);
@@ -218,5 +323,90 @@ export default {
   left: 3%;
   top: 15%;
   z-index: 5;
+}
+.navigation-button {
+  position: fixed;
+  bottom: 20%;
+  z-index: 5;
+  font-size: 30px;
+  width: 60px;
+  height: 60px;
+}
+
+.navigation-button:nth-of-type(1) {
+  left: 10%;
+}
+
+.navigation-button:nth-of-type(2) {
+  right: 10%;
+}
+
+.large-card {
+  width: 100%;
+  max-width: 1900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.option-box {
+  display: flex;
+  align-items: center;
+  height: 80px;
+  font-size: 24px;
+  margin: 10px 0;
+}
+
+.correct-answer {
+  background-color: #31bc51;
+}
+
+.wrong-answer {
+  background-color: #f8d7da;
+}
+
+.correct-icon {
+  color: #28a745;
+  margin-right: 10px;
+}
+
+.wrong-icon {
+  color: #dc3545;
+  margin-right: 10px;
+}
+
+.text-field-large {
+  font-size: 24px;
+  height: 60px;
+}
+
+.green-button {
+  background-color: #4caf50;
+  color: white;
+  border-radius: 10px;
+  font-size: 30px;
+  padding: 30px 50px;
+  margin-right: 10px;
+  min-width: 150px;
+  height: 600;
+}
+
+.alert-large {
+  font-size: 20px;
+}
+
+.answer-card-large {
+  background-color: #28a745;
+  
+  width: 100%;
+  max-width: 1900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+.disabled {
+  pointer-events: none;
 }
 </style>

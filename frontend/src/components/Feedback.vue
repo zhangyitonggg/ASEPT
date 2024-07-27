@@ -82,7 +82,6 @@
     methods: {
       submit() {
         if (this.$refs.form.validate()) {
-          console.log(this.name, this.email, this.advice, this.complaint, this.rating)
           this.showThankYouDialog = true // 提交后显示感谢图片对话框
         }
       },

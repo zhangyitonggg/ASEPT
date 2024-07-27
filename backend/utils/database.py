@@ -193,7 +193,6 @@ def md5_passwd(password: str) -> str:
 
 
 def get_user_permissions(uid: str):
-    print(uid)
     db = new_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Permissions WHERE uid = %s", (uid))
@@ -214,7 +213,6 @@ def get_admin_permissions(uid: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM Users WHERE uid = %s", (uid))
     user_status = cursor.fetchone()
-    print(user_status[3] == 'True')
     if user_status[3] != 'True':
         raise HTTPException(
             status_code=401,
@@ -227,7 +225,6 @@ def get_admin_permissions(uid: str):
 
 
 def set_permission(db, target_user_name: str, perm: PermissionType, cancel: bool):
-    print(target_user_name, perm, cancel)
     target_user = get_user(db, target_user_name)
     if not target_user:
         raise HTTPException(
@@ -282,7 +279,6 @@ def leave_group(db, gid: str, user: User):
         cursor.execute("DELETE FROM UserGroupMembers WHERE (gid, uid) = (%s, %s)", (group[0], user.uid))
         db.commit()
     except Exception as e:
-        print("Error leaving group: ", e)
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -305,21 +301,20 @@ def create_group(
     db.commit()
 
 
-def delete_group(db, group_name: str, uid: str):
-    group = get_group(db, group_name)
+def delete_group(db, gid: str, user: User):
+    group = get_group_by_gid(db, gid)
     if not group:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Group not found.",
         )
-    if group[3] != uid:
+    if group[3] != user.uid and user.permissions.get("IS_ADMIN") == False:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Permission denied. You are not the owner of this group.",
         )
     cursor = db.cursor()
-    cursor.execute("DELETE FROM UserGroups WHERE name = %s", (group_name))
-    cursor.execute("DELETE FROM UserGroupMembers WHERE gid = %s", (group[0]))
+    cursor.execute("DELETE FROM UserGroups WHERE gid = %s", (gid))
     db.commit()
 
 
@@ -387,9 +382,14 @@ def show_unentered_groups(db, uid: str, search_key: str):
     for group in groups:
         cursor.execute("SELECT * FROM UserGroupMembers WHERE gid = %s AND uid = %s", (group[0], uid))
         if cursor.fetchone() == None:
+            founder = get_user_by_uid(db, group[3])
+            if founder:
+                founder = founder[0]
+            else:
+                founder = "Unknown"
             res.append({
                 "group_name": group[1],
-                "founder": get_user_by_uid(db, group[3])[0],
+                "founder": founder,
                 "need_password": group[5] != None,
                 "gid": group[0],
                 "description": group[2] if group[2] else "This group has no description."
@@ -877,6 +877,12 @@ def get_all_problems(db, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
     res = []
     for problem in problems_with_access:
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM ProblemTags WHERE pid = %s", (problem[0]))
+        tags = cursor.fetchall()
+        _tags_ = []
+        for tag in tags:
+            _tags_.append(tag[1])
         res.append({
             "pid": problem[0],
             "title": problem[1],
@@ -887,6 +893,7 @@ def get_all_problems(db, user: User):
             "choices": problem[6],
             "answers": problem[7],
             "is_public": problem[8],
+            "tags": _tags_,
         })
     return {"problems": res}
 
@@ -914,7 +921,6 @@ def get_problem_tags(db, pid: str, user: User):
 
 def search_problem_by_tag(db, tag: str, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
-    print(problems_with_access)
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemTags")
     problem_tags = cursor.fetchall()
@@ -994,33 +1000,56 @@ def submit_problem(db, pid: str, answer: str, user: User):
     db.commit()
     return is_correct
 
-
-def get_user_statistics(db, user: User):
+def get_user_statistics(db, user):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ProblemSubmit WHERE uid = %s", (user.uid))
     submits = cursor.fetchall()
     def get_problem_type(pid):
-        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
-        problem = cursor.fetchone()
-        return problem[3]
+        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid,))
+        return cursor.fetchone()[3]
+    problem_pass_counts = {}
     choice_submit = 0
     choice_correct = 0
     blank_submit = 0
     blank_correct = 0
+    last_submit_time = None
     for submit in submits:
-        if "choice" in get_problem_type(submit[1]):
+        pid = submit[1]
+        correct = submit[4]
+        last_submit_time = submit[5]
+        problem_type = get_problem_type(pid)
+        if "choice" in problem_type:
             choice_submit += 1
-            if submit[4]:
+            if correct:
                 choice_correct += 1
         else:
             blank_submit += 1
-            if submit[4]:
+            if correct:
                 blank_correct += 1
+        if correct and pid not in problem_pass_counts:
+            problem_pass_counts[pid] = last_submit_time
+    total_passes = len(problem_pass_counts)
+    # # Calculate passes over regular intervals
+    start_time = min(submits, key=lambda x: x[5])[5] if submits else None
+    end_time = max(submits, key=lambda x: x[5])[5] if submits else None
+    interval_count = {}
+    label = {}
+    if start_time and end_time:
+        interval_duration = (end_time - start_time) / 7  # For example, 5 intervals
+        for i in range(8):
+            current_time = start_time + i * interval_duration
+            label[i] = str(current_time).replace('T', ' ')
+            interval_count[label[i]] = sum(1 for submit in submits if submit[4] and submit[5] <= current_time)
+
     return {
         "choice_submit": choice_submit,
         "choice_correct": choice_correct,
         "blank_submit": blank_submit,
         "blank_correct": blank_correct,
+        "total_passes": total_passes,
+        "last_submit_time": str(last_submit_time).replace('T', ' ') if last_submit_time else None,
+        "labels": [label[i][0:19] for i in range(8)],
+        "values": [interval_count[label[i]] for i in range(8)]
     }
 
 
@@ -1185,3 +1214,10 @@ def modify_user_info(db, user: User, original_password: str, new_password: str):
         )
     cursor.execute("UPDATE Users SET password = %s WHERE uid = %s", (md5_passwd(new_password), user[1]))
     db.commit()
+
+
+def get_current_time(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT NOW()")
+    time = cursor.fetchone()
+    return time[0]

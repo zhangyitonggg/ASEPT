@@ -66,3 +66,13 @@ async def get_announcements(
     ```
     '''
     return database.get_announcements(db, max_announcements, True)
+
+
+@router.get("/current_time")
+async def get_current_time(db: pymysql.connections.Connection = Depends(database.connect)):
+    '''
+    返回当前时间，格式为 "2021-01-01 00:00:00"
+    '''
+    return {
+        "current_time": str(database.get_current_time(db)).replace('T', ' ')
+    }
