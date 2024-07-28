@@ -352,7 +352,8 @@ export default {
     }, 4000); // 5秒后隐藏提示信息
   },
     returnback() {
-      this.$router.go(-1);
+      //this.$router.go(-1);
+      this.$router.push('/exercises');
     },
   },
 };
