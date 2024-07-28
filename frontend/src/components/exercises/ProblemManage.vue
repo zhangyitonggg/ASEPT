@@ -6,7 +6,7 @@
     <v-container fluid v-else>
       <v-layout>
         <v-flex xs1>
-          <v-btn color="primary" @click="dialogCreate = true">创建题目</v-btn>
+          <v-btn color="primary" @click="openCreateDialog">创建题目</v-btn>
         </v-flex>
         <v-spacer/>
         <v-flex xs24>
@@ -31,11 +31,9 @@
               <v-list-item-action>
                 <v-btn class="butspace" color="primary" @click="openAddTagDialog(item)">增加 Tag</v-btn>
               </v-list-item-action>
-              
               <v-list-item-action>
                 <v-btn  color="primary" @click="addToList(item)">加入题单</v-btn>
               </v-list-item-action>
-              
               <v-list-item-action>
                 <v-btn class="butspace" color="primary" @click="changeProblem(item)">修改问题</v-btn>
               </v-list-item-action>
@@ -52,6 +50,10 @@
             <h3>
               创建新题目
             </h3>
+            <v-spacer></v-spacer>
+            <v-btn icon @click="dialogCreate = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
           </v-card-title>
           <v-card-text>
             <v-stepper v-model="e1">
@@ -156,7 +158,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="dialogAdd" max-width="600px">
+      <v-dialog v-model="dialogAdd" max-width="50%">
         <v-card>
           <v-card-title>
             添加题目到题单
@@ -175,30 +177,88 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-
-        <!-- 修改题目对话框 -->
-      <v-dialog v-model="dialogEdit" max-width="600px">
+      <!-- 修改题目对话框 -->
+      <v-dialog v-model="dialogEdit" fullscreen hide-overlay scrollable transition="dialog-bottom-transition">
         <v-card>
           <v-card-title>
-            修改问题
+            <h3>
+              修改题目
+            </h3>
             <v-spacer></v-spacer>
             <v-btn icon @click="dialogEdit = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-card-title>
           <v-card-text>
-            <v-text-field v-model="currentProblem.name" label="题目名称" required></v-text-field>
-            <v-textarea v-model="currentProblem.content" label="题目内容" rows="4" required></v-textarea>
+            <v-stepper v-model="e2">
+              <v-stepper-header>
+                <v-stepper-step
+                  :complete="e2 > 1"
+                  step="1"
+                > 修改题目信息
+                </v-stepper-step>
+                <v-divider></v-divider>
+                <v-stepper-step
+                  :complete="e1 > 2"
+                  step="2"
+                > 预览并保存
+                </v-stepper-step>
+              </v-stepper-header>
+              <v-stepper-items>
+                <v-stepper-content step="1">
+                  <v-text-field v-model="currentProblem.title" label="题目名称" required></v-text-field>
+                  <v-textarea v-model="currentProblem.content" label="题目内容" rows="23" required hint="支持 Markdown 语法"></v-textarea>
+                  <v-select v-model="currentProblem.type" :items="questionTypes" label="题目类型" required></v-select>
+                  <template v-if="isMultipleChoice(currentProblem.type)">
+                    <v-text-field v-for="(option, index) in currentProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="currentProblem.options[index]">
+                      <template v-slot:append>
+                        <v-btn icon @click="removeOption(index)">
+                          <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                      </template>
+                    </v-text-field>
+                    <v-select v-if="currentProblem.type === 'SINGLE_CHOICE'" v-model="currentProblem.correctAnswer" :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
+                    <v-select v-if="currentProblem.type === 'MULTI_CHOICE'" v-model="currentProblem.correctAnswers" :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+                    <v-btn @click="addOption">添加选项</v-btn>
+                  </template>
+                  <template v-if="currentProblem.type === 'BLANK_FILLING'">
+                    <v-text-field v-for="(blank, index) in currentProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="currentProblem.fillBlanks[index]"></v-text-field>
+                    <v-btn @click="addFillBlank">添加答案</v-btn>
+                  </template>
+                </v-stepper-content>
+                <v-stepper-content step="2">
+                  <v-text-field v-model="currentProblem.title" label="题目名称" required disabled></v-text-field>
+                  <v-subheader>题目内容</v-subheader>
+                  <v-md-preview :text="currentProblem.content"></v-md-preview>
+                  <v-select v-model="currentProblem.type" :items="questionTypes" label="题目类型" required disabled></v-select>
+                  <template v-if="isMultipleChoice(currentProblem.type)">
+                    <v-text-field v-for="(option, index) in currentProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="currentProblem.options[index]" disabled>
+                      <template v-slot:append>
+                        <v-btn icon @click="removeOption(index)" disabled>
+                          <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                      </template>
+                    </v-text-field>
+                    <v-select disabled v-if="currentProblem.type === 'SINGLE_CHOICE'" v-model="currentProblem.correctAnswer" :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
+                    <v-select disabled v-if="currentProblem.type === 'MULTI_CHOICE'" v-model="currentProblem.correctAnswers" :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+                  </template>
+                  <template v-if="currentProblem.type === 'BLANK_FILLING'">
+                    <v-text-field disabled v-for="(blank, index) in currentProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="currentProblem.fillBlanks[index]"></v-text-field>
+                  </template>
+                </v-stepper-content>
+              </v-stepper-items>
+            </v-stepper>
           </v-card-text>
           <v-card-actions>
-            <v-btn color="primary" @click="confirmChangeProblem">保存修改</v-btn>
-            <v-btn text @click="dialogEdit = false">取消</v-btn>
+            <v-spacer />
+            <v-btn @click="e2 = e2 - 1" large :disabled="e2 == 1"> 上一步 </v-btn>
+            <v-btn color="primary" @click="confirmChangeProblem" large> {{ `${this.e2 == 1 ? "下一步" : "保存修改"}`}}</v-btn>
+            <v-btn text @click="dialogEdit = false" large outlined color="error">取消</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
-
         <!-- 增加Tag对话框 -->
-      <v-dialog v-model="dialogAddTag" max-width="400px">
+      <v-dialog v-model="dialogAddTag" max-width="50%">
         <v-card>
           <v-card-title>
             增加 Tag
@@ -237,6 +297,7 @@ export default {
   data() {
     return {
       e1: 1,
+      e2: 1,
       loading_file_convert: false, // 控制文件转换的加载状态
       dialogCreate: false, // 控制“创建题目”对话框的显示
       dialogAdd: false, // 控制“添加题单”对话框的显示
@@ -306,6 +367,11 @@ export default {
     VMdPreview,
   },
   methods: {
+    openCreateDialog() {
+      this.e1 = 1;
+      this.newProblem = { name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] };
+      this.dialogCreate = true;
+    },
     handleFileUpload() {
       if (this.uploadedFile) {
         this.loading_file_convert = true;
@@ -372,7 +438,9 @@ export default {
       this.dialogAdd = true;
     },
     changeProblem(item) {
+      this.e2 = 1;
       this.currentProblem = item;
+      console.log(this.currentProblem);
       this.dialogEdit = true;
     },
     openAddTagDialog(item) {
@@ -521,6 +589,10 @@ export default {
       };
     },
     confirmChangeProblem() {
+      if (this.e2 != 2) {
+        this.e2++;
+        return;
+      }
       this.$store
         .dispatch('updateProblem', this.currentProblem)
         .then(() => {
