@@ -84,9 +84,13 @@ const api = {
       console.log("add_problem_tag");
       return await router.post(path.baseUrl + path.add_problem_tag,{}, {params: {pid: pid, tag: tag}});
     },
-    search_problem_by_tag: async(tag) => {
+    search_problem_by_tag: async(data) => {
       console.log("search_problem_by_tag");;
-      return await router.get(path.baseUrl + path.search_problem_by_tag, {params: {tag: tag}});
+      let param = {};
+      if(data.tag && data.keyword) param = {tid: data.tag, key:data.keyword};
+      else if(data.tag) param = {tid: data.tag};
+      else if(data.keyword) param = {key:data.keyword};
+      return await router.get(path.baseUrl + path.search_problem_by_tag, {params: param});
     },
     get_my_problems: async() => {
       console.log("get_my_problems");
@@ -143,6 +147,9 @@ const api = {
     },
     getTime: async() => {
       return await router.get(path.baseUrl + path.getTime);
+    },
+    getProblemTag:  async() => {
+      return await router.get(path.baseUrl + path.getProblemTags);
     },
 };
 

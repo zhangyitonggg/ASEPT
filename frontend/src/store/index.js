@@ -161,6 +161,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getProblemTags(context) {
+      return new Promise((resolve, reject) => {
+        api.getProblemTag()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     deleteGroup(context, {gid}) {
       return new Promise((resolve, reject) => {
         api.deleteGroup(gid)
@@ -271,9 +282,9 @@ export default new Vuex.Store({
           })
       })
     },
-    searchProblemByTag(context,tag) {
+    searchProblemByTag(context,data) {
       return new Promise((resolve, reject) => {
-        api.search_problem_by_tag(tag)
+        api.search_problem_by_tag(data)
           .then(response => {
             resolve(response.data);
           })

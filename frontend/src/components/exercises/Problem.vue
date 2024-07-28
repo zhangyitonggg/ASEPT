@@ -10,7 +10,7 @@
     <v-container fluid v-else>
       <v-layout>
         <!-- 查找题目按钮 -->
-        <v-btn color="primary" @click="showSearchDialog = true">查找题目</v-btn>
+        <v-btn color="primary" @click=" openSearchDialog">查找题目</v-btn>
         <v-spacer/>
         <v-flex xs24>
           <searchbar v-model="search" searchBtnText='搜索题目'/>
@@ -48,7 +48,6 @@
                 > 去做题 </v-btn>
               </v-list-item-action>
             </v-list-item>
-            <v-divider v-if="index < currentPageItems.length - 1"></v-divider>
           </template>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
@@ -66,7 +65,19 @@
           </v-card-title>
           <v-card-text>
             <v-form @submit.prevent="searchProblems">
-              <v-text-field v-model="searchTag" label="Tag"></v-text-field>
+              <v-select
+                v-model="searchTag"
+                :items="tags"
+                item-text="tag_name"
+                item-value="tid"
+                label="选择标签"
+                outlined
+              ></v-select>
+              <v-text-field
+                v-model="searchKeyword"
+                label="关键词"
+                outlined
+              ></v-text-field>
               <v-btn color="primary" type="submit">搜索</v-btn>
             </v-form>
             <v-list three-line>
@@ -80,7 +91,7 @@
                     <v-list-item-subtitle>{{ problem.content }}</v-list-item-subtitle>
                   </v-list-item-content>
                   <v-list-item-action>
-                    <v-btn color="primary" @click="solveProblem(problem)">去做题</v-btn>
+                    <v-btn color="primary" @click="solveProbleminTag(problem)">去做题</v-btn>
                   </v-list-item-action>
                 </v-list-item>
               </template>
@@ -112,6 +123,8 @@ export default {
       showSearchDialog: false,
       searchTag: '',
       searchResults: [],
+      searchKeyword: '',
+      tags: [], // 用于存储获取到的标签
     };
   },
   created() {
@@ -119,7 +132,7 @@ export default {
   },
   computed: {
     numberOfPages() {
-      return Math.ceil(this.items.length / this.itemsPerPage);
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
     filteredKeys() {
       return this.keys.filter(key => key !== 'Name');
@@ -141,12 +154,24 @@ export default {
       });
     },
   },
+  watch: {
+    search() {
+      this.currentPage = 1;
+    },
+    numberOfPages(newVal) {
+      if (this.currentPage > newVal) {
+        this.currentPage = newVal;
+      }
+    }
+  },
   methods: {
     fetchProblems() {
       this.$store
         .dispatch('getMyProblem')
         .then(res => {
           this.items = [{ header: '我创建的题目' }, ...res.problems];
+          console.log("hhh",this.items);
+          
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -158,12 +183,6 @@ export default {
           this.loading = false;
         });
     },
-    nextPage() {
-      if (this.page + 1 <= this.numberOfPages) this.page += 1;
-    },
-    formerPage() {
-      if (this.page - 1 >= 1) this.page -= 1;
-    },
     updateItemsPerPage(number) {
       this.itemsPerPage = number;
     },
@@ -171,10 +190,16 @@ export default {
       this.$store.commit('setCurrentProblemGroup', {problems: this.items.slice(1)});
       this.$router.push({ path: 'solve/' + item.pid, append: true });
     },
+    solveProbleminTag(item) {
+      this.$store.commit('setCurrentProblemGroup', {problems: this.searchResults});
+      this.$router.push({ path: 'solve/' + item.pid, append: true });
+    },
     searchProblems() {
-      const tag = this.searchTag.trim();
+      let mytag = this.searchTag;
+      let mykeyword = this.searchKeyword || '';
+      console.log(mytag);
       this.$store
-        .dispatch('searchProblemByTag', tag)
+        .dispatch('searchProblemByTag', {tag:mytag, keyword: mykeyword})
         .then(res => {
           this.searchResults = res.problems;
         })
@@ -184,6 +209,27 @@ export default {
             message: error,
           });
         });
+    },
+    openSearchDialog() {
+      this.showSearchDialog = true;
+      this.fetchTags();
+    },
+    fetchTags() {
+      this.$store
+        .dispatch('getProblemTags')
+        .then(res => {
+          this.tags = res.tags;
+        })
+        .catch(error => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        });
+    },
+    selectTag(tag) {
+      this.searchTag =  tag;
+      console.log(this.searchTag.tag_name);
     },
   },
   components: {
@@ -232,5 +278,15 @@ export default {
   font-weight: 900;
   top: 15px;
   right: 20px;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+ 
+}
+.ma-2 {
+  margin: 5px;
 }
 </style>

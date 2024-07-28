@@ -9,3 +9,6 @@ pytesseract==0.3.10
 uvicorn==0.30.3
 openai==1.37.1
 redis==5.0.7
+tesseract
+python-Levenshtein==0.25.1
+fuzzywuzzy0.18.0
