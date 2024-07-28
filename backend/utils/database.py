@@ -5,6 +5,7 @@ import pymysql
 import hashlib
 from fastapi import HTTPException, status
 import uuid
+from fuzzywuzzy import process
 
 from backend.data.User import User, PermissionType
 from backend.data.Announcement import Announcement
@@ -948,19 +949,30 @@ def get_problem_tags(db, pid: str, user: User):
         })
     return {"tags": res}
 
-def search_problem_by_tag(db, tid: str, user: User):
+def search_problem_by_tag(db, tid, key, user: User):
     problems_with_access = get_all_accessible_problems(db, user)
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM ProblemTags")
-    problem_tags = cursor.fetchall()
-    problem_tags = [problem for problem in problem_tags if tid in problem[1]]
-    pids = [problem[0] for problem in problem_tags]
-    problems = []
-    for pid in pids:
-        cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
-        problem = cursor.fetchone()
-        if problem in problems_with_access:
-            problems.append(problem)
+    if tid:
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM ProblemTags")
+        problem_tags = cursor.fetchall()
+        problem_tags = [problem for problem in problem_tags if tid in problem[1]]
+        pids = [problem[0] for problem in problem_tags]
+        problems = []
+        for pid in pids:
+            cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+            problem = cursor.fetchone()
+            if problem in problems_with_access:
+                problems.append(problem)
+    else:
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM Problems")
+        all_problems = cursor.fetchall()
+        problems = []
+        for problem in all_problems:
+            if problem in problems_with_access:
+                problems.append(problem)
+    if key:
+        problems = fuzzy_match(problems, key)
     res = []
     for problem in problems:
         res.append({
@@ -1270,3 +1282,15 @@ def get_current_time(db):
     cursor.execute("SELECT NOW()")
     time = cursor.fetchone()
     return time[0]
+
+
+def fuzzy_match(problems, key, threshold=50):
+    scores = []
+    for problem in problems:
+        title_score = process.extractOne(key, problem[1])[1]
+        content_score = process.extractOne(key, problem[2])[1]
+        overall_score = max(title_score, content_score)
+        if overall_score >= threshold:
+            scores.append((overall_score, problem))
+    scores.sort(reverse=True, key=lambda x: x[0])
+    return [item[1] for item in scores]

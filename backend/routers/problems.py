@@ -428,8 +428,9 @@ async def get_problem_tags(
 
 
 @router.get('/search_problem_by_tag')
-async def search_problem_by_tag(
-    tid: str,
+async def search_problem_by_tag_and_key(
+    tid: str | None = None,
+    key: str | None = None,
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
@@ -477,7 +478,11 @@ async def search_problem_by_tag(
         ]
     }
     '''
-    return database.search_problem_by_tag(db, tid, user)
+    if tid == '':
+        tid = None
+    if key == '':
+        key = None
+    return database.search_problem_by_tag(db, tid, key, user)
 
 
 @router.get('/get_all_tags')
