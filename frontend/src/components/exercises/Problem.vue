@@ -72,6 +72,7 @@
                 item-value="tid"
                 label="选择标签"
                 outlined
+                clearable
               ></v-select>
               <v-text-field
                 v-model="searchKeyword"
