@@ -24,7 +24,7 @@ router = APIRouter(
 '''
 
 GPT_KEY = "sk-du8ZeyDgmoxJVg24771dFfFf646445A289018dAaBeD4A2Fa"
-HINT = "检测以下内容是否包含敏感词，忽略内容的语义，请回答是或者否\n\n"
+HINT = "检测以下内容是否包含敏感词，忽略内容的语义，请只回答是或者否\n\n"
 
 client = OpenAI(
     base_url="https://aihubmix.com/v1/",
