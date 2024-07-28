@@ -1030,11 +1030,18 @@ def get_my_problems(db, user: User):
         _tags_ = []
         for tag in tags:
             _tags_.append(get_tag_by_tid(db, tag[1])[1])
+        if problem[3] == "choice":
+            if len(json.loads(problem[7])) > 1:
+                ptype = "MULTI_CHOICE"
+            else:
+                ptype = "SINGLE_CHOICE"
+        else:
+            ptype = "BLANK_FILLING"
         res.append({
             "pid": problem[0],
             "title": problem[1],
             "content": problem[2],
-            "type": problem[3],
+            "type": ptype,
             "author": problem[4],
             "update_time": problem[5],
             "choices": problem[6],
@@ -1177,6 +1184,7 @@ def get_problem_recommend(db, user: User):
             "is_public": problem[8],
             "tags": _tags_,
         })
+    ret = random.sample(ret, min(7, len(ret)))
     return {"problems": ret}
     
 

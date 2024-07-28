@@ -76,7 +76,6 @@ const api = {
       return await router.post(path.baseUrl + path.add_problem_to_group,{},{ params: {pid: ppid,pgid: ppgid}});
     },
     share_problem_group_to_user_group: async(pgid, gid) => {
-      console.log("share_problem_group_to_user_group");
       console.log(pgid,gid);
       return await router.post(path.baseUrl + path.share_problem_group_to_user_group,{}, {params: {pgid: pgid, gid: gid}});
     },
@@ -85,7 +84,6 @@ const api = {
       return await router.post(path.baseUrl + path.add_problem_tag,{}, {params: {pid: pid, tag_name: tag}});
     },
     search_problem_by_tag: async(data) => {
-      console.log("search_problem_by_tag");;
       let param = {};
       if(data.tag && data.keyword) param = {tid: data.tag, key:data.keyword};
       else if(data.tag) param = {tid: data.tag};
@@ -93,15 +91,12 @@ const api = {
       return await router.get(path.baseUrl + path.search_problem_by_tag, {params: param});
     },
     get_my_problems: async() => {
-      console.log("get_my_problems");
-      return await router.get(path.baseUrl + path.get_all_problems);
+      return await router.get(path.baseUrl + path.get_my_problems);
     },
     getAllProblems: async() => {
-      console.log("get_all_problems");
       return await router.get(path.baseUrl + path.get_all_problems);
     },
     submit_problem: async(pid, answer) => {
-      console.log("submit_problem");
       console.log('sub: ',pid,answer);
       return await router.get(path.baseUrl + path.submit_problem,{params: {pid: pid, answer: answer}});
     },

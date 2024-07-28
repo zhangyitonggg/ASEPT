@@ -210,15 +210,15 @@
                   <v-textarea v-model="currentProblem.content" label="题目内容" rows="23" required hint="支持 Markdown 语法"></v-textarea>
                   <v-select v-model="currentProblem.type" :items="questionTypes" label="题目类型" required></v-select>
                   <template v-if="isMultipleChoice(currentProblem.type)">
-                    <v-text-field v-for="(option, index) in currentProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="currentProblem.options[index]">
+                    <v-text-field v-for="(option, index) in currentProblem.choices" :key="index" :label="'选项 ' + (index + 1)" v-model="currentProblem.choices[index]">
                       <template v-slot:append>
                         <v-btn icon @click="removeOption(index)">
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                       </template>
                     </v-text-field>
-                    <v-select v-if="currentProblem.type === 'SINGLE_CHOICE'" v-model="currentProblem.correctAnswer" :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
-                    <v-select v-if="currentProblem.type === 'MULTI_CHOICE'" v-model="currentProblem.correctAnswers" :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+                    <v-select v-if="currentProblem.type === 'SINGLE_CHOICE'" v-model="currentProblem.answers" :items="currentProblem.choices.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
+                    <v-select v-if="currentProblem.type === 'MULTI_CHOICE'" v-model="currentProblem.answers" :items="currentProblem.choices.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
                     <v-btn @click="addOption">添加选项</v-btn>
                   </template>
                   <template v-if="currentProblem.type === 'BLANK_FILLING'">
@@ -417,7 +417,7 @@ export default {
       this.$store
         .dispatch('getMyProblem')
         .then((res) => {
-          this.items.splice(0, this.items.length, { header: '我创建的题目' }, ...res.problems); // 清空当前数组并插入新数据
+          this.items.splice(0, this.items.length, ...res.problems); // 清空当前数组并插入新数据
         })
         .catch((error) => {
           this.$store.commit('setAlert', {

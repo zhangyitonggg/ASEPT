@@ -168,11 +168,10 @@ export default {
   methods: {
     fetchProblems() {
       this.$store
-        .dispatch('getMyProblem')
+        .dispatch('getAllProblems')
         .then(res => {
           this.items = [{ header: '我创建的题目' }, ...res.problems];
           console.log("hhh",this.items);
-          
         })
         .catch(error => {
           this.$store.commit('setAlert', {
