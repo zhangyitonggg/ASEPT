@@ -1116,17 +1116,30 @@ def get_problem_recommend(db, user: User):
         cursor.execute("SELECT * FROM ProblemSubmit WHERE pid = %s", (problem[0]))
         submits = cursor.fetchall()
         correct = 0
+        mysubmit = 0
+        mycorrect = 0
         for submit in submits:
             if submit[4]:
                 correct += 1
-        res.append((problem[0], correct / len(submits) if len(submits) != 0 else 0))
-    res = sorted(res, key=lambda x: x[1])
-    res = res[:20]
-    if len(res) > 10:
-        res = random.sample(res, (10))
-    res = res[:10]
-    final_res = []
-    for problem in res:
+            if submit[2] == user.uid:
+                mysubmit += 1
+                if submit[4]:
+                    mycorrect += 1
+        res.append((problem[0], len(submits), correct, mysubmit, mycorrect))
+    def get_correct_rate(submit, correct):
+        if submit == 0:
+            return 0
+        return correct / submit
+    my_res = [i for i in res if i[3] - i[4] > 0]
+    res = [i for i in res if i[3] - i[4] == 0]
+    my_res.sort(key=lambda x: get_correct_rate(x[3], x[4]))
+    num1 = 7 if len(my_res) >= 10 else min(4, len(my_res))
+    final_res, my_res = my_res[:num1], my_res[num1:]
+    res = res + my_res
+    num2 = min(10 - num1, len(res))
+    final_res += random.sample(res, num2)
+    ret = []
+    for problem in final_res:
         cursor.execute("SELECT * FROM Problems WHERE pid = %s", (problem[0]))
         problem = cursor.fetchone()
         cursor.execute("SELECT * FROM ProblemTags WHERE pid = %s", (problem[0]))
@@ -1134,7 +1147,7 @@ def get_problem_recommend(db, user: User):
         _tags_ = []
         for tag in tags:
             _tags_.append(get_tag_by_tid(db, tag[1])[1])
-        final_res.append({
+        ret.append({
             "pid": problem[0],
             "title": problem[1],
             "content": problem[2],
@@ -1146,7 +1159,7 @@ def get_problem_recommend(db, user: User):
             "is_public": problem[8],
             "tags": _tags_,
         })
-    return {"problems": final_res}
+    return {"problems": ret}
     
 
 def problem_accessible(db, user: User, pid: str):
