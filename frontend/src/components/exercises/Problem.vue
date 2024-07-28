@@ -48,7 +48,6 @@
                 > 去做题 </v-btn>
               </v-list-item-action>
             </v-list-item>
-            <v-divider v-if="index < currentPageItems.length - 1"></v-divider>
           </template>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
@@ -133,7 +132,7 @@ export default {
   },
   computed: {
     numberOfPages() {
-      return Math.ceil(this.items.length / this.itemsPerPage);
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
     filteredKeys() {
       return this.keys.filter(key => key !== 'Name');
@@ -155,12 +154,24 @@ export default {
       });
     },
   },
+  watch: {
+    search() {
+      this.currentPage = 1;
+    },
+    numberOfPages(newVal) {
+      if (this.currentPage > newVal) {
+        this.currentPage = newVal;
+      }
+    }
+  },
   methods: {
     fetchProblems() {
       this.$store
         .dispatch('getMyProblem')
         .then(res => {
           this.items = [{ header: '我创建的题目' }, ...res.problems];
+          console.log("hhh",this.items);
+          
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -171,12 +182,6 @@ export default {
         .finally(() => {
           this.loading = false;
         });
-    },
-    nextPage() {
-      if (this.page + 1 <= this.numberOfPages) this.page += 1;
-    },
-    formerPage() {
-      if (this.page - 1 >= 1) this.page -= 1;
     },
     updateItemsPerPage(number) {
       this.itemsPerPage = number;

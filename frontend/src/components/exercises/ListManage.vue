@@ -136,7 +136,7 @@ export default {
   },
   computed: {
     numberOfPages() {
-      return Math.ceil(this.items.length / this.itemsPerPage);
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
     filteredKeys() {
       return this.keys.filter(key => key !== 'Name');
@@ -152,6 +152,16 @@ export default {
       const endIndex = startIndex + this.itemsPerPage;
       return this.filteredItems.slice(startIndex, endIndex);
     },
+  },
+  watch: {
+    search() {
+      this.currentPage = 1;
+    },
+    numberOfPages(newVal) {
+      if (this.currentPage > newVal) {
+        this.currentPage = newVal;
+      }
+    }
   },
   methods: {
     fetchItems() {

@@ -201,7 +201,7 @@ export default {
   },
   computed: {
     numberOfPages() {
-      return Math.ceil(this.items.length / this.itemsPerPage);
+      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
     filteredKeys() {
       return this.keys.filter((key) => key !== 'Name');
@@ -222,6 +222,16 @@ export default {
         };
       });
     },
+  },
+  watch: {
+    search() {
+      this.currentPage = 1;
+    },
+    numberOfPages(newVal) {
+      if (this.currentPage > newVal) {
+        this.currentPage = newVal;
+      }
+    }
   },
   components: {
     searchbar,
