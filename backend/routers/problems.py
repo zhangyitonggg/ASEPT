@@ -24,9 +24,10 @@ router = APIRouter(
 '''
 
 GPT_KEY = "sk-du8ZeyDgmoxJVg24771dFfFf646445A289018dAaBeD4A2Fa"
-HINT = "检测以下内容是否包含敏感词：\n\n"
+HINT = "检测以下内容是否包含敏感词，忽略内容的语义，请回答是或者否\n\n"
 
 client = OpenAI(
+    base_url="https://aihubmix.com/v1/",
     api_key=GPT_KEY
 )
 
@@ -44,9 +45,9 @@ def detect_sensetive(problem: Choice_Problem | Blank_Filling_Problem):
         ],
         model="gpt-3.5-turbo",
     )
-    print(chat.choices[0].message)
-    return '不包含' not in chat.choices[0].message
-    
+    reply = chat.choices[0].message.content
+    return reply == "是"
+
 
 @router.post('/upload_problem')
 async def add_problem(
