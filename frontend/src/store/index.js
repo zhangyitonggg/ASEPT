@@ -201,6 +201,7 @@ export default new Vuex.Store({
             resolve(response.data);
           })
           .catch(error => {
+            console.log(error);
             reject(error);
           })
       })

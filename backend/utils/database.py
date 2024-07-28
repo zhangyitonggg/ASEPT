@@ -1166,6 +1166,7 @@ def get_problem_recommend(db, user: User):
             "is_public": problem[8],
             "tags": _tags_,
         })
+    ret = random.sample(ret, min(7, len(ret)))
     return {"problems": ret}
     
 

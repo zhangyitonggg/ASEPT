@@ -80,7 +80,8 @@ const api = {
       return await router.post(path.baseUrl + path.share_problem_group_to_user_group,{}, {params: {pgid: pgid, gid: gid}});
     },
     add_problem_tag: async(pid, tag) => {
-      return await router.post(path.baseUrl + path.add_problem_tag,{}, {params: {pid: pid, tag: tag}});
+      console.log("add_problem_tag");
+      return await router.post(path.baseUrl + path.add_problem_tag,{}, {params: {pid: pid, tag_name: tag}});
     },
     search_problem_by_tag: async(data) => {
       let param = {};

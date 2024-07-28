@@ -257,8 +257,9 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-        <!-- 增加Tag对话框 -->
-      <v-dialog v-model="dialogAddTag" max-width="50%">
+
+      <!-- 增加Tag对话框 -->
+      <v-dialog v-model="dialogAddTag" max-width="600px">
         <v-card>
           <v-card-title>
             增加 Tag
@@ -269,6 +270,25 @@
           </v-card-title>
           <v-card-text>
             <v-text-field v-model="newTag" label="输入 Tag" required></v-text-field>
+            <!-- 可选 Tag 显示区域 -->
+            <v-chip-group
+              column
+              v-model="selectedTags"
+              multiple
+              active-class="primary--text"
+            >
+              <v-chip
+                v-for="tag in availableTags"
+                :key="tag.tid"
+                @click="newTag = tag.tag_name"
+                color="yellow"
+                text-color="white"
+                
+                
+              >
+                {{ tag.tag_name }}
+              </v-chip>
+            </v-chip-group>
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="confirmAddTag">确认增加</v-btn>
@@ -322,6 +342,9 @@ export default {
       currentPage: 1,
       problems: [],
       search:'',
+      selectedTags: [], // 选中的标签
+      newTag: '', // 新输入的标签
+      availableTags: [], // 可用的标签
     };
   },
   created() {
@@ -446,6 +469,20 @@ export default {
     openAddTagDialog(item) {
       this.currentProblem = item;
       this.dialogAddTag = true;
+      this.fetchTags();
+    },
+    fetchTags() {
+      this.$store
+        .dispatch('getProblemTags')
+        .then(res => {
+          this.availableTags= res.tags;
+        })
+        .catch(error => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        });
     },
     confirmAddTag() {
       if (this.newTag.trim() === '') {
