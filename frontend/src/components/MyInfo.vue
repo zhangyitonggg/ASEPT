@@ -46,9 +46,25 @@
           查看您的状态
         </h2>
       </v-card-title>
-      <v-container fluid class="d-flex justify-center align-center" v-if="status_loading">
-        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-      </v-container>
+      <template v-if="status_loading">
+        <v-container fluid class="d-flex align-center justify-center">
+          <v-row class="text-center">
+            <v-col>
+              <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-container fluid class="d-flex align-center justify-center">
+          <v-row class="text-center">
+            <v-col>
+              <h3>
+                路漫漫其修远兮，吾将上下而求索。
+              </h3>
+              <span>正在获取你的记录。</span>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
       <v-card-text v-else>
         <v-row class="pl-3 pr-3">
           <v-col>
@@ -105,15 +121,14 @@ export default {
       blankFailedQuestions: 0,
       total_passed: 0,
       last_submit_time: new Date().toLocaleString(),
-      labels: null,
-      values: null,
+      labels: [],
+      values: [],
     }
   },
   mounted() {
     this.$store.commit('setAppTitle', "个人信息");
     this.$store.dispatch('getUserStatus')
       .then((res) => {
-        console.log(res);
         this.choicePassedQuestions = res.choice_correct;
         this.choiceFailedQuestions = res.choice_submit - res.choice_correct;
         this.blankPassedQuestions = res.blank_correct;
@@ -124,6 +139,7 @@ export default {
         this.values = res.values;
       })
       .catch((e) => {
+        this.$store.commit('setAlert', { message: e, type: 'error' });
       })
       .finally(() => {
         this.status_loading = false;

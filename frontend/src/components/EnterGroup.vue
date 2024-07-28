@@ -1,8 +1,24 @@
 <template>
   <div>
-    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-    </v-container>
+    <template v-if="loading">
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <h3>
+              修对古人思故国，且将新火试新茶。
+            </h3>
+            <span>正在获取可以加入的团队。</span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </template>
     <v-container fluid v-else>
       <v-layout>
         <v-spacer />

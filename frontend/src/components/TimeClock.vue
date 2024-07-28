@@ -21,7 +21,6 @@ export default {
     fetchTime() {
       const response = api.getTime()
         .then(response => {
-          console.log(response);
           this.serverTime = new Date(response.data.current_time);
           this.formattedTime = this.formatDateTime(this.serverTime);
         })

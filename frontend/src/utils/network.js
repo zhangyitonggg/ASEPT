@@ -31,7 +31,7 @@ const errorHandle = (status, info) => {
 
 
 const router = axios.create({
-  timeout: 5000,
+  timeout: 6000,
 });
 
 
@@ -43,7 +43,7 @@ router.interceptors.request.use(
         config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
       } else if (config.useMultipart) {
         config.headers['Content-Type'] = 'multipart/form-data';
-        config.timeout = 60000;
+        config.timeout = 120000;
       } else {
         config.headers['Content-Type'] = 'application/json';
       }
@@ -74,7 +74,11 @@ router.interceptors.response.use(
   },
   error => {
     const { response } = error;
-    return Promise.reject(errorHandle(response.status, response.info));
+    try {
+      return Promise.reject(errorHandle(response.status, response.data));
+    } catch (e) {
+      return Promise.reject("对不起。我们遇到了一些未知的问题。");
+    }
   }
 )
 

@@ -1,8 +1,24 @@
 <template>
   <div>
-    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-    </v-container>
+    <template v-if="loading">
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <h3>
+              学而时习之，不亦说乎？
+            </h3>
+            <span>正在为你精心安排题目。</span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </template>
     <v-container class="spacing-playground pa-16" fluid v-else>
       <v-layout>
         <v-flex xs1>

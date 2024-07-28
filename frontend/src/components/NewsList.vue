@@ -1,8 +1,27 @@
 <template>
   <div>
-    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-    </v-container>
+    <template v-if="loading">
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <h3>
+              潮平两岸阔，风正一帆悬。
+            </h3>
+            <h4>
+              欢迎回到 ASEPT。
+            </h4>
+            <span>正在获取公告。</span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </template>
     <v-expansion-panels v-else inset v-model="activePanel" focusable>
       <v-expansion-panel v-if="news.length > 0" v-for="(item, index) in news" :key="index" :value="index === 0"
         :readonly="!item.is_active">

@@ -1,8 +1,24 @@
 <template>
   <div>
-    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-    </v-container>
+    <template v-if="loading">
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <h3>
+              落霞与孤鹜齐飞，秋水共长天一色。
+            </h3>
+            <span>正在获取你管理的题目。</span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </template>
     <v-container fluid v-else>
       <v-layout>
         <v-flex xs1>
