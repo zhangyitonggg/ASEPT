@@ -1,17 +1,8 @@
 <template>
-  <v-container
-    class="spacing-playground pa-16"
-    fluid
-  >
+  <v-container class="spacing-playground pa-16" fluid>
     <component :is="currentComponent" />
 
-    <v-bottom-navigation
-      app
-      fixed
-      color="primary"
-      v-model="activeBtn"
-      @change="handleNavigateClick"
-    >
+    <v-bottom-navigation app fixed color="primary" v-model="activeBtn" @change="handleNavigateClick">
       <v-btn value="problems">
         <span>题目</span>
         <v-icon>mdi-lightbulb-question</v-icon>

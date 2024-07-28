@@ -1,14 +1,11 @@
 <template>
   <div>
     <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     </v-container>
     <v-expansion-panels v-else inset v-model="activePanel" focusable>
-      <v-expansion-panel v-if="news.length > 0" v-for="(item, index) in news" :key="index" :value="index === 0" :readonly="!item.is_active">
+      <v-expansion-panel v-if="news.length > 0" v-for="(item, index) in news" :key="index" :value="index === 0"
+        :readonly="!item.is_active">
         <v-expansion-panel-header :disable-icon-rotate="!item.is_active">
           <div style="display: flex; justify-content: space-between; width: 100%;">
             <div>{{ item.title }}</div>
@@ -70,7 +67,7 @@ export default {
       })
       .catch(_ => {
         this.news = [];
-        this.$store.commit("setAlert", {type: "error", message: "无法获取公告。请检查你的网络设置。"})
+        this.$store.commit("setAlert", { type: "error", message: "无法获取公告。请检查你的网络设置。" })
       })
       .finally(() => {
         this.loading = false;

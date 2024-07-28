@@ -1,16 +1,12 @@
 <template>
   <div>
     <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     </v-container>
     <v-container fluid v-else>
       <v-layout>
-        <v-spacer/>
-        <searchbar v-model="search" searchBtnText='搜索团队'/>
+        <v-spacer />
+        <searchbar v-model="search" searchBtnText='搜索团队' />
       </v-layout>
       <v-col v-if="items.length == 0" class="d-flex justify-center">
         <h2>
@@ -21,17 +17,10 @@
         <v-list three-line>
           <div v-for="(item, index) in currentPageItems" :key="index">
             <v-divider inset></v-divider>
-            <v-subheader
-              v-if="item.header"
-              :key="item.header"
-              v-text="item.header"
-            ></v-subheader>
-            <v-list-item
-              v-else-if="item.group_name"
-              :key="item.group_name"
-            >
+            <v-subheader v-if="item.header" :key="item.header" v-text="item.header"></v-subheader>
+            <v-list-item v-else-if="item.group_name" :key="item.group_name">
               <v-list-item-avatar>
-                <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+                <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link" }}</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
@@ -40,20 +29,17 @@
                   </h4>
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                  Founder: 
+                  Founder:
                   <strong>
                     {{ item.founder }}
                   </strong>
                   <br>
                   Description:
-                    {{ item.description }}
+                  {{ item.description }}
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
-                <v-btn
-                  color="warning"
-                  @click="leave(item)"
-                > 离开 </v-btn>
+                <v-btn color="warning" @click="leave(item)"> 离开 </v-btn>
               </v-list-item-action>
             </v-list-item>
           </div>
@@ -62,29 +48,18 @@
       </v-col>
     </v-container>
     <v-row justify="center">
-      <v-dialog
-        v-model="dialog"
-        max-width="290"
-      >
+      <v-dialog v-model="dialog" max-width="290">
         <v-card>
           <v-card-title class="text-h7">
-            确定要离开 {{curItem.group_name}} 吗？
+            确定要离开 {{ curItem.group_name }} 吗？
           </v-card-title>
 
-           <v-card-actions>
+          <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="handleAboutClick(false)"
-            >
+            <v-btn color="green darken-1" text @click="handleAboutClick(false)">
               取消
             </v-btn>
-            <v-btn
-              color="red darken-1"
-              text
-              @click="handleAboutClick(true)"
-            >
+            <v-btn color="red darken-1" text @click="handleAboutClick(true)">
               确定
             </v-btn>
           </v-card-actions>
@@ -98,7 +73,7 @@
 import searchbar from './SearchBar.vue'
 
 export default {
-  data () {
+  data() {
     return {
       dialog: false,
       curItem: {},
@@ -112,7 +87,7 @@ export default {
     }
   },
   computed: {
-    numberOfPages () {
+    numberOfPages() {
       return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
     filteredItems() {
@@ -146,13 +121,13 @@ export default {
           this.loading = false;
         });
     },
-    nextPage () {
+    nextPage() {
       if (this.page + 1 <= this.numberOfPages) this.page += 1
     },
-    formerPage () {
+    formerPage() {
       if (this.page - 1 >= 1) this.page -= 1
     },
-    updateItemsPerPage (number) {
+    updateItemsPerPage(number) {
       this.itemsPerPage = number
     },
     leave(item) {
@@ -170,25 +145,25 @@ export default {
       this.dialog = false;
       if (flag) {
         this.$store
-        .dispatch("leaveGroup",{gid: this.curItem.gid})
-        .then((res) => {
-          if (flag) {
-            this.$store.commit("setAlert", {
-              type: "success",
-              message: `你离开了 ${this.curItem.group_name}`
-            })
-            const index = this.items.findIndex(item => item.gid === this.curItem.gid);
-            if (index !== -1) {
-              this.items.splice(index, 1);
+          .dispatch("leaveGroup", { gid: this.curItem.gid })
+          .then((res) => {
+            if (flag) {
+              this.$store.commit("setAlert", {
+                type: "success",
+                message: `你离开了 ${this.curItem.group_name}`
+              })
+              const index = this.items.findIndex(item => item.gid === this.curItem.gid);
+              if (index !== -1) {
+                this.items.splice(index, 1);
+              }
             }
-          }
-        })
-        .catch((e) => {
-          this.$store.commit("setAlert", {
-            type: "error",
-            message: e,
+          })
+          .catch((e) => {
+            this.$store.commit("setAlert", {
+              type: "error",
+              message: e,
+            });
           });
-        });
       }
     },
   },
@@ -226,7 +201,8 @@ export default {
 .pagination-info {
   font-size: 16px;
   font-weight: bold;
-  margin-left: 2%; /* Adjust as needed to move it slightly to the right */
+  margin-left: 2%;
+  /* Adjust as needed to move it slightly to the right */
 }
 
 .item-card {
@@ -238,14 +214,15 @@ export default {
 
 .description-text {
   display: block;
-  white-space: normal; /* Allow text to wrap onto multiple lines */
+  white-space: normal;
+  /* Allow text to wrap onto multiple lines */
 }
 
 .apply-button {
   font-size: 14px;
   position: absolute;
   color: white;
-  font-weight:900;
+  font-weight: 900;
   top: 15px;
   right: 20px;
 }

@@ -1,39 +1,25 @@
 <template>
   <div>
     <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     </v-container>
     <v-container v-else>
-      <v-btn
-        class="fixed-button"
-        fab
-        dark
-        color="indigo"
-        @click="returnback"
-      >
+      <v-btn class="fixed-button" fab dark color="indigo" @click="returnback">
         <v-icon dark>
           mdi-arrow-u-left-bottom-bold
         </v-icon>
       </v-btn>
-     
+
       <v-row justify="center">
         <v-col cols="12">
-  
+
           <v-card class="progress-card">
             <v-card-text>
               <h2 class="progress-text">当前进度：{{ currentProblemIndex + 1 }}/{{ totalProblems }}</h2>
-              <v-progress-linear
-                :value="progressValue"
-                color="green"
-                class="progress-bar"
-              ></v-progress-linear>
+              <v-progress-linear :value="progressValue" color="green" class="progress-bar"></v-progress-linear>
             </v-card-text>
           </v-card>
-  
+
           <v-form @submit.prevent="submitForm" v-if="question">
             <v-card class="large-card">
               <v-card-title>
@@ -45,98 +31,55 @@
                 <v-md-preview :text="question.content"></v-md-preview>
                 <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
                   <v-radio-group v-model="answer">
-                    <v-radio
-                      v-for="(choice, key) in question.choices"
-                      :key="key"
-                      :label="`${key}. ${choice}`"
-                      :value="key"
-                      class="option-box"
-                      :class="{
+                    <v-radio v-for="(choice, key) in question.choices" :key="key" :label="`${key}. ${choice}`"
+                      :value="key" class="option-box" :class="{
                         'correct-answer': resultType === 'success' && answer === key,
                         'wrong-answer': resultType === 'error' && answer === key,
                         'disabled': resultMessage
-                      }"
-                    >
+                      }">
                       <template v-slot:label>
-                        <v-icon
-                          v-if="resultType === 'success' && answer === key"
-                          class="correct-icon"
-                          color="green"
-                        >mdi-check-circle</v-icon>
-                        <v-icon
-                          v-if="resultType === 'error' && answer === key"
-                          class="wrong-icon"
-                          color="red"
-                        >mdi-close-circle</v-icon>
+                        <v-icon v-if="resultType === 'success' && answer === key" class="correct-icon"
+                          color="green">mdi-check-circle</v-icon>
+                        <v-icon v-if="resultType === 'error' && answer === key" class="wrong-icon"
+                          color="red">mdi-close-circle</v-icon>
                         {{ key }}. {{ choice }}
                       </template>
                     </v-radio>
                   </v-radio-group>
                 </template>
                 <template v-else-if="question.type === 'MULTI_CHOICE' && question.choices">
-                  <v-checkbox
-                    v-for="(choice, key) in question.choices"
-                    :key="key"
-                    :label="`${key}. ${choice}`"
-                    :value="key"
-                    v-model="selectedAnswers"
-                    @change="updateAnswers"
-                    class="option-box"
-                    :class="{
+                  <v-checkbox v-for="(choice, key) in question.choices" :key="key" :label="`${key}. ${choice}`"
+                    :value="key" v-model="selectedAnswers" @change="updateAnswers" class="option-box" :class="{
                       'correct-answer': resultType === 'success' && selectedAnswers.includes(key),
                       'wrong-answer': resultType === 'error' && selectedAnswers.includes(key),
                       'disabled': resultMessage
-                    }"
-                  >
+                    }">
                     <template v-slot:label>
-                      <v-icon
-                        v-if="resultType === 'success' && selectedAnswers.includes(key)"
-                        class="correct-icon"
-                        color="green"
-                      >mdi-check-circle</v-icon>
-                      <v-icon
-                        v-if="resultType === 'error' && selectedAnswers.includes(key)"
-                        class="wrong-icon"
-                        color="red"
-                      >mdi-close-circle</v-icon>
+                      <v-icon v-if="resultType === 'success' && selectedAnswers.includes(key)" class="correct-icon"
+                        color="green">mdi-check-circle</v-icon>
+                      <v-icon v-if="resultType === 'error' && selectedAnswers.includes(key)" class="wrong-icon"
+                        color="red">mdi-close-circle</v-icon>
                       {{ key }}. {{ choice }}
                     </template>
                   </v-checkbox>
                 </template>
                 <template v-else-if="question.type === 'BLANK_FILLING'">
-                  <v-text-field
-                    v-model="answer"
-                    label="填空"
-                  ></v-text-field>
+                  <v-text-field v-model="answer" label="填空"></v-text-field>
                 </template>
               </v-card-text>
               <v-card-actions>
-                <v-btn
-                  type="submit"
-                  color="success"
-                  class="green-button"
-                >
+                <v-btn type="submit" color="success" class="green-button">
                   提交
                 </v-btn>
-                <v-btn
-                  v-if="resultMessage && !showAnswers"
-                  @click="fetchCorrectAnswers"
-                  color="success"
-                  class="green-button"
-                >
+                <v-btn v-if="resultMessage && !showAnswers" @click="fetchCorrectAnswers" color="success"
+                  class="green-button">
                   显示答案
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-btn
-                  @click="previousProblem"
-                  class="navigation-button"
-                >
+                <v-btn @click="previousProblem" class="navigation-button">
                   <span class="green-text">上一题</span>
                 </v-btn>
-                <v-btn
-                  @click="nextProblem"
-                  class="navigation-button"
-                >
+                <v-btn @click="nextProblem" class="navigation-button">
                   <span class="green-text">下一题</span>
                 </v-btn>
               </v-card-actions>
@@ -226,8 +169,8 @@ export default {
     this.fetchQuestion();
   },
   watch: {
-  '$route.params.pid': 'fetchQuestion',
-},
+    '$route.params.pid': 'fetchQuestion',
+  },
   methods: {
     fetchQuestion() {
       this.loading = true;
@@ -260,10 +203,10 @@ export default {
     previousProblem() {
       const currentIndex = this.currentProblemIndex;
       if (currentIndex > 0) {
-        const previousProblem =this.$store.state.currentProblemGroup.problems[currentIndex - 1];
-          this.selectedAnswers = [];
-          this.showAnswers = false;
-          this.resultType = '';
+        const previousProblem = this.$store.state.currentProblemGroup.problems[currentIndex - 1];
+        this.selectedAnswers = [];
+        this.showAnswers = false;
+        this.resultType = '';
         this.$router.push({ path: '' + previousProblem.pid });
       } else {
         this.$store.commit('setAlert', {
@@ -277,10 +220,10 @@ export default {
       if (currentIndex < this.totalProblems - 1) {
         const nextProblem =
           this.$store.state.currentProblemGroup.problems[currentIndex + 1];
-          this.selectedAnswers = [];
-          this.showAnswers = false;
-          this.resultType = '';
-          this.$router.push({ path: '' + nextProblem.pid });
+        this.selectedAnswers = [];
+        this.showAnswers = false;
+        this.resultType = '';
+        this.$router.push({ path: '' + nextProblem.pid });
       } else {
         this.$store.commit('setAlert', {
           type: 'warning',
@@ -288,11 +231,11 @@ export default {
         });
       }
     },
-  getCurrentProblemIndex() {
-    return this.$store.state.currentProblemGroup.problems.findIndex(
-      (problem) => problem.pid === this.pid
-    );
-  },
+    getCurrentProblemIndex() {
+      return this.$store.state.currentProblemGroup.problems.findIndex(
+        (problem) => problem.pid === this.pid
+      );
+    },
     parseChoices(choices) {
       if (choices) {
         return JSON.parse(choices);
@@ -345,7 +288,7 @@ export default {
             this.resultType = 'error';
           }
           this.showAnswers = false;
-          this.hideAlertAfterDelay(); 
+          this.hideAlertAfterDelay();
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -369,10 +312,10 @@ export default {
         });
     },
     hideAlertAfterDelay() {
-    setTimeout(() => {
-      this.resultMessage = ''; // 清除提示信息
-    }, 4000); // 5秒后隐藏提示信息
-  },
+      setTimeout(() => {
+        this.resultMessage = ''; // 清除提示信息
+      }, 4000); // 5秒后隐藏提示信息
+    },
     returnback() {
       //this.$router.go(-1);
       this.$router.push('/exercises');
@@ -388,6 +331,7 @@ export default {
   top: 15%;
   z-index: 5;
 }
+
 .navigation-button {
   background-color: transparent;
   color: inherit;
@@ -402,6 +346,7 @@ export default {
   margin: 0 auto;
   padding: 20px;
 }
+
 .progress-card {
   width: 100%;
   max-width: 1900px;
@@ -466,7 +411,7 @@ export default {
 
 .answer-card-large {
   background-color: #28a745;
-  
+
   width: 100%;
   max-width: 1900px;
   margin: 0 auto;
@@ -476,6 +421,7 @@ export default {
 .mt-4 {
   margin-top: 16px;
 }
+
 .disabled {
   pointer-events: none;
 }

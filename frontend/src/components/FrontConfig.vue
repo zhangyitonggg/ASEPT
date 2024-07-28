@@ -8,12 +8,7 @@
     <v-row>
       <v-col>
         <v-col>
-          <v-switch
-          inset
-          v-model="$vuetify.theme.dark"
-          label="启用黑暗模式"
-          @click="handleDarkTheme"
-          />
+          <v-switch inset v-model="$vuetify.theme.dark" label="启用黑暗模式" @click="handleDarkTheme" />
         </v-col>
       </v-col>
     </v-row>
@@ -21,10 +16,10 @@
 </template>
 
 <script>
-export default{
+export default {
   methods: {
     handleDarkTheme() {
-      this.$store.commit("setAlert", this.$vuetify.theme.dark ? {"type": "success", "message": "黑暗模式已启用。"} : {"type": "success", "message": "黑暗模式已关闭。"});
+      this.$store.commit("setAlert", this.$vuetify.theme.dark ? { "type": "success", "message": "黑暗模式已启用。" } : { "type": "success", "message": "黑暗模式已关闭。" });
       localStorage.setItem("__dark_theme__", this.$vuetify.theme.dark);
     }
   }

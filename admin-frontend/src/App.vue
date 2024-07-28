@@ -1,58 +1,44 @@
 <template>
-    <v-app id="inspire">
-      <v-app-bar
-        app
-        v-if="$store.state._show_platform_frame_"
-      >
-        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-        <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
+  <v-app id="inspire">
+    <v-app-bar app v-if="$store.state._show_platform_frame_">
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <div>{{ getCurrentTimeGreetings() }}，{{ $store.getters.username }}</div>
+    </v-app-bar>
+    <v-navigation-drawer v-model="drawer" fixed temporary>
+      <div class="d-flex flex-column" style="height: 100%;">
+        <v-list class="flex-grow-1">
+          <v-list-item v-for="[icon, text, route] in links" :key="icon" link @click="navigateTo(route)">
+            <v-list-item-icon>
+              <v-icon>{{ icon }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>{{ text }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
         <v-spacer></v-spacer>
-        <div>{{ getCurrentTimeGreetings() }}，{{ $store.getters.username }}</div>
-      </v-app-bar>
-      <v-navigation-drawer
-        v-model="drawer"
-        fixed
-        temporary>
-        <div class="d-flex flex-column" style="height: 100%;">
-          <v-list class="flex-grow-1">
-            <v-list-item
-              v-for="[icon, text, route] in links"
-              :key="icon"
-              link
-              @click="navigateTo(route)">
-              <v-list-item-icon>
-                <v-icon>{{ icon }}</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>{{ text }}</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-          <v-spacer></v-spacer>
-          <v-list>
-            <v-list-item link @click="handleAboutClick" class="about-btn">
-              <v-list-item-icon>
-                <v-icon>mdi-progress-question</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>关于</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </div>
-      </v-navigation-drawer>
-      <v-main>
-        <router-view />
-      </v-main>
-      <v-alert
-        elevation="11"
-        v-show="$store.state._alert_.show"
-        :type="$store.state._alert_.type"
-        transition="scroll-y-transition"
-      >{{ $store.state._alert_.message }}
-      </v-alert>
-    </v-app>
-  </template>
+        <v-list>
+          <v-list-item link @click="handleAboutClick" class="about-btn">
+            <v-list-item-icon>
+              <v-icon>mdi-progress-question</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>关于</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </div>
+    </v-navigation-drawer>
+    <v-main>
+      <router-view />
+    </v-main>
+    <v-alert elevation="11" v-show="$store.state._alert_.show" :type="$store.state._alert_.type"
+      transition="scroll-y-transition">{{ $store.state._alert_.message }}
+    </v-alert>
+  </v-app>
+</template>
 
 <script lang="ts">
 import Vue from 'vue';
@@ -79,10 +65,10 @@ const App = Vue.extend({
   methods: {
     navigateTo(route) {
       this.$router.push(route).catch(err => {
-      if (err.name !== 'NavigationDuplicated') {
-        throw err;
-      }
-    });
+        if (err.name !== 'NavigationDuplicated') {
+          throw err;
+        }
+      });
     },
     handleAboutClick() { // 处理关于按钮点击事件
       this.navigateTo('/about');
@@ -129,10 +115,13 @@ export default App;
   left: 0;
 }
 
-.slide-y-enter-active, .slide-y-leave-active {
+.slide-y-enter-active,
+.slide-y-leave-active {
   transition: all 0.5s ease;
 }
-.slide-y-enter, .slide-y-leave-to {
+
+.slide-y-enter,
+.slide-y-leave-to {
   transform: translateY(100%);
   opacity: 0;
 }

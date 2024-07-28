@@ -36,28 +36,28 @@ const router = axios.create({
 
 
 router.interceptors.request.use(
-config => {
-  if (config.method === 'post') {
-    if (config.useQs) {
-      config.data = qs.stringify(config.data);
-      config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-    } else {
-      config.headers['Content-Type'] = 'application/json';
+  config => {
+    if (config.method === 'post') {
+      if (config.useQs) {
+        config.data = qs.stringify(config.data);
+        config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+      } else {
+        config.headers['Content-Type'] = 'application/json';
+      }
     }
+    const token = store.state._token_;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      config.params = {
+        ...config.params,
+        authorized_user_name: store.getters.username
+      };
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
   }
-  const token = store.state._token_;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-    config.params = {
-      ...config.params,
-      authorized_user_name: store.getters.username
-    };
-  }
-  return config;
-},
-error => {
-  return Promise.reject(error);
-}
 )
 
 router.interceptors.response.use(

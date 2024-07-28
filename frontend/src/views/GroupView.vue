@@ -1,13 +1,7 @@
 <template>
   <v-container>
     <component :is="currentComponent"></component>
-    <v-bottom-navigation
-      app
-      fixed
-      color="primary"
-      v-model="activeBtn"
-      @change="handleNavigateClick"
-    >
+    <v-bottom-navigation app fixed color="primary" v-model="activeBtn" @change="handleNavigateClick">
       <v-btn value="mygroups">
         <span>我的团队</span>
         <v-icon>mdi-account-group-outline</v-icon>

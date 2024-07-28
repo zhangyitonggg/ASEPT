@@ -1,33 +1,23 @@
 <template>
   <div>
     <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     </v-container>
     <v-container fluid v-else>
       <v-layout>
         <!-- 查找题目按钮 -->
-        <v-btn color="primary" @click=" openSearchDialog">查找题目</v-btn>
-        <v-spacer/>
+        <v-btn color="primary" @click="openSearchDialog">查找题目</v-btn>
+        <v-spacer />
         <v-flex xs24>
-          <searchbar v-model="search" searchBtnText='搜索题目'/>
+          <searchbar v-model="search" searchBtnText='搜索题目' />
         </v-flex>
       </v-layout>
       <v-col>
         <v-list three-line>
           <v-subheader>题目列表</v-subheader>
           <template v-for="(item, index) in currentPageItems">
-            <v-divider
-              v-if="item.divider"
-              :inset="item.inset"
-            ></v-divider>
-            <v-list-item
-              v-else
-              :key="item.pid"
-            >
+            <v-divider v-if="item.divider" :inset="item.inset"></v-divider>
+            <v-list-item v-else :key="item.pid">
               <v-list-item-avatar>
                 <v-icon> mdi-help-circle-outline</v-icon>
               </v-list-item-avatar>
@@ -42,17 +32,14 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
-                <v-btn
-                  color="primary"
-                  @click="solveProblem(item)"
-                > 去做题 </v-btn>
+                <v-btn color="primary" @click="solveProblem(item)"> 去做题 </v-btn>
               </v-list-item-action>
             </v-list-item>
           </template>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
       </v-col>
-      
+
       <!-- 查找题目弹窗 -->
       <v-dialog v-model="showSearchDialog" max-width="800px">
         <v-card>
@@ -65,20 +52,9 @@
           </v-card-title>
           <v-card-text>
             <v-form @submit.prevent="searchProblems">
-              <v-select
-                v-model="searchTag"
-                :items="tags"
-                item-text="tag_name"
-                item-value="tid"
-                label="选择标签"
-                outlined
-                clearable
-              ></v-select>
-              <v-text-field
-                v-model="searchKeyword"
-                label="关键词"
-                outlined
-              ></v-text-field>
+              <v-select v-model="searchTag" :items="tags" item-text="tag_name" item-value="tid" label="选择标签" outlined
+                clearable></v-select>
+              <v-text-field v-model="searchKeyword" label="关键词" outlined></v-text-field>
               <v-btn color="primary" type="submit">搜索</v-btn>
             </v-form>
             <v-list three-line>
@@ -171,7 +147,7 @@ export default {
         .dispatch('getAllProblems')
         .then(res => {
           this.items = [{ header: '我创建的题目' }, ...res.problems];
-          console.log("hhh",this.items);
+          console.log("hhh", this.items);
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -187,11 +163,11 @@ export default {
       this.itemsPerPage = number;
     },
     solveProblem(item) {
-      this.$store.commit('setCurrentProblemGroup', {problems: this.items.slice(1)});
+      this.$store.commit('setCurrentProblemGroup', { problems: this.items.slice(1) });
       this.$router.push({ path: 'solve/' + item.pid, append: true });
     },
     solveProbleminTag(item) {
-      this.$store.commit('setCurrentProblemGroup', {problems: this.searchResults});
+      this.$store.commit('setCurrentProblemGroup', { problems: this.searchResults });
       this.$router.push({ path: 'solve/' + item.pid, append: true });
     },
     searchProblems() {
@@ -199,7 +175,7 @@ export default {
       let mykeyword = this.searchKeyword || '';
       console.log(mytag);
       this.$store
-        .dispatch('searchProblemByTag', {tag:mytag, keyword: mykeyword})
+        .dispatch('searchProblemByTag', { tag: mytag, keyword: mykeyword })
         .then(res => {
           this.searchResults = res.problems;
         })
@@ -228,7 +204,7 @@ export default {
         });
     },
     selectTag(tag) {
-      this.searchTag =  tag;
+      this.searchTag = tag;
       console.log(this.searchTag.tag_name);
     },
   },
@@ -256,7 +232,8 @@ export default {
 .pagination-info {
   font-size: 16px;
   font-weight: bold;
-  margin-left: 2%; /* Adjust as needed to move it slightly to the right */
+  margin-left: 2%;
+  /* Adjust as needed to move it slightly to the right */
 }
 
 .item-card {
@@ -268,7 +245,8 @@ export default {
 
 .description-text {
   display: block;
-  white-space: normal; /* Allow text to wrap onto multiple lines */
+  white-space: normal;
+  /* Allow text to wrap onto multiple lines */
 }
 
 .apply-button {
@@ -284,8 +262,9 @@ export default {
   display: flex;
   flex-wrap: wrap;
   margin-top: 10px;
- 
+
 }
+
 .ma-2 {
   margin: 5px;
 }

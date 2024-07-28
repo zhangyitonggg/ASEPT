@@ -1,10 +1,6 @@
 <template>
   <v-list dense>
-    <v-list-item 
-      v-for="post in posts" 
-      :key="post.id" 
-      @click="selectPost(post)"
-    >
+    <v-list-item v-for="post in posts" :key="post.id" @click="selectPost(post)">
       <v-list-item-content>
         <v-list-item-title>{{ post.title }}</v-list-item-title>
       </v-list-item-content>
@@ -18,14 +14,14 @@ export default {
   data() {
     return {
       posts: [
-          {
-            id: 111,
-            title: 'Post Title'
-          },
-          {
-            id: 222,
-            title: 'Another Post Title',
-          }
+        {
+          id: 111,
+          title: 'Post Title'
+        },
+        {
+          id: 222,
+          title: 'Another Post Title',
+        }
       ],
     }
   },

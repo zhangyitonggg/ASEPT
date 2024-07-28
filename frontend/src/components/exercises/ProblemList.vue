@@ -1,33 +1,19 @@
-
-
 <template>
   <div>
     <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     </v-container>
     <v-container fluid v-else>
       <v-layout>
         <v-flex xs24>
-          <searchbar v-model="search" searchBtnText='搜索题单'/>
+          <searchbar v-model="search" searchBtnText='搜索题单' />
         </v-flex>
       </v-layout>
       <v-col>
         <v-list three-line>
           <template v-for="(item, index) in currentPageItems">
-            <v-subheader
-              v-if="item.header"
-              :key="item.header"
-              v-text="item.header"
-            ></v-subheader>
-            <v-divider
-              v-else-if="item.divider"
-              :key="index"
-              :inset="item.inset"
-            ></v-divider>
+            <v-subheader v-if="item.header" :key="item.header" v-text="item.header"></v-subheader>
+            <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
             <v-list-item v-else-if="item.pgid" :key="item.pgid">
               <v-list-item-avatar>
                 <v-icon> mdi-invoice-list-outline</v-icon>
@@ -44,13 +30,13 @@
                 <v-btn color="primary" @click="openDialog(item)">查看题单</v-btn>
               </v-list-item-action>
             </v-list-item>
-             <v-divider v-if="index < currentPageItems.length - 1"></v-divider>
+            <v-divider v-if="index < currentPageItems.length - 1"></v-divider>
           </template>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
       </v-col>
-  
-    
+
+
       <v-dialog v-model="dialog" max-width="800px">
         <v-card>
           <v-card-title class="titlebig">
@@ -59,7 +45,7 @@
             <v-btn icon @click="dialog = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
-          </v-card-title><br/>
+          </v-card-title><br />
           <v-card-subtitle class="big">
             题单名称: {{ currentItem.name }}
           </v-card-subtitle>
@@ -170,7 +156,7 @@ export default {
             message: error,
           });
         })
-        .finally(() => {  
+        .finally(() => {
           this.loading = false;
         });
     },
@@ -221,7 +207,8 @@ export default {
 .pagination-info {
   font-size: 16px;
   font-weight: bold;
-  margin-left: 2%; /* Adjust as needed to move it slightly to the right */
+  margin-left: 2%;
+  /* Adjust as needed to move it slightly to the right */
 }
 
 .item-card {
@@ -233,7 +220,8 @@ export default {
 
 .description-text {
   display: block;
-  white-space: normal; /* Allow text to wrap onto multiple lines */
+  white-space: normal;
+  /* Allow text to wrap onto multiple lines */
 }
 
 .apply-button {
@@ -253,4 +241,3 @@ export default {
   font-size: 35px;
 }
 </style>
-

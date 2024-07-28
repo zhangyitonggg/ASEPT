@@ -65,7 +65,7 @@ const routes: Array<RouteConfig> = [
     }
   },
   {
-    path:'/users',
+    path: '/users',
     name: 'users',
     component: () => import('../views/UserView.vue'),
     meta: {
@@ -103,9 +103,9 @@ router.beforeEach((to, from, next) => {
     sessionStorage.removeItem('__user_name__');
     store.commit("hidePlatformFrame");
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        next({ name: 'login' });
+      next({ name: 'login' });
     } else {
-      document.title =  title + default_title;
+      document.title = title + default_title;
       next();
     }
   } else {
@@ -113,7 +113,7 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresNotAuthed)) {
       next({ name: 'home' });
     } else {
-      document.title =  title + default_title;
+      document.title = title + default_title;
       next();
     }
   }

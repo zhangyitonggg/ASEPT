@@ -1,17 +1,8 @@
 <template>
-  <v-container
-    class="spacing-playground pa-16"
-    fluid
-  >
+  <v-container class="spacing-playground pa-16" fluid>
     <component :is="currentComponent" />
 
-    <v-bottom-navigation
-      app
-      fixed
-      color="primary"
-      v-model="activeBtn"
-      @change="handleNavigateClick"
-    >
+    <v-bottom-navigation app fixed color="primary" v-model="activeBtn" @change="handleNavigateClick">
       <v-btn value="manageProblemGroups">
         <span>管理题单</span>
         <v-icon>mdi-window-shutter-cog</v-icon>
@@ -60,7 +51,7 @@ export default {
         switch (newValue) {
           case 'manageProblems':
             return '管理题目';
-            default:
+          default:
             return '管理题单';
         }
       })());

@@ -2,20 +2,10 @@
   <div class="expandable-search">
     <v-btn @click="toggleSearch" v-show="!open ^ this.openBar">
       <v-icon> {{ searchBtnIcon }}</v-icon>
-      {{searchBtnText}}
+      {{ searchBtnText }}
     </v-btn>
-      <v-text-field
-        v-if="open ^ this.openBar"
-        v-model="search"
-        @input="updateSearch"
-        class="search-input"
-        dense
-        append-icon="mdi-close"
-        flat
-        hide-details
-        @click:append="hideSearch"
-        ref="searchInput"
-      ></v-text-field>
+    <v-text-field v-if="open ^ this.openBar" v-model="search" @input="updateSearch" class="search-input" dense
+      append-icon="mdi-close" flat hide-details @click:append="hideSearch" ref="searchInput"></v-text-field>
   </div>
 </template>
 
@@ -60,17 +50,21 @@ export default {
 
 <style scoped>
 .expandable-search {
-  position: relative; /* Position relative to the parent container */
+  position: relative;
+  /* Position relative to the parent container */
   display: flex;
-  flex-direction: row-reverse; /* Align the button to the right */
+  flex-direction: row-reverse;
+  /* Align the button to the right */
 }
 
 .search-input {
-  width: 250px; /* Define your desired width */
+  width: 250px;
+  /* Define your desired width */
   height: 32px;
 }
 
 .v-btn {
-  height: 56px; /* Ensuring both have the same height */
+  height: 56px;
+  /* Ensuring both have the same height */
 }
 </style>

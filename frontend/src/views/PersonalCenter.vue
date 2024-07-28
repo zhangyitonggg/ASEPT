@@ -1,15 +1,7 @@
 <template>
-  <v-container
-    class="spacing-playground pa-16"
-    fluid
-  > <component :is="this.activeBtn" />
-    <v-bottom-navigation
-      app
-      fixed
-      color="primary"
-      v-model="activeBtn"
-      @change="handleNavigateClick"
-    >
+  <v-container class="spacing-playground pa-16" fluid>
+    <component :is="this.activeBtn" />
+    <v-bottom-navigation app fixed color="primary" v-model="activeBtn" @change="handleNavigateClick">
       <v-btn value="myinfo">
         <span>个人信息</span>
         <v-icon>mdi-account-settings</v-icon>

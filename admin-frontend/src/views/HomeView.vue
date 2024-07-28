@@ -1,16 +1,7 @@
 <template>
-  <v-container
-    class="spacing-playground pa-16"
-    fluid
-  >
+  <v-container class="spacing-playground pa-16" fluid>
     <component :is="currentComponent" />
-    <v-bottom-navigation
-      app
-      fixed
-      color="primary"
-      v-model="activeBtn"
-      @change="handleNavigateClick"
-    >
+    <v-bottom-navigation app fixed color="primary" v-model="activeBtn" @change="handleNavigateClick">
       <v-btn value="news">
         <span>公告</span>
         <v-icon>mdi-message-alert-outline</v-icon>
@@ -62,7 +53,7 @@ export default {
       if (newValue == 'waterbar') {
         this.$nextTick(() => {
           this.activeBtn = 'news';
-          this.$store.commit("setAlert", {"type": "info", "message": "coming soon..."})
+          this.$store.commit("setAlert", { "type": "info", "message": "coming soon..." })
         });
       }
     },

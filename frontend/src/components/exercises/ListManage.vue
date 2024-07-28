@@ -1,11 +1,7 @@
 <template>
   <div>
     <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     </v-container>
     <v-container fluid v-else>
       <v-layout>
@@ -13,12 +9,12 @@
         <v-flex xs1>
           <v-btn color="primary" @click="showCreateDialog = true">创建题单</v-btn>
         </v-flex>
-        <v-spacer/>
+        <v-spacer />
         <v-flex xs24>
-          <searchbar v-model="search" searchBtnText='搜索题单'/>
+          <searchbar v-model="search" searchBtnText='搜索题单' />
         </v-flex>
       </v-layout>
-      
+
       <v-col>
         <v-list three-line>
           <template v-for="(item, index) in currentPageItems">
@@ -45,7 +41,7 @@
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
       </v-col>
-  
+
       <!-- 创建题单弹窗 -->
       <v-dialog v-model="showCreateDialog" max-width="500px">
         <v-card>
@@ -68,7 +64,7 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-  
+
       <!-- 分享题单弹窗 -->
       <v-dialog v-model="showShareDialog" max-width="500px">
         <v-card>
@@ -81,14 +77,8 @@
           </v-card-title>
           <v-card-text>
             <v-form @submit.prevent="shareList">
-              <v-select
-                v-model="selectedGroup"
-                :items="groups"
-                item-text="group_name"
-                item-value="gid"
-                label="选择群组"
-                required
-              ></v-select>
+              <v-select v-model="selectedGroup" :items="groups" item-text="group_name" item-value="gid" label="选择群组"
+                required></v-select>
               <v-card-actions>
                 <v-btn color="primary" type="submit">分享</v-btn>
                 <v-btn text @click="showShareDialog = false">取消</v-btn>
@@ -203,7 +193,7 @@ export default {
           pgid: this.selectedItem.pgid,
           gid: this.selectedGroup,
         };
-        
+
         this.$store
           .dispatch('shareProblemList', data)
           .then(() => {
@@ -273,7 +263,8 @@ export default {
 .pagination-info {
   font-size: 16px;
   font-weight: bold;
-  margin-left: 2%; /* Adjust as needed to move it slightly to the right */
+  margin-left: 2%;
+  /* Adjust as needed to move it slightly to the right */
 }
 
 .item-card {
@@ -285,7 +276,8 @@ export default {
 
 .description-text {
   display: block;
-  white-space: normal; /* Allow text to wrap onto multiple lines */
+  white-space: normal;
+  /* Allow text to wrap onto multiple lines */
 }
 
 .apply-button {

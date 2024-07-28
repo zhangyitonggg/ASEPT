@@ -8,9 +8,9 @@
         <v-flex xs1>
           <v-btn color="primary" @click="dialogCreate = true">创建题目</v-btn>
         </v-flex>
-        <v-spacer/>
+        <v-spacer />
         <v-flex xs24>
-          <searchbar v-model="search" searchBtnText='搜索题目'/>
+          <searchbar v-model="search" searchBtnText='搜索题目' />
         </v-flex>
       </v-layout>
       <v-col>
@@ -44,57 +44,58 @@
       </v-col>
 
       <!-- 创建题目对话框 -->
-<v-dialog v-model="dialogCreate" max-width="600px">
-  <v-card>
-    <v-card-title>
-      创建新题目
-      <v-spacer></v-spacer>
-      <v-btn icon @click="dialogCreate = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-card-title>
-    <v-card-text>
-      <v-file-input
-        v-model="uploadedFile"
-        ref="fileInput"
-        label="上传 PDF 文件"
-        accept=".pdf"
-        @change="handleFileUpload"
-      ></v-file-input>
-      <v-text-field v-model="newProblem.name" label="题目名称" required></v-text-field>
-      <v-textarea v-model="newProblem.content" label="题目内容" rows="4" required></v-textarea>
-      <v-text-field v-model="newProblem.tag" label="标签"></v-text-field>
-      <v-select v-model="newProblem.type" :items="questionTypes" label="题目类型" required></v-select>
-
-      <!-- 单选和多选题的选项输入 -->
-      <template v-if="isMultipleChoice(newProblem.type)">
-        <v-text-field v-for="(option, index) in newProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="newProblem.options[index]">
-          <template v-slot:append>
-            <v-btn icon @click="removeOption(index)">
+      <v-dialog v-model="dialogCreate" max-width="600px">
+        <v-card>
+          <v-card-title>
+            创建新题目
+            <v-spacer></v-spacer>
+            <v-btn icon @click="dialogCreate = false">
               <v-icon>mdi-close</v-icon>
             </v-btn>
-          </template>
-        </v-text-field>
+          </v-card-title>
+          <v-card-text>
+            <v-file-input v-model="uploadedFile" ref="fileInput" label="上传 PDF 文件" accept=".pdf"
+              @change="handleFileUpload"></v-file-input>
+            <v-text-field v-model="newProblem.name" label="题目名称" required></v-text-field>
+            <v-textarea v-model="newProblem.content" label="题目内容" rows="4" required></v-textarea>
+            <v-text-field v-model="newProblem.tag" label="标签"></v-text-field>
+            <v-select v-model="newProblem.type" :items="questionTypes" label="题目类型" required></v-select>
 
-        <v-select v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
+            <!-- 单选和多选题的选项输入 -->
+            <template v-if="isMultipleChoice(newProblem.type)">
+              <v-text-field v-for="(option, index) in newProblem.options" :key="index" :label="'选项 ' + (index + 1)"
+                v-model="newProblem.options[index]">
+                <template v-slot:append>
+                  <v-btn icon @click="removeOption(index)">
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                </template>
+              </v-text-field>
 
-        <v-select v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+              <v-select v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer"
+                :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                label="选择正确答案" required></v-select>
 
-        <v-btn @click="addOption">添加选项</v-btn>
-      </template>
+              <v-select v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers"
+                :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                label="选择正确答案" multiple required></v-select>
 
-      <!-- 填空题的答案输入 -->
-      <template v-if="newProblem.type === 'BLANK_FILLING'">
-        <v-text-field v-for="(blank, index) in newProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="newProblem.fillBlanks[index]"></v-text-field>
-        <v-btn @click="addFillBlank">添加答案</v-btn>
-      </template>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn color="primary" @click="createProblem">保存题目</v-btn>
-      <v-btn text @click="dialogCreate = false">取消</v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+              <v-btn @click="addOption">添加选项</v-btn>
+            </template>
+
+            <!-- 填空题的答案输入 -->
+            <template v-if="newProblem.type === 'BLANK_FILLING'">
+              <v-text-field v-for="(blank, index) in newProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)"
+                v-model="newProblem.fillBlanks[index]"></v-text-field>
+              <v-btn @click="addFillBlank">添加答案</v-btn>
+            </template>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" @click="createProblem">保存题目</v-btn>
+            <v-btn text @click="dialogCreate = false">取消</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
 
       <!-- 添加题单对话框 -->
@@ -109,7 +110,8 @@
           </v-card-title>
           <v-card-text>
             请选择要添加到的题单:
-            <v-select v-model="selectedList" :items="listOptions" label="选择题单" item-text="name" item-value="pgid" required></v-select>
+            <v-select v-model="selectedList" :items="listOptions" label="选择题单" item-text="name" item-value="pgid"
+              required></v-select>
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="confirmAddToList">确认添加</v-btn>
@@ -189,7 +191,7 @@ export default {
       uploadedFile: null, // 上传的文件
       currentPage: 1,
       problems: [],
-      search:'',
+      search: '',
     };
   },
   watch: {
@@ -229,33 +231,33 @@ export default {
     searchbar,
   },
   methods: {
-    
+
     handleFileUpload() {
-    // const fileInput = this.$refs.fileInput;
-    // if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-    //   this.$store.commit('setAlert', {
-    //     type: 'error',
-    //     message: '无法获取上传的文件。',
-    //   });
-    //   return;
-    // }
+      // const fileInput = this.$refs.fileInput;
+      // if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      //   this.$store.commit('setAlert', {
+      //     type: 'error',
+      //     message: '无法获取上传的文件。',
+      //   });
+      //   return;
+      // }
       if (this.uploadedFile) {
-          // let formData = new FormData();
-          // formData.append('file', file);
+        // let formData = new FormData();
+        // formData.append('file', file);
         console.log(this.uploadedFile);
         // console.log(formData);
 
-      this.$store.dispatch('uploadFile', this.uploadedFile)
-        .then(response => {
-          // 假设 response.data.text 是从 PDF 中提取的文本
-          console.log(response.text);
-        })
-        .catch(error => {
-          this.$store.commit('setAlert', {
-            type: 'error',
-            message: error.message || '上传文件失败。',
+        this.$store.dispatch('uploadFile', this.uploadedFile)
+          .then(response => {
+            // 假设 response.data.text 是从 PDF 中提取的文本
+            console.log(response.text);
+          })
+          .catch(error => {
+            this.$store.commit('setAlert', {
+              type: 'error',
+              message: error.message || '上传文件失败。',
+            });
           });
-        });
       }
     },
     fetchProblems() {
@@ -288,7 +290,7 @@ export default {
         });
     },
     isMultipleChoice(type) {
-      return ['SINGLE_CHOICE','MULTI_CHOICE'].includes(type);
+      return ['SINGLE_CHOICE', 'MULTI_CHOICE'].includes(type);
     },
     addOption() {
       this.newProblem.options.push('');
@@ -365,88 +367,88 @@ export default {
         });
     },
     createProblem() {
-  let choices = {};
-  let answer = {};
+      let choices = {};
+      let answer = {};
 
-  if (this.newProblem.type === 'SINGLE_CHOICE' || this.newProblem.type === 'MULTI_CHOICE') {
-    // 构造 choices 对象
-    choices = this.newProblem.options.reduce((acc, choice, index) => {
-      const key = String.fromCharCode(65 + index); // 生成键名，如 'A', 'B', 'C' 等
-      if (choice.trim()) {
-        acc[key] = choice;
-      }
-      return acc;
-    }, {});
+      if (this.newProblem.type === 'SINGLE_CHOICE' || this.newProblem.type === 'MULTI_CHOICE') {
+        // 构造 choices 对象
+        choices = this.newProblem.options.reduce((acc, choice, index) => {
+          const key = String.fromCharCode(65 + index); // 生成键名，如 'A', 'B', 'C' 等
+          if (choice.trim()) {
+            acc[key] = choice;
+          }
+          return acc;
+        }, {});
 
-    // 将 correctAnswers 数组转为对象
-    if (this.newProblem.type === 'MULTI_CHOICE') {
-      const sortedCorrectAnswers = this.newProblem.correctAnswers.slice().sort(); // 排序
-      answer = sortedCorrectAnswers.reduce((acc, key) => {
-        if (choices[key]) {
-          acc[key] = choices[key];
+        // 将 correctAnswers 数组转为对象
+        if (this.newProblem.type === 'MULTI_CHOICE') {
+          const sortedCorrectAnswers = this.newProblem.correctAnswers.slice().sort(); // 排序
+          answer = sortedCorrectAnswers.reduce((acc, key) => {
+            if (choices[key]) {
+              acc[key] = choices[key];
+            }
+            return acc;
+          }, {});
+        } else if (this.newProblem.type === 'SINGLE_CHOICE') {
+          const correctAnswerKey = this.newProblem.correctAnswer;
+          if (correctAnswerKey && choices[correctAnswerKey]) {
+            answer[correctAnswerKey] = choices[correctAnswerKey];
+          }
         }
-        return acc;
-      }, {});
-    } else if (this.newProblem.type === 'SINGLE_CHOICE') {
-      const correctAnswerKey = this.newProblem.correctAnswer;
-      if (correctAnswerKey && choices[correctAnswerKey]) {
-        answer[correctAnswerKey] = choices[correctAnswerKey];
+      } else if (this.newProblem.type === 'BLANK_FILLING') {
+        // 构造填空题答案对象
+        answer = this.newProblem.fillBlanks.reduce((acc, blank, index) => {
+          acc[`${index + 1}`] = blank;
+          return acc;
+        }, {});
       }
-    }
-  } else if (this.newProblem.type === 'BLANK_FILLING') {
-    // 构造填空题答案对象
-    answer = this.newProblem.fillBlanks.reduce((acc, blank, index) => {
-      acc[`${index + 1}`] = blank;
-      return acc;
-    }, {});
-  }
 
-  // 将对象转换为 JSON 字符串
-  const choicesJson = JSON.stringify(choices);
-  const answerJson = JSON.stringify(answer);
+      // 将对象转换为 JSON 字符串
+      const choicesJson = JSON.stringify(choices);
+      const answerJson = JSON.stringify(answer);
 
-  // 准备新的题目数据
-  const newProblemDataChoice = {
-    title: this.newProblem.name,
-    type: this.newProblem.type,
-    content: this.newProblem.content,
-    choices: choicesJson,
-    answer: answerJson,
-    tag: this.newProblem.tag,
-  };
-  const newProblemDataBlankFilling = {
-    title: this.newProblem.name,
-    type: this.newProblem.type,
-    content: this.newProblem.content,
-    answer: answerJson,
-    tag: this.newProblem.tag,
-  };
-  let newProblemData = {};
-  if(this.newProblem.type === 'BLANK_FILLING') {
-    newProblemData = newProblemDataBlankFilling;
-  } else {
-    newProblemData = newProblemDataChoice;
-  }
+      // 准备新的题目数据
+      const newProblemDataChoice = {
+        title: this.newProblem.name,
+        type: this.newProblem.type,
+        content: this.newProblem.content,
+        choices: choicesJson,
+        answer: answerJson,
+        tag: this.newProblem.tag,
+      };
+      const newProblemDataBlankFilling = {
+        title: this.newProblem.name,
+        type: this.newProblem.type,
+        content: this.newProblem.content,
+        answer: answerJson,
+        tag: this.newProblem.tag,
+      };
+      let newProblemData = {};
+      if (this.newProblem.type === 'BLANK_FILLING') {
+        newProblemData = newProblemDataBlankFilling;
+      } else {
+        newProblemData = newProblemDataChoice;
+      }
 
-  console.log(newProblemData);
-  // 发送请求创建题目
-  this.$store
-    .dispatch('createProblem', newProblemData)
-    .then(() => {
-      this.$store.commit('setAlert', {
-        type: 'success',
-        message: '题目创建成功！',
-      });
-      this.dialogCreate = false;
-      this.fetchProblems(); // 刷新题目列表
-    })
-    .catch((error) => {
-      this.$store.commit('setAlert', {
-        type: 'error',
-        message: error,
-      });
-    });
-},
+      console.log(newProblemData);
+      // 发送请求创建题目
+      this.$store
+        .dispatch('createProblem', newProblemData)
+        .then(() => {
+          this.$store.commit('setAlert', {
+            type: 'success',
+            message: '题目创建成功！',
+          });
+          this.dialogCreate = false;
+          this.fetchProblems(); // 刷新题目列表
+        })
+        .catch((error) => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        });
+    },
 
     resetNewProblem() {
       this.newProblem = {

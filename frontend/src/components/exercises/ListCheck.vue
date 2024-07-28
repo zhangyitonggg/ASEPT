@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-  <v-col>
+    <v-col>
       <v-card class="mb-5">
         <v-card-title>
           题目列表名称: {{ listName }}
@@ -10,15 +10,9 @@
         </v-card-subtitle>
       </v-card>
     </v-col>
-       <v-row class="align-center">
+    <v-row class="align-center">
       <v-col cols="auto">
-        <v-btn
-          class="fixed-button"
-          fab
-          dark
-          color="indigo"
-          @click="returnback"
-        >
+        <v-btn class="fixed-button" fab dark color="indigo" @click="returnback">
           <v-icon dark>
             mdi-arrow-u-left-bottom-bold
           </v-icon>
@@ -28,47 +22,33 @@
         <searchbar />
       </v-col>
     </v-row>
-      <v-col>
-        <v-list three-line>
-          <template v-for="(item, index) in items">
-            <v-subheader
-              v-if="item.header"
-              :key="item.header"
-              v-text="item.header"
-            ></v-subheader>
-            <v-divider
-              v-else-if="item.divider"
-              :key="index"
-              :inset="item.inset"
-            ></v-divider>
-            <v-list-item
-              v-else-if="item.name"
-              :key="item.name"
-            >
-              <v-list-item-avatar>
-                <v-icon> mdi-help-circle-outline</v-icon>
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>
-                  <h4>
-                    {{ item.name }}
-                  </h4>
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  Tag: {{ item.tag }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn
-                  color="primary"
-                  @click="solveProblem(item)"
-                > 去做题 </v-btn>
-              </v-list-item-action>
+    <v-col>
+      <v-list three-line>
+        <template v-for="(item, index) in items">
+          <v-subheader v-if="item.header" :key="item.header" v-text="item.header"></v-subheader>
+          <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
+          <v-list-item v-else-if="item.name" :key="item.name">
+            <v-list-item-avatar>
+              <v-icon> mdi-help-circle-outline</v-icon>
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title>
+                <h4>
+                  {{ item.name }}
+                </h4>
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                Tag: {{ item.tag }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-btn color="primary" @click="solveProblem(item)"> 去做题 </v-btn>
+            </v-list-item-action>
 
-            </v-list-item>
-          </template>
-        </v-list>
-      </v-col>
+          </v-list-item>
+        </template>
+      </v-list>
+    </v-col>
   </v-container>
 </template>
 
@@ -76,7 +56,7 @@
 import searchbar from '../SearchBar.vue'
 
 export default {
-  data () {
+  data() {
     return {
       itemsPerPageArray: [4, 8, 12],
       search: '',
@@ -126,25 +106,25 @@ export default {
     }
   },
   computed: {
-    numberOfPages () {
+    numberOfPages() {
       return Math.ceil(this.items.length / this.itemsPerPage)
     },
-    filteredKeys () {
+    filteredKeys() {
       return this.keys.filter(key => key !== 'Name')
     },
   },
   methods: {
-    nextPage () {
+    nextPage() {
       if (this.page + 1 <= this.numberOfPages) this.page += 1
     },
-    formerPage () {
+    formerPage() {
       if (this.page - 1 >= 1) this.page -= 1
     },
-    updateItemsPerPage (number) {
+    updateItemsPerPage(number) {
       this.itemsPerPage = number
     },
-    solveProblem(item){
-      this.$router.push({path:'solve',append:true});
+    solveProblem(item) {
+      this.$router.push({ path: 'solve', append: true });
     },
     returnback() {
       this.$router.go(-1);
@@ -174,7 +154,8 @@ export default {
 .pagination-info {
   font-size: 16px;
   font-weight: bold;
-  margin-left: 2%; /* Adjust as needed to move it slightly to the right */
+  margin-left: 2%;
+  /* Adjust as needed to move it slightly to the right */
 }
 
 .item-card {
@@ -186,14 +167,15 @@ export default {
 
 .description-text {
   display: block;
-  white-space: normal; /* Allow text to wrap onto multiple lines */
+  white-space: normal;
+  /* Allow text to wrap onto multiple lines */
 }
 
 .apply-button {
   font-size: 14px;
   position: absolute;
   color: white;
-  font-weight:900;
+  font-weight: 900;
   top: 15px;
   right: 20px;
 }

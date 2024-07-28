@@ -1,16 +1,12 @@
 <template>
   <div>
     <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     </v-container>
     <v-container fluid v-else>
       <v-layout>
-        <v-spacer/>
-        <searchbar v-model="search" searchBtnText='搜索团队'/>
+        <v-spacer />
+        <searchbar v-model="search" searchBtnText='搜索团队' />
       </v-layout>
       <v-col v-if="items.length == 0" class="d-flex justify-center">
         <h2>
@@ -21,17 +17,10 @@
         <v-list three-line>
           <template v-for="(item, index) in currentPageItems">
             <v-divider inset></v-divider>
-            <v-subheader
-              v-if="item.header"
-              :key="item.header"
-              v-text="item.header"
-            ></v-subheader>
-            <v-list-item
-              v-else-if="item.group_name"
-              :key="item.gid"
-            >
+            <v-subheader v-if="item.header" :key="item.header" v-text="item.header"></v-subheader>
+            <v-list-item v-else-if="item.group_name" :key="item.gid">
               <v-list-item-avatar>
-                <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link"}}</v-icon>
+                <v-icon> {{ item.need_password ? "mdi-link-lock" : "mdi-link" }}</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
@@ -40,7 +29,7 @@
                   </h4>
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                  Founder: 
+                  Founder:
                   <strong>
                     {{ item.founder }}
                   </strong>
@@ -50,10 +39,7 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
-                <v-btn
-                  color="primary"
-                  @click="applyJoin(item)"
-                > 加入 </v-btn>
+                <v-btn color="primary" @click="applyJoin(item)"> 加入 </v-btn>
               </v-list-item-action>
             </v-list-item>
           </template>
@@ -83,7 +69,7 @@
 import searchbar from './SearchBar.vue'
 
 export default {
-  data () {
+  data() {
     return {
       itemsPerPageArray: [4, 8, 12],
       search: '',
@@ -101,7 +87,7 @@ export default {
     this.getUnGroups();
   },
   computed: {
-    numberOfPages () {
+    numberOfPages() {
       return Math.ceil(this.filteredItems.length / this.itemsPerPage)
     },
     filteredItems() {
@@ -121,7 +107,7 @@ export default {
       this.$store.dispatch("showUnGroups")
         .then((res) => {
           this.items.splice(0, this.items.length, ...res.groups);
-          console.log('@',this.items);
+          console.log('@', this.items);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {
@@ -200,7 +186,8 @@ export default {
 .pagination-info {
   font-size: 16px;
   font-weight: bold;
-  margin-left: 2%; /* Adjust as needed to move it slightly to the right */
+  margin-left: 2%;
+  /* Adjust as needed to move it slightly to the right */
 }
 
 .item-card {
@@ -212,14 +199,15 @@ export default {
 
 .description-text {
   display: block;
-  white-space: normal; /* Allow text to wrap onto multiple lines */
+  white-space: normal;
+  /* Allow text to wrap onto multiple lines */
 }
 
 .apply-button {
   font-size: 14px;
   position: absolute;
   color: white;
-  font-weight:900;
+  font-weight: 900;
   top: 15px;
   right: 20px;
 }

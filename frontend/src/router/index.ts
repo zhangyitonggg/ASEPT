@@ -85,7 +85,7 @@ const routes: Array<RouteConfig> = [
       title: '去做题'
     }
   },
-  
+
   {
     path: '/exercises/list',
     name: 'list',
@@ -105,8 +105,8 @@ const routes: Array<RouteConfig> = [
     }
   },
   {
-    path:'/arrange',
-    name:'arrange',
+    path: '/arrange',
+    name: 'arrange',
     component: () => import('../views/ArrangeView.vue'),
     meta: {
       requiresAuth: true,
@@ -143,9 +143,9 @@ router.beforeEach((to, from, next) => {
     sessionStorage.removeItem('__user_name__');
     store.commit("hidePlatformFrame");
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        next({ name: 'login' });
+      next({ name: 'login' });
     } else {
-      document.title =  title + default_title;
+      document.title = title + default_title;
       next();
     }
   } else {
@@ -153,7 +153,7 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresNotAuthed)) {
       next({ name: 'home' });
     } else {
-      document.title =  title + default_title;
+      document.title = title + default_title;
       next();
     }
   }

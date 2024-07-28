@@ -8,9 +8,9 @@
         <v-flex xs1>
           <v-btn color="primary" @click="openCreateDialog">创建题目</v-btn>
         </v-flex>
-        <v-spacer/>
+        <v-spacer />
         <v-flex xs24>
-          <searchbar v-model="search" searchBtnText='搜索题目'/>
+          <searchbar v-model="search" searchBtnText='搜索题目' />
         </v-flex>
       </v-layout>
       <v-col>
@@ -32,7 +32,7 @@
                 <v-btn class="butspace" color="primary" @click="openAddTagDialog(item)">增加 Tag</v-btn>
               </v-list-item-action>
               <v-list-item-action>
-                <v-btn  color="primary" @click="addToList(item)">加入题单</v-btn>
+                <v-btn color="primary" @click="addToList(item)">加入题单</v-btn>
               </v-list-item-action>
               <v-list-item-action>
                 <v-btn class="butspace" color="primary" @click="changeProblem(item)">修改问题</v-btn>
@@ -58,16 +58,10 @@
           <v-card-text>
             <v-stepper v-model="e1">
               <v-stepper-header>
-                <v-stepper-step
-                  :complete="e1 > 1"
-                  step="1"
-                > 从 PDF 或图像提取文字
+                <v-stepper-step :complete="e1 > 1" step="1"> 从 PDF 或图像提取文字
                 </v-stepper-step>
                 <v-divider></v-divider>
-                <v-stepper-step
-                  :complete="e1 > 2"
-                  step="2"
-                > 完善题目信息
+                <v-stepper-step :complete="e1 > 2" step="2"> 完善题目信息
                 </v-stepper-step>
                 <v-divider></v-divider>
                 <v-stepper-step step="3">
@@ -76,54 +70,40 @@
               </v-stepper-header>
               <v-stepper-items>
                 <v-stepper-content step="1">
-                    <v-file-input
-                    v-model="uploadedFile"
-                    accept=".pdf, .jpg, .jpeg, .png"
-                    label="选择 PDF 或图像文件"
-                  ></v-file-input>
-                  <v-btn
-                    color="primary"
-                    @click="handleFileUpload"
-                    block
-                    :disabled="loading_file_convert || !uploadedFile"
-                    class="mb-4"
-                  > 提取文本 </v-btn>
-                  <v-textarea
-                    v-model="newProblem.content"
-                    label="提取的文本"
-                    rows="20"
-                    hint="支持 Markdown 语法"
-                    required
-                    :disabled="!newProblem.content"
-                    :loading="loading_file_convert"
-                  ></v-textarea>
-                  <v-banner
-                    v-if="loading_file_convert"
-                    color="info"
-                  > 我们正在为你提取文件里的文本。这可能需要一些时间。 </v-banner>
-                  <v-banner
-                    v-else-if="newProblem.content"
-                    color="warning"
-                  > 提取的文字可能有错误。请手动修正。 </v-banner>
+                  <v-file-input v-model="uploadedFile" accept=".pdf, .jpg, .jpeg, .png"
+                    label="选择 PDF 或图像文件"></v-file-input>
+                  <v-btn color="primary" @click="handleFileUpload" block
+                    :disabled="loading_file_convert || !uploadedFile" class="mb-4"> 提取文本 </v-btn>
+                  <v-textarea v-model="newProblem.content" label="提取的文本" rows="20" hint="支持 Markdown 语法" required
+                    :disabled="!newProblem.content" :loading="loading_file_convert"></v-textarea>
+                  <v-banner v-if="loading_file_convert" color="info"> 我们正在为你提取文件里的文本。这可能需要一些时间。 </v-banner>
+                  <v-banner v-else-if="newProblem.content" color="warning"> 提取的文字可能有错误。请手动修正。 </v-banner>
                 </v-stepper-content>
                 <v-stepper-content step="2">
                   <v-text-field v-model="newProblem.name" label="题目名称" required></v-text-field>
-                  <v-textarea v-model="newProblem.content" label="题目内容" rows="23" required hint="支持 Markdown 语法"></v-textarea>
+                  <v-textarea v-model="newProblem.content" label="题目内容" rows="23" required
+                    hint="支持 Markdown 语法"></v-textarea>
                   <v-select v-model="newProblem.type" :items="questionTypes" label="题目类型" required></v-select>
                   <template v-if="isMultipleChoice(newProblem.type)">
-                    <v-text-field v-for="(option, index) in newProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="newProblem.options[index]">
+                    <v-text-field v-for="(option, index) in newProblem.options" :key="index"
+                      :label="'选项 ' + (index + 1)" v-model="newProblem.options[index]">
                       <template v-slot:append>
                         <v-btn icon @click="removeOption(index)">
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                       </template>
                     </v-text-field>
-                    <v-select v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
-                    <v-select v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+                    <v-select v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer"
+                      :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      label="选择正确答案" required></v-select>
+                    <v-select v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers"
+                      :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      label="选择正确答案" multiple required></v-select>
                     <v-btn @click="addOption">添加选项</v-btn>
                   </template>
                   <template v-if="newProblem.type === 'BLANK_FILLING'">
-                    <v-text-field v-for="(blank, index) in newProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="newProblem.fillBlanks[index]"></v-text-field>
+                    <v-text-field v-for="(blank, index) in newProblem.fillBlanks" :key="index"
+                      :label="'填空答案 ' + (index + 1)" v-model="newProblem.fillBlanks[index]"></v-text-field>
                     <v-btn @click="addFillBlank">添加答案</v-btn>
                   </template>
                 </v-stepper-content>
@@ -133,18 +113,24 @@
                   <v-md-preview :text="newProblem.content"></v-md-preview>
                   <v-select v-model="newProblem.type" :items="questionTypes" label="题目类型" required disabled></v-select>
                   <template v-if="isMultipleChoice(newProblem.type)">
-                    <v-text-field v-for="(option, index) in newProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="newProblem.options[index]" disabled>
+                    <v-text-field v-for="(option, index) in newProblem.options" :key="index"
+                      :label="'选项 ' + (index + 1)" v-model="newProblem.options[index]" disabled>
                       <template v-slot:append>
                         <v-btn icon @click="removeOption(index)" disabled>
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                       </template>
                     </v-text-field>
-                    <v-select disabled v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
-                    <v-select disabled v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers" :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+                    <v-select disabled v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer"
+                      :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      label="选择正确答案" required></v-select>
+                    <v-select disabled v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers"
+                      :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      label="选择正确答案" multiple required></v-select>
                   </template>
                   <template v-if="newProblem.type === 'BLANK_FILLING'">
-                    <v-text-field disabled v-for="(blank, index) in newProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="newProblem.fillBlanks[index]"></v-text-field>
+                    <v-text-field disabled v-for="(blank, index) in newProblem.fillBlanks" :key="index"
+                      :label="'填空答案 ' + (index + 1)" v-model="newProblem.fillBlanks[index]"></v-text-field>
                   </template>
                 </v-stepper-content>
               </v-stepper-items>
@@ -153,7 +139,7 @@
           <v-card-actions>
             <v-spacer />
             <v-btn @click="e1 = e1 - 1" :disabled="e1 == 1" large> 上一步 </v-btn>
-            <v-btn color="primary" @click="createProblem" large> {{ `${e1 != 3 ? "下一步" : "保存"}`}} </v-btn>
+            <v-btn color="primary" @click="createProblem" large> {{ `${e1 != 3 ? "下一步" : "保存"}` }} </v-btn>
             <v-btn color="error" outlined @click="dialogCreate = false" large> 取消 </v-btn>
           </v-card-actions>
         </v-card>
@@ -169,7 +155,8 @@
           </v-card-title>
           <v-card-text>
             请选择要添加到的题单:
-            <v-select v-model="selectedList" :items="listOptions" label="选择题单" item-text="name" item-value="pgid" required></v-select>
+            <v-select v-model="selectedList" :items="listOptions" label="选择题单" item-text="name" item-value="pgid"
+              required></v-select>
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="confirmAddToList">确认添加</v-btn>
@@ -192,37 +179,38 @@
           <v-card-text>
             <v-stepper v-model="e2">
               <v-stepper-header>
-                <v-stepper-step
-                  :complete="e2 > 1"
-                  step="1"
-                > 修改题目信息
+                <v-stepper-step :complete="e2 > 1" step="1"> 修改题目信息
                 </v-stepper-step>
                 <v-divider></v-divider>
-                <v-stepper-step
-                  :complete="e1 > 2"
-                  step="2"
-                > 预览并保存
+                <v-stepper-step :complete="e1 > 2" step="2"> 预览并保存
                 </v-stepper-step>
               </v-stepper-header>
               <v-stepper-items>
                 <v-stepper-content step="1">
                   <v-text-field v-model="currentProblem.title" label="题目名称" required></v-text-field>
-                  <v-textarea v-model="currentProblem.content" label="题目内容" rows="23" required hint="支持 Markdown 语法"></v-textarea>
+                  <v-textarea v-model="currentProblem.content" label="题目内容" rows="23" required
+                    hint="支持 Markdown 语法"></v-textarea>
                   <v-select v-model="currentProblem.type" :items="questionTypes" label="题目类型" required></v-select>
                   <template v-if="isMultipleChoice(currentProblem.type)">
-                    <v-text-field v-for="(option, index) in currentProblem.choices" :key="index" :label="'选项 ' + (index + 1)" v-model="currentProblem.choices[index]">
+                    <v-text-field v-for="(option, index) in currentProblem.choices" :key="index"
+                      :label="'选项 ' + (index + 1)" v-model="currentProblem.choices[index]">
                       <template v-slot:append>
                         <v-btn icon @click="removeOption(index)">
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                       </template>
                     </v-text-field>
-                    <v-select v-if="currentProblem.type === 'SINGLE_CHOICE'" v-model="currentProblem.answers" :items="currentProblem.choices.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
-                    <v-select v-if="currentProblem.type === 'MULTI_CHOICE'" v-model="currentProblem.answers" :items="currentProblem.choices.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+                    <v-select v-if="currentProblem.type === 'SINGLE_CHOICE'" v-model="currentProblem.answers"
+                      :items="currentProblem.choices.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      label="选择正确答案" required></v-select>
+                    <v-select v-if="currentProblem.type === 'MULTI_CHOICE'" v-model="currentProblem.answers"
+                      :items="currentProblem.choices.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      label="选择正确答案" multiple required></v-select>
                     <v-btn @click="addOption">添加选项</v-btn>
                   </template>
                   <template v-if="currentProblem.type === 'BLANK_FILLING'">
-                    <v-text-field v-for="(blank, index) in currentProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="currentProblem.fillBlanks[index]"></v-text-field>
+                    <v-text-field v-for="(blank, index) in currentProblem.fillBlanks" :key="index"
+                      :label="'填空答案 ' + (index + 1)" v-model="currentProblem.fillBlanks[index]"></v-text-field>
                     <v-btn @click="addFillBlank">添加答案</v-btn>
                   </template>
                 </v-stepper-content>
@@ -230,20 +218,29 @@
                   <v-text-field v-model="currentProblem.title" label="题目名称" required disabled></v-text-field>
                   <v-subheader>题目内容</v-subheader>
                   <v-md-preview :text="currentProblem.content"></v-md-preview>
-                  <v-select v-model="currentProblem.type" :items="questionTypes" label="题目类型" required disabled></v-select>
+                  <v-select v-model="currentProblem.type" :items="questionTypes" label="题目类型" required
+                    disabled></v-select>
                   <template v-if="isMultipleChoice(currentProblem.type)">
-                    <v-text-field v-for="(option, index) in currentProblem.options" :key="index" :label="'选项 ' + (index + 1)" v-model="currentProblem.options[index]" disabled>
+                    <v-text-field v-for="(option, index) in currentProblem.options" :key="index"
+                      :label="'选项 ' + (index + 1)" v-model="currentProblem.options[index]" disabled>
                       <template v-slot:append>
                         <v-btn icon @click="removeOption(index)" disabled>
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                       </template>
                     </v-text-field>
-                    <v-select disabled v-if="currentProblem.type === 'SINGLE_CHOICE'" v-model="currentProblem.correctAnswer" :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" required></v-select>
-                    <v-select disabled v-if="currentProblem.type === 'MULTI_CHOICE'" v-model="currentProblem.correctAnswers" :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))" label="选择正确答案" multiple required></v-select>
+                    <v-select disabled v-if="currentProblem.type === 'SINGLE_CHOICE'"
+                      v-model="currentProblem.correctAnswer"
+                      :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      label="选择正确答案" required></v-select>
+                    <v-select disabled v-if="currentProblem.type === 'MULTI_CHOICE'"
+                      v-model="currentProblem.correctAnswers"
+                      :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      label="选择正确答案" multiple required></v-select>
                   </template>
                   <template v-if="currentProblem.type === 'BLANK_FILLING'">
-                    <v-text-field disabled v-for="(blank, index) in currentProblem.fillBlanks" :key="index" :label="'填空答案 ' + (index + 1)" v-model="currentProblem.fillBlanks[index]"></v-text-field>
+                    <v-text-field disabled v-for="(blank, index) in currentProblem.fillBlanks" :key="index"
+                      :label="'填空答案 ' + (index + 1)" v-model="currentProblem.fillBlanks[index]"></v-text-field>
                   </template>
                 </v-stepper-content>
               </v-stepper-items>
@@ -252,7 +249,7 @@
           <v-card-actions>
             <v-spacer />
             <v-btn @click="e2 = e2 - 1" large :disabled="e2 == 1"> 上一步 </v-btn>
-            <v-btn color="primary" @click="confirmChangeProblem" large> {{ `${this.e2 == 1 ? "下一步" : "保存修改"}`}}</v-btn>
+            <v-btn color="primary" @click="confirmChangeProblem" large> {{ `${this.e2 == 1 ? "下一步" : "保存修改"}` }}</v-btn>
             <v-btn text @click="dialogEdit = false" large outlined color="error">取消</v-btn>
           </v-card-actions>
         </v-card>
@@ -271,21 +268,9 @@
           <v-card-text>
             <v-text-field v-model="newTag" label="输入 Tag" required></v-text-field>
             <!-- 可选 Tag 显示区域 -->
-            <v-chip-group
-              column
-              v-model="selectedTags"
-              multiple
-              active-class="primary--text"
-            >
-              <v-chip
-                v-for="tag in availableTags"
-                :key="tag.tid"
-                @click="newTag = tag.tag_name"
-                color="yellow"
-                text-color="white"
-                
-                
-              >
+            <v-chip-group column v-model="selectedTags" multiple active-class="primary--text">
+              <v-chip v-for="tag in availableTags" :key="tag.tid" @click="newTag = tag.tag_name" color="yellow"
+                text-color="white">
                 {{ tag.tag_name }}
               </v-chip>
             </v-chip-group>
@@ -341,7 +326,7 @@ export default {
       uploadedFile: null, // 上传的文件
       currentPage: 1,
       problems: [],
-      search:'',
+      search: '',
       selectedTags: [], // 选中的标签
       newTag: '', // 新输入的标签
       availableTags: [], // 可用的标签
@@ -443,7 +428,7 @@ export default {
         });
     },
     isMultipleChoice(type) {
-      return ['SINGLE_CHOICE','MULTI_CHOICE'].includes(type);
+      return ['SINGLE_CHOICE', 'MULTI_CHOICE'].includes(type);
     },
     addOption() {
       this.newProblem.options.push('');
@@ -475,7 +460,7 @@ export default {
       this.$store
         .dispatch('getProblemTags')
         .then(res => {
-          this.availableTags= res.tags;
+          this.availableTags = res.tags;
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -526,7 +511,7 @@ export default {
             type: 'success',
             message: '题目成功加入题单！',
           });
-          this.selectedList=null;
+          this.selectedList = null;
           this.dialogAdd = false;
         })
         .catch((error) => {
@@ -591,7 +576,7 @@ export default {
         tag: this.newProblem.tag,
       };
       let newProblemData = {};
-      if(this.newProblem.type === 'BLANK_FILLING') {
+      if (this.newProblem.type === 'BLANK_FILLING') {
         newProblemData = newProblemDataBlankFilling;
       } else {
         newProblemData = newProblemDataChoice;
@@ -604,7 +589,7 @@ export default {
             message: '题目创建成功！',
           });
           this.dialogCreate = false;
-          this.newProblem={ name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] };
+          this.newProblem = { name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] };
           this.fetchProblems(); // 刷新题目列表
         })
         .catch((error) => {
@@ -653,6 +638,7 @@ export default {
 
 <style scoped>
 .butspace {
-  margin-right: 18px; /* 或其他适当的间距 */
+  margin-right: 18px;
+  /* 或其他适当的间距 */
 }
 </style>
