@@ -161,6 +161,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getAllProblems(context) {
+      return new Promise((resolve, reject) => {
+        api.getAllProblems()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     getProblemTags(context) {
       return new Promise((resolve, reject) => {
         api.getProblemTag()
