@@ -86,7 +86,11 @@ const api = {
     },
     search_problem_by_tag: async(data) => {
       console.log("search_problem_by_tag");;
-      return await router.get(path.baseUrl + path.search_problem_by_tag, {params: {tid: data.tag, key:data.keyword}});
+      let param = {};
+      if(data.tag && data.keyword) param = {tid: data.tag, key:data.keyword};
+      else if(data.tag) param = {tid: data.tag};
+      else if(data.keyword) param = {key:data.keyword};
+      return await router.get(path.baseUrl + path.search_problem_by_tag, {params: param});
     },
     get_my_problems: async() => {
       console.log("get_my_problems");

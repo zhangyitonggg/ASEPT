@@ -122,7 +122,7 @@ export default {
       keys: ['Name', 'Tag'],
       items: [],
       showSearchDialog: false,
-      searchTag: {},
+      searchTag: '',
       searchResults: [],
       searchKeyword: '',
       tags: [], // 用于存储获取到的标签
