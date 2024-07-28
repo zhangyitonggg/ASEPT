@@ -93,6 +93,50 @@ async def add_problem(
     pid = database.add_problem(db, problem, user)
     return {'status': 'success', 'pid': pid}
 
+@router.post('/modify_problem')
+async def modify_problem(
+    pid: str,
+    problem: Choice_Problem | Blank_Filling_Problem,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    The choices should be like this:
+    ```
+    {
+        "A": "Choice A",
+        "B": "Choice B",
+        "C": "Choice C",
+        "D": "Choice D"
+    }
+    ```
+    and the answer should be like this:
+    ```
+    {
+        "A": "Choice A",
+        "B": "Choice B"
+    }
+    ```
+    for blank filling problem, the answer should be like this:
+    ```
+    {
+        "1": "answer1",
+        "2": [
+            "answer2",
+            "answer3"
+        ]
+    }
+    ```
+    
+    for blank filling problem, **DO NOT** provide choices.
+    '''
+    # if not user.permissions.get("UPLOAD_PROBLEM"):
+    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
+    check_problem_format(problem)
+    if detect_sensetive(problem):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Contains sensetive words')
+    pid = database.modify_problem(db, pid, problem, user)
+    return {'status': 'success', 'pid': pid}
 
 @router.post('/create_problem_group')
 async def create_problem_group(

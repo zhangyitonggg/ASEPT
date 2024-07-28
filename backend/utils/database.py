@@ -621,6 +621,24 @@ def add_problem(db, problem: Choice_Problem | Blank_Filling_Problem, user: User)
     db.commit()
     return pid
 
+def modify_problem(db, pid: str, problem: Choice_Problem | Blank_Filling_Problem, user: User):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Problems WHERE pid = %s", (pid))
+    problem_info = cursor.fetchone()
+    if not problem_info:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Problem not found."
+        )
+    if problem_info[4] != user.uid and user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied."
+        )
+    cursor.execute("UPDATE Problems SET title = %s, content = %s, type = %s, choices = %s, answers = %s WHERE pid = %s",
+                     (problem.title, problem.content, problem.type.name, None if isinstance(problem, Blank_Filling_Problem) else problem.choices, problem.answer, pid))
+    db.commit()
+    return pid
 
 def create_problem_group(db, group_name: str, description: str, owner: User):
     cursor = db.cursor()
