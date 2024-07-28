@@ -282,9 +282,9 @@ export default new Vuex.Store({
           })
       })
     },
-    searchProblemByTag(context,tag) {
+    searchProblemByTag(context,data) {
       return new Promise((resolve, reject) => {
-        api.search_problem_by_tag(tag)
+        api.search_problem_by_tag(data)
           .then(response => {
             resolve(response.data);
           })

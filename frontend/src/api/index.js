@@ -84,9 +84,9 @@ const api = {
       console.log("add_problem_tag");
       return await router.post(path.baseUrl + path.add_problem_tag,{}, {params: {pid: pid, tag: tag}});
     },
-    search_problem_by_tag: async(tag) => {
+    search_problem_by_tag: async(data) => {
       console.log("search_problem_by_tag");;
-      return await router.get(path.baseUrl + path.search_problem_by_tag, {params: {tid: tag}});
+      return await router.get(path.baseUrl + path.search_problem_by_tag, {params: {tid: data.tag, key:data.keyword}});
     },
     get_my_problems: async() => {
       console.log("get_my_problems");

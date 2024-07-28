@@ -70,10 +70,15 @@
                 v-model="searchTag"
                 :items="tags"
                 item-text="tag_name"
-               item-value="tid"
+                item-value="tid"
                 label="选择标签"
                 outlined
               ></v-select>
+              <v-text-field
+                v-model="searchKeyword"
+                label="关键词"
+                outlined
+              ></v-text-field>
               <v-btn color="primary" type="submit">搜索</v-btn>
             </v-form>
             <v-list three-line>
@@ -119,6 +124,7 @@ export default {
       showSearchDialog: false,
       searchTag: {},
       searchResults: [],
+      searchKeyword: '',
       tags: [], // 用于存储获取到的标签
     };
   },
@@ -185,9 +191,10 @@ export default {
     },
     searchProblems() {
       let mytag = this.searchTag;
+      let mykeyword = this.searchKeyword || '';
       console.log(mytag);
       this.$store
-        .dispatch('searchProblemByTag', mytag)
+        .dispatch('searchProblemByTag', {tag:mytag, keyword: mykeyword})
         .then(res => {
           this.searchResults = res.problems;
         })
