@@ -66,20 +66,16 @@
           </v-card-title>
           <v-card-text>
             <v-form @submit.prevent="searchProblems">
-              <v-text-field v-model="searchTag.tag_name" label="Tag"></v-text-field>
+              <v-select
+                v-model="searchTag"
+                :items="tags"
+                item-text="tag_name"
+               item-value="tid"
+                label="选择标签"
+                outlined
+              ></v-select>
               <v-btn color="primary" type="submit">搜索</v-btn>
             </v-form>
-            <div class="tags-container">
-              <v-chip
-                v-for="tag in tags"
-                :key="tag.tag_id"
-                class="ma-2"
-                color="yellow"
-                @click="selectTag(tag)"
-              >
-                {{ tag.tag_name }}
-              </v-chip>
-            </div>
             <v-list three-line>
               <template v-for="problem in searchResults">
                 <v-list-item>
@@ -188,7 +184,7 @@ export default {
       this.$router.push({ path: 'solve/' + item.pid, append: true });
     },
     searchProblems() {
-      let mytag = this.searchTag.tid;
+      let mytag = this.searchTag;
       console.log(mytag);
       this.$store
         .dispatch('searchProblemByTag', mytag)
