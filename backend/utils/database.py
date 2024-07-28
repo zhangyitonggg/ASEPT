@@ -647,6 +647,11 @@ def create_problem_group(db, group_name: str, description: str, owner: User):
 
 def get_pgids_user_can_access(db, user: User):
     cursor = db.cursor()
+    if user.permissions.get("IS_ADMIN") == True:
+        cursor.execute("SELECT * FROM ProblemGroups")
+        groups = cursor.fetchall()
+        pgids = [group[0] for group in groups]
+        return pgids
     cursor.execute("SELECT * FROM UserGroupMembers WHERE uid = %s", (user.uid))
     groups = cursor.fetchall()
     gids = [group[1] for group in groups]
@@ -665,6 +670,10 @@ def get_pgids_user_can_access(db, user: User):
 
 def get_all_accessible_problems(db, user: User):
     cursor = db.cursor()
+    if user.permissions.get("IS_ADMIN") == True:
+        cursor.execute("SELECT * FROM Problems")
+        problems = cursor.fetchall()
+        return problems
     all_pgids = get_pgids_user_can_access(db, user)
     cursor.execute("SELECT * FROM Problems WHERE author = %s", (user.uid))
     all_pids = cursor.fetchall()
