@@ -119,14 +119,14 @@
               <v-spacer></v-spacer>
               <v-btn
                 @click="previousProblem"
-                color="white"
+                
                 class="navigation-button"
               >
                 <span class="green-text">上一题</span>
               </v-btn>
               <v-btn
                 @click="nextProblem"
-                color="white"
+               
                 class="navigation-button"
               >
                 <span class="green-text">下一题</span>
@@ -367,7 +367,7 @@ export default {
 }
 .navigation-button {
   background-color: transparent;
-  color: #4caf50;
+  color: inherit;
   border: none;
   font-size: 1.5em;
   box-shadow: none;
