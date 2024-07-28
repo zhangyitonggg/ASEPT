@@ -195,17 +195,28 @@
                     <v-text-field v-for="(option, index) in currentProblem.choices" :key="index"
                       :label="'选项 ' + (index + 1)" v-model="currentProblem.choices[index]">
                       <template v-slot:append>
-                        <v-btn icon @click="removeOption(index)">
+                        <v-btn icon @click="removeCurOption(index)">
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                       </template>
                     </v-text-field>
-                    <v-select v-if="currentProblem.type === 'SINGLE_CHOICE'" v-model="currentProblem.answers"
-                      :items="currentProblem.choices.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
-                      label="选择正确答案" required></v-select>
-                    <v-select v-if="currentProblem.type === 'MULTI_CHOICE'" v-model="currentProblem.answers"
-                      :items="currentProblem.choices.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
-                      label="选择正确答案" multiple required></v-select>
+                    <v-select v-if="currentProblem.type === 'SINGLE_CHOICE'" 
+                      v-model="currentProblem.answers" 
+                      :items="parsedChoices" 
+                      item-text="text" 
+                      item-value="value" 
+                      label="选择正确答案" 
+                      required>
+                    </v-select>
+                    <v-select v-if="currentProblem.type === 'MULTI_CHOICE'" 
+                      v-model="currentProblem.answers" 
+                      :items="parsedChoices" 
+                      item-text="text" 
+                      item-value="value" 
+                      label="选择正确答案" 
+                      multiple 
+                      required>
+                    </v-select>
                     <v-btn @click="addOption">添加选项</v-btn>
                   </template>
                   <template v-if="currentProblem.type === 'BLANK_FILLING'">
@@ -224,18 +235,18 @@
                     <v-text-field v-for="(option, index) in currentProblem.options" :key="index"
                       :label="'选项 ' + (index + 1)" v-model="currentProblem.options[index]" disabled>
                       <template v-slot:append>
-                        <v-btn icon @click="removeOption(index)" disabled>
+                        <v-btn icon @click="removeCurOption(index)" disabled>
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                       </template>
                     </v-text-field>
                     <v-select disabled v-if="currentProblem.type === 'SINGLE_CHOICE'"
                       v-model="currentProblem.correctAnswer"
-                      :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      :items="parsedOptions"
                       label="选择正确答案" required></v-select>
                     <v-select disabled v-if="currentProblem.type === 'MULTI_CHOICE'"
                       v-model="currentProblem.correctAnswers"
-                      :items="currentProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
+                      :items="parsedOptions"
                       label="选择正确答案" multiple required></v-select>
                   </template>
                   <template v-if="currentProblem.type === 'BLANK_FILLING'">
@@ -336,7 +347,36 @@ export default {
     this.fetchProblems();
     this.fetchQuestionLists();
   },
-  computed: {
+  computed: {  
+  parsedChoices() {
+    let choices = [];
+    console.log("Raw choices:", this.currentProblem.choices);
+    try {
+      let choicesObj = JSON.parse(this.currentProblem.choices);
+      console.log("Parsed choices object:", choicesObj);
+      choices = Object.keys(choicesObj).map((key) => ({
+        text: choicesObj[key],
+        value: key
+      }));
+      console.log("Formatted choices array:", choices);
+    } catch (error) {
+      console.error('Failed to parse choices:', error);
+    }
+    return choices;
+  },
+    parsedOptions() {
+      let options = [];
+      try {
+        let optionsObj = JSON.parse(this.currentProblem.options);
+        options = Object.keys(optionsObj).map((key, index) => ({
+          text: optionsObj[key],
+          value: key
+        }));
+      } catch (error) {
+        console.error('Failed to parse options:', error);
+      }
+      return options;
+    },
     numberOfPages() {
       return Math.ceil(this.filteredItems.length / this.itemsPerPage);
     },
@@ -438,6 +478,11 @@ export default {
         this.newProblem.options.splice(index, 1);
       }
     },
+    removeCurOption(index) {
+      if (this.currentProblem.options.length > 1) {
+        this.currentProblem.options.splice(index, 1);
+      }
+    },
     addFillBlank() {
       this.newProblem.fillBlanks.push('');
     },
@@ -448,7 +493,7 @@ export default {
     changeProblem(item) {
       this.e2 = 1;
       this.currentProblem = item;
-      console.log(this.currentProblem);
+      console.log("cur",this.currentProblem);
       this.dialogEdit = true;
     },
     openAddTagDialog(item) {
