@@ -1,169 +1,178 @@
 <template>
-  <v-container>
-    <v-btn
-      class="fixed-button"
-      fab
-      dark
-      color="indigo"
-      @click="returnback"
-    >
-      <v-icon dark>
-        mdi-arrow-u-left-bottom-bold
-      </v-icon>
-    </v-btn>
-   
-    <v-row justify="center">
-      <v-col cols="12">
-
-        <v-card class="progress-card">
-          <v-card-text>
-            <h2 class="progress-text">当前进度：{{ currentProblemIndex + 1 }}/{{ totalProblems }}</h2>
-            <v-progress-linear
-              :value="progressValue"
-              color="green"
-              class="progress-bar"
-            ></v-progress-linear>
-          </v-card-text>
-        </v-card>
-
-        <v-form @submit.prevent="submitForm" v-if="question">
-          <v-card class="large-card">
-            <v-card-title>
-              <h3>
-                {{ question.title }}
-              </h3>
-            </v-card-title>
+  <div>
+    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
+    </v-container>
+    <v-container v-else>
+      <v-btn
+        class="fixed-button"
+        fab
+        dark
+        color="indigo"
+        @click="returnback"
+      >
+        <v-icon dark>
+          mdi-arrow-u-left-bottom-bold
+        </v-icon>
+      </v-btn>
+     
+      <v-row justify="center">
+        <v-col cols="12">
+  
+          <v-card class="progress-card">
             <v-card-text>
-              <v-md-preview :text="question.content"></v-md-preview>
-              <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
-                <v-radio-group v-model="answer">
-                  <v-radio
+              <h2 class="progress-text">当前进度：{{ currentProblemIndex + 1 }}/{{ totalProblems }}</h2>
+              <v-progress-linear
+                :value="progressValue"
+                color="green"
+                class="progress-bar"
+              ></v-progress-linear>
+            </v-card-text>
+          </v-card>
+  
+          <v-form @submit.prevent="submitForm" v-if="question">
+            <v-card class="large-card">
+              <v-card-title>
+                <h3>
+                  {{ question.title }}
+                </h3>
+              </v-card-title>
+              <v-card-text>
+                <v-md-preview :text="question.content"></v-md-preview>
+                <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
+                  <v-radio-group v-model="answer">
+                    <v-radio
+                      v-for="(choice, key) in question.choices"
+                      :key="key"
+                      :label="`${key}. ${choice}`"
+                      :value="key"
+                      class="option-box"
+                      :class="{
+                        'correct-answer': resultType === 'success' && answer === key,
+                        'wrong-answer': resultType === 'error' && answer === key,
+                        'disabled': resultMessage
+                      }"
+                    >
+                      <template v-slot:label>
+                        <v-icon
+                          v-if="resultType === 'success' && answer === key"
+                          class="correct-icon"
+                          color="green"
+                        >mdi-check-circle</v-icon>
+                        <v-icon
+                          v-if="resultType === 'error' && answer === key"
+                          class="wrong-icon"
+                          color="red"
+                        >mdi-close-circle</v-icon>
+                        {{ key }}. {{ choice }}
+                      </template>
+                    </v-radio>
+                  </v-radio-group>
+                </template>
+                <template v-else-if="question.type === 'MULTI_CHOICE' && question.choices">
+                  <v-checkbox
                     v-for="(choice, key) in question.choices"
                     :key="key"
                     :label="`${key}. ${choice}`"
                     :value="key"
+                    v-model="selectedAnswers"
+                    @change="updateAnswers"
                     class="option-box"
                     :class="{
-                      'correct-answer': resultType === 'success' && answer === key,
-                      'wrong-answer': resultType === 'error' && answer === key,
+                      'correct-answer': resultType === 'success' && selectedAnswers.includes(key),
+                      'wrong-answer': resultType === 'error' && selectedAnswers.includes(key),
                       'disabled': resultMessage
                     }"
                   >
                     <template v-slot:label>
                       <v-icon
-                        v-if="resultType === 'success' && answer === key"
+                        v-if="resultType === 'success' && selectedAnswers.includes(key)"
                         class="correct-icon"
                         color="green"
                       >mdi-check-circle</v-icon>
                       <v-icon
-                        v-if="resultType === 'error' && answer === key"
+                        v-if="resultType === 'error' && selectedAnswers.includes(key)"
                         class="wrong-icon"
                         color="red"
                       >mdi-close-circle</v-icon>
                       {{ key }}. {{ choice }}
                     </template>
-                  </v-radio>
-                </v-radio-group>
-              </template>
-              <template v-else-if="question.type === 'MULTI_CHOICE' && question.choices">
-                <v-checkbox
-                  v-for="(choice, key) in question.choices"
-                  :key="key"
-                  :label="`${key}. ${choice}`"
-                  :value="key"
-                  v-model="selectedAnswers"
-                  @change="updateAnswers"
-                  class="option-box"
-                  :class="{
-                    'correct-answer': resultType === 'success' && selectedAnswers.includes(key),
-                    'wrong-answer': resultType === 'error' && selectedAnswers.includes(key),
-                    'disabled': resultMessage
-                  }"
+                  </v-checkbox>
+                </template>
+                <template v-else-if="question.type === 'BLANK_FILLING'">
+                  <v-text-field
+                    v-model="answer"
+                    label="填空"
+                  ></v-text-field>
+                </template>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn
+                  type="submit"
+                  color="success"
+                  class="green-button"
                 >
-                  <template v-slot:label>
-                    <v-icon
-                      v-if="resultType === 'success' && selectedAnswers.includes(key)"
-                      class="correct-icon"
-                      color="green"
-                    >mdi-check-circle</v-icon>
-                    <v-icon
-                      v-if="resultType === 'error' && selectedAnswers.includes(key)"
-                      class="wrong-icon"
-                      color="red"
-                    >mdi-close-circle</v-icon>
-                    {{ key }}. {{ choice }}
-                  </template>
-                </v-checkbox>
-              </template>
-              <template v-else-if="question.type === 'BLANK_FILLING'">
-                <v-text-field
-                  v-model="answer"
-                  label="填空"
-                ></v-text-field>
-              </template>
+                  提交
+                </v-btn>
+                <v-btn
+                  v-if="resultMessage && !showAnswers"
+                  @click="fetchCorrectAnswers"
+                  color="success"
+                  class="green-button"
+                >
+                  显示答案
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn
+                  @click="previousProblem"
+                  class="navigation-button"
+                >
+                  <span class="green-text">上一题</span>
+                </v-btn>
+                <v-btn
+                  @click="nextProblem"
+                  class="navigation-button"
+                >
+                  <span class="green-text">下一题</span>
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-form>
+          <v-alert v-if="resultMessage" :type="resultType" class="mt-4 alert-large">
+            {{ resultMessage }}
+          </v-alert>
+          <v-card v-if="correctAnswers && showAnswers" class="mt-4 answer-card-large">
+            <v-card-title>
+              <h3>
+                参考答案
+              </h3>
+            </v-card-title>
+            <v-card-text>
+              <div v-if="question.type === 'SINGLE_CHOICE'">
+                <ul>
+                  <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
+                </ul>
+              </div>
+              <div v-else-if="question.type === 'MULTI_CHOICE'">
+                <ul>
+                  <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
+                </ul>
+              </div>
+              <div v-else-if="question.type === 'BLANK_FILLING'">
+                <ul>
+                  <li v-for="(answer, index) in correctAnswers" :key="index">{{ `${index}: ${answer}` }}</li>
+                </ul>
+              </div>
             </v-card-text>
-            <v-card-actions>
-              <v-btn
-                type="submit"
-                color="success"
-                class="green-button"
-              >
-                提交
-              </v-btn>
-              <v-btn
-                v-if="resultMessage && !showAnswers"
-                @click="fetchCorrectAnswers"
-                color="success"
-                class="green-button"
-              >
-                显示答案
-              </v-btn>
-              <v-spacer></v-spacer>
-              <v-btn
-                @click="previousProblem"
-                class="navigation-button"
-              >
-                <span class="green-text">上一题</span>
-              </v-btn>
-              <v-btn
-                @click="nextProblem"
-                class="navigation-button"
-              >
-                <span class="green-text">下一题</span>
-              </v-btn>
-            </v-card-actions>
           </v-card>
-        </v-form>
-        <v-alert v-if="resultMessage" :type="resultType" class="mt-4 alert-large">
-          {{ resultMessage }}
-        </v-alert>
-        <v-card v-if="correctAnswers && showAnswers" class="mt-4 answer-card-large">
-          <v-card-title>
-            <h3>
-              参考答案
-            </h3>
-          </v-card-title>
-          <v-card-text>
-            <div v-if="question.type === 'SINGLE_CHOICE'">
-              <ul>
-                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
-              </ul>
-            </div>
-            <div v-else-if="question.type === 'MULTI_CHOICE'">
-              <ul>
-                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
-              </ul>
-            </div>
-            <div v-else-if="question.type === 'BLANK_FILLING'">
-              <ul>
-                <li v-for="(answer, index) in correctAnswers" :key="index">{{ `${index}: ${answer}` }}</li>
-              </ul>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -190,6 +199,7 @@ export default {
   data() {
     return {
       question: null,
+      loading: true,
       selectedAnswers: [], // 用于多选题选项
       answer: '', // 用于单选题和填空题答案
       isSingleChoice: true,
@@ -220,6 +230,7 @@ export default {
 },
   methods: {
     fetchQuestion() {
+      this.loading = true;
       this.$store
         .dispatch('getProblemById', this.pid)
         .then(res => {
@@ -241,6 +252,9 @@ export default {
             type: 'error',
             message: error,
           });
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
     previousProblem() {
