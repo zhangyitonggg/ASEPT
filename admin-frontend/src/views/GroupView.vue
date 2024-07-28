@@ -236,6 +236,16 @@ export default {
       currentPage: 1,
     }
   },
+  watch: {
+    search() {
+      this.currentPage = 1;
+    },
+    numberOfPages(newVal) {
+      if (this.currentPage > newVal) {
+        this.currentPage = newVal;
+      }
+    }
+  },
   computed: {
     filteredItems() {
       const filtered = this.items.filter(item =>
