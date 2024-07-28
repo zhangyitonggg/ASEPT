@@ -21,7 +21,7 @@
           </v-card>
 
           <v-form @submit.prevent="submitForm" v-if="question">
-            <v-card class="large-card">
+            <v-card class="large-card" :loading="waiting_for_submit">
               <v-card-title>
                 <h3>
                   {{ question.title }}
@@ -68,26 +68,22 @@
                 </template>
               </v-card-text>
               <v-card-actions>
-                <v-btn type="submit" color="success" class="green-button">
+                <v-btn type="submit" color="success" large :loading="waiting_for_submit">
                   提交
                 </v-btn>
-                <v-btn v-if="resultMessage && !showAnswers" @click="fetchCorrectAnswers" color="success"
-                  class="green-button">
-                  显示答案
+                <v-btn v-if="resultMessage" @click="fetchCorrectAnswers" color="info" large outlined>
+                  查看答案
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-btn @click="previousProblem" class="navigation-button">
-                  <span class="green-text">上一题</span>
+                <v-btn @click="previousProblem" class="navigation-button" large :blocked="waiting_for_submit">
+                  上一题
                 </v-btn>
-                <v-btn @click="nextProblem" class="navigation-button">
-                  <span class="green-text">下一题</span>
+                <v-btn @click="nextProblem" class="navigation-button" large :blocked="waiting_for_submit">
+                  下一题
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-form>
-          <v-alert v-if="resultMessage" :type="resultType" class="mt-4 alert-large">
-            {{ resultMessage }}
-          </v-alert>
           <v-card v-if="correctAnswers && showAnswers" class="mt-4 answer-card-large">
             <v-card-title>
               <h3>
@@ -141,6 +137,7 @@ export default {
   },
   data() {
     return {
+      waiting_for_submit: false,
       question: null,
       loading: true,
       selectedAnswers: [], // 用于多选题选项
@@ -203,6 +200,7 @@ export default {
     clearData() {
       this.selectedAnswers = [];
       this.answer = '';
+      this.resultMessage = '';
     },
     previousProblem() {
       this.clearData();
@@ -284,24 +282,31 @@ export default {
         pid: this.pid,
         answer: this.formatAnswerForSubmission() // Convert answer to JSON string
       };
-      this.$store
-        .dispatch('submitAnswer', payload)
+      this.waiting_for_submit = true;
+      this.$store.dispatch('submitAnswer', payload)
         .then(res => {
           if (res.is_correct) {
-            this.resultMessage = '回答正确';
-            this.resultType = 'success';
+            this.$store.commit('setAlert', {
+              type: 'success',
+              message: '回答正确。',
+            });
           } else {
-            this.resultMessage = '回答错误';
-            this.resultType = 'error';
+            this.$store.commit('setAlert', {
+              type: 'error',
+              message: '回答错误。',
+            });
           }
-          this.showAnswers = false;
-          this.hideAlertAfterDelay();
+          this.resultMessage = "True";
+          this.showAnswers = true;
         })
         .catch(error => {
           this.$store.commit('setAlert', {
             type: 'error',
             message: error,
           });
+        })
+        .finally(() => {
+          this.waiting_for_submit = false;
         });
     },
     fetchCorrectAnswers() {
@@ -317,11 +322,6 @@ export default {
             message: error,
           });
         });
-    },
-    hideAlertAfterDelay() {
-      setTimeout(() => {
-        this.resultMessage = ''; // 清除提示信息
-      }, 4000); // 5秒后隐藏提示信息
     },
     returnback() {
       //this.$router.go(-1);
@@ -410,10 +410,6 @@ export default {
   margin-right: 10px;
   min-width: 150px;
   height: 600;
-}
-
-.alert-large {
-  font-size: 20px;
 }
 
 .answer-card-large {
