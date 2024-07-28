@@ -35,6 +35,7 @@ const base = {
     uploadFile: '/problem_file_upload',
     getTime: '/news/current_time',
     get_all_problems: '/problems/get_all_problems',
+    getProblemTags: '/problems/get_all_tags',
 }
 
 export default base;

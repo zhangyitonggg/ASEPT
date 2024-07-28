@@ -10,7 +10,7 @@
     <v-container fluid v-else>
       <v-layout>
         <!-- 查找题目按钮 -->
-        <v-btn color="primary" @click="showSearchDialog = true">查找题目</v-btn>
+        <v-btn color="primary" @click=" openSearchDialog">查找题目</v-btn>
         <v-spacer/>
         <v-flex xs24>
           <searchbar v-model="search" searchBtnText='搜索题目'/>
@@ -66,9 +66,20 @@
           </v-card-title>
           <v-card-text>
             <v-form @submit.prevent="searchProblems">
-              <v-text-field v-model="searchTag" label="Tag"></v-text-field>
+              <v-text-field v-model="searchTag.tag_name" label="Tag"></v-text-field>
               <v-btn color="primary" type="submit">搜索</v-btn>
             </v-form>
+            <div class="tags-container">
+              <v-chip
+                v-for="tag in tags"
+                :key="tag.tag_id"
+                class="ma-2"
+                color="yellow"
+                @click="selectTag(tag)"
+              >
+                {{ tag.tag_name }}
+              </v-chip>
+            </div>
             <v-list three-line>
               <template v-for="problem in searchResults">
                 <v-list-item>
@@ -80,7 +91,7 @@
                     <v-list-item-subtitle>{{ problem.content }}</v-list-item-subtitle>
                   </v-list-item-content>
                   <v-list-item-action>
-                    <v-btn color="primary" @click="solveProblem(problem)">去做题</v-btn>
+                    <v-btn color="primary" @click="solveProbleminTag(problem)">去做题</v-btn>
                   </v-list-item-action>
                 </v-list-item>
               </template>
@@ -110,8 +121,9 @@ export default {
       keys: ['Name', 'Tag'],
       items: [],
       showSearchDialog: false,
-      searchTag: '',
+      searchTag: {},
       searchResults: [],
+      tags: [], // 用于存储获取到的标签
     };
   },
   created() {
@@ -171,10 +183,15 @@ export default {
       this.$store.commit('setCurrentProblemGroup', {problems: this.items.slice(1)});
       this.$router.push({ path: 'solve/' + item.pid, append: true });
     },
+    solveProbleminTag(item) {
+      this.$store.commit('setCurrentProblemGroup', {problems: this.searchResults});
+      this.$router.push({ path: 'solve/' + item.pid, append: true });
+    },
     searchProblems() {
-      const tag = this.searchTag.trim();
+      let mytag = this.searchTag.tid;
+      console.log(mytag);
       this.$store
-        .dispatch('searchProblemByTag', tag)
+        .dispatch('searchProblemByTag', mytag)
         .then(res => {
           this.searchResults = res.problems;
         })
@@ -184,6 +201,27 @@ export default {
             message: error,
           });
         });
+    },
+    openSearchDialog() {
+      this.showSearchDialog = true;
+      this.fetchTags();
+    },
+    fetchTags() {
+      this.$store
+        .dispatch('getProblemTags')
+        .then(res => {
+          this.tags = res.tags;
+        })
+        .catch(error => {
+          this.$store.commit('setAlert', {
+            type: 'error',
+            message: error,
+          });
+        });
+    },
+    selectTag(tag) {
+      this.searchTag =  tag;
+      console.log(this.searchTag.tag_name);
     },
   },
   components: {
@@ -232,5 +270,15 @@ export default {
   font-weight: 900;
   top: 15px;
   right: 20px;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+ 
+}
+.ma-2 {
+  margin: 5px;
 }
 </style>

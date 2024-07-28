@@ -161,6 +161,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getProblemTags(context) {
+      return new Promise((resolve, reject) => {
+        api.getProblemTag()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     deleteGroup(context, {gid}) {
       return new Promise((resolve, reject) => {
         api.deleteGroup(gid)

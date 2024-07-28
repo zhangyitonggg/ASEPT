@@ -86,7 +86,7 @@ const api = {
     },
     search_problem_by_tag: async(tag) => {
       console.log("search_problem_by_tag");;
-      return await router.get(path.baseUrl + path.search_problem_by_tag, {params: {tag: tag}});
+      return await router.get(path.baseUrl + path.search_problem_by_tag, {params: {tid: tag}});
     },
     get_my_problems: async() => {
       console.log("get_my_problems");
@@ -143,6 +143,9 @@ const api = {
     },
     getTime: async() => {
       return await router.get(path.baseUrl + path.getTime);
+    },
+    getProblemTag:  async() => {
+      return await router.get(path.baseUrl + path.getProblemTags);
     },
 };
 
