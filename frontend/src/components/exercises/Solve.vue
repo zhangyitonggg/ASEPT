@@ -17,11 +17,10 @@
 
         <v-card class="progress-card">
           <v-card-text>
-            <div class="progress-text text-h4">当前进度：{{ currentProblemIndex + 1 }}/{{ totalProblems }}</div>
+            <h2 class="progress-text">当前进度：{{ currentProblemIndex + 1 }}/{{ totalProblems }}</h2>
             <v-progress-linear
               :value="progressValue"
               color="green"
-              height="10"
               class="progress-bar"
             ></v-progress-linear>
           </v-card-text>
@@ -29,9 +28,13 @@
 
         <v-form @submit.prevent="submitForm" v-if="question">
           <v-card class="large-card">
-            <v-card-title class="text-h3">{{ question.title }}</v-card-title>
+            <v-card-title>
+              <h3>
+                {{ question.title }}
+              </h3>
+            </v-card-title>
             <v-card-text>
-              <p class="text-h5">{{ question.content }}</p>
+              <v-md-preview :text="question.content"></v-md-preview>
               <template v-if="question.type === 'SINGLE_CHOICE' && question.choices">
                 <v-radio-group v-model="answer">
                   <v-radio
@@ -43,7 +46,7 @@
                     :class="{
                       'correct-answer': resultType === 'success' && answer === key,
                       'wrong-answer': resultType === 'error' && answer === key,
-                      'disabled': resultMessage // 禁用选项交互
+                      'disabled': resultMessage
                     }"
                   >
                     <template v-slot:label>
@@ -74,7 +77,7 @@
                   :class="{
                     'correct-answer': resultType === 'success' && selectedAnswers.includes(key),
                     'wrong-answer': resultType === 'error' && selectedAnswers.includes(key),
-                    'disabled': resultMessage // 禁用选项交互
+                    'disabled': resultMessage
                   }"
                 >
                   <template v-slot:label>
@@ -96,7 +99,6 @@
                 <v-text-field
                   v-model="answer"
                   label="填空"
-                  class="text-field-large"
                 ></v-text-field>
               </template>
             </v-card-text>
@@ -119,14 +121,12 @@
               <v-spacer></v-spacer>
               <v-btn
                 @click="previousProblem"
-                
                 class="navigation-button"
               >
                 <span class="green-text">上一题</span>
               </v-btn>
               <v-btn
                 @click="nextProblem"
-               
                 class="navigation-button"
               >
                 <span class="green-text">下一题</span>
@@ -138,24 +138,25 @@
           {{ resultMessage }}
         </v-alert>
         <v-card v-if="correctAnswers && showAnswers" class="mt-4 answer-card-large">
-          <v-card-title class="text-h3">正确答案</v-card-title>
+          <v-card-title>
+            <h3>
+              参考答案
+            </h3>
+          </v-card-title>
           <v-card-text>
             <div v-if="question.type === 'SINGLE_CHOICE'">
-              <p class="text-h5">正确选项:</p>
               <ul>
-                <li v-for="(value, key) in correctAnswers" :key="key" class="text-h5">{{ `${key}. ${value}` }}</li>
+                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
               </ul>
             </div>
             <div v-else-if="question.type === 'MULTI_CHOICE'">
-              <p class="text-h5">正确选项:</p>
               <ul>
-                <li v-for="(value, key) in correctAnswers" :key="key" class="text-h5">{{ `${key}. ${value}` }}</li>
+                <li v-for="(value, key) in correctAnswers" :key="key">{{ `${key}. ${value}` }}</li>
               </ul>
             </div>
             <div v-else-if="question.type === 'BLANK_FILLING'">
-              <p class="text-h5">正确答案:</p>
               <ul>
-                <li v-for="(answer, index) in correctAnswers" :key="index" class="text-h5">{{ `${index}: ${answer}` }}</li>
+                <li v-for="(answer, index) in correctAnswers" :key="index">{{ `${index}: ${answer}` }}</li>
               </ul>
             </div>
           </v-card-text>
@@ -166,12 +167,25 @@
 </template>
 
 <script>
+import VMdPreview from '@kangc/v-md-editor/lib/preview';
+import '@kangc/v-md-editor/lib/style/preview.css';
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
+import '@kangc/v-md-editor/lib/theme/style/github.css';
+import hljs from 'highlight.js';
+
+VMdPreview.use(githubTheme, {
+  Hljs: hljs,
+});
+
 export default {
   props: {
     pid: {
       type: String,
       required: true,
     },
+  },
+  components: {
+    VMdPreview,
   },
   data() {
     return {
@@ -183,8 +197,6 @@ export default {
       resultType: '',
       correctAnswers: null,
       showAnswers: false,
-      
-     
     };
   },
   computed: {
@@ -201,7 +213,6 @@ export default {
     },
   },
   created() {
-  
     this.fetchQuestion();
   },
   watch: {
@@ -224,7 +235,6 @@ export default {
             answers: [] // 初始时不包含答案
           };
           this.isSingleChoice = this.question.answers && Object.keys(this.question.answers).length === 1;
-         
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -269,7 +279,6 @@ export default {
       (problem) => problem.pid === this.pid
     );
   },
-   
     parseChoices(choices) {
       if (choices) {
         return JSON.parse(choices);
@@ -347,7 +356,6 @@ export default {
     },
     hideAlertAfterDelay() {
     setTimeout(() => {
-     
       this.resultMessage = ''; // 清除提示信息
     }, 4000); // 5秒后隐藏提示信息
   },
@@ -399,7 +407,6 @@ export default {
 .option-box {
   display: flex;
   align-items: center;
-  height: 80px;
   font-size: 24px;
   margin: 10px 0;
 }
