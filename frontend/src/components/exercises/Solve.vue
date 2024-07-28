@@ -255,6 +255,7 @@ export default {
       return [];
     },
     updateAnswers() {
+      this.resultType = '';
       this.answer = this.selectedAnswers;
     },
     formatAnswerForSubmission() {
