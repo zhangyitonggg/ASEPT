@@ -200,7 +200,12 @@ export default {
           this.loading = false;
         });
     },
+    clearData() {
+      this.selectedAnswers = [];
+      this.answer = '';
+    },
     previousProblem() {
+      this.clearData();
       const currentIndex = this.currentProblemIndex;
       if (currentIndex > 0) {
         const previousProblem = this.$store.state.currentProblemGroup.problems[currentIndex - 1];
@@ -216,6 +221,7 @@ export default {
       }
     },
     nextProblem() {
+      this.clearData();
       const currentIndex = this.currentProblemIndex;
       if (currentIndex < this.totalProblems - 1) {
         const nextProblem =
