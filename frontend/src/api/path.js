@@ -1,5 +1,5 @@
 const base = {
-    baseUrl: 'http://localhost:8000',
+    baseUrl: 'http://45.78.56.122:8000',
     login: '/security/token',
     logon: '/create_user',
     userModify: '/user/modify',
@@ -36,6 +36,7 @@ const base = {
     getTime: '/news/current_time',
     get_all_problems: '/problems/get_all_problems',
     getProblemTags: '/problems/get_all_tags',
+    updateproblem: '/problems/modify_problem',
 }
 
 export default base;

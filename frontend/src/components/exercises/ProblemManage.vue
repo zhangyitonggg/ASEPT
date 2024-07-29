@@ -84,6 +84,7 @@
                   预览并保存
                 </v-stepper-step>
               </v-stepper-header>
+
               <v-stepper-items>
                 <v-stepper-content step="1">
                   <v-file-input v-model="uploadedFile" accept=".pdf, .jpg, .jpeg, .png"
@@ -109,13 +110,14 @@
                         </v-btn>
                       </template>
                     </v-text-field>
+
                     <v-select v-if="newProblem.type === 'SINGLE_CHOICE'" v-model="newProblem.correctAnswer"
                       :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
                       label="选择正确答案" required></v-select>
                     <v-select v-if="newProblem.type === 'MULTI_CHOICE'" v-model="newProblem.correctAnswers"
                       :items="newProblem.options.map((opt, index) => ({ text: opt, value: String.fromCharCode(65 + index) }))"
                       label="选择正确答案" multiple required></v-select>
-                    <v-btn @click="addOption">添加选项</v-btn>
+                    <v-btn @click="addOptionNew">添加选项</v-btn>
                   </template>
                   <template v-if="newProblem.type === 'BLANK_FILLING'">
                     <v-text-field v-for="(blank, index) in newProblem.fillBlanks" :key="index"
@@ -180,6 +182,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      
       <!-- 修改题目对话框 -->
       <v-dialog v-model="dialogEdit" fullscreen hide-overlay scrollable transition="dialog-bottom-transition">
         <v-card>
@@ -201,6 +204,7 @@
                 <v-stepper-step :complete="e1 > 2" step="2"> 预览并保存
                 </v-stepper-step>
               </v-stepper-header>
+
               <v-stepper-items>
                 <v-stepper-content step="1">
                   <v-text-field v-model="currentProblem.title" label="题目名称" required></v-text-field>
@@ -209,7 +213,7 @@
                   <v-select v-model="currentProblem.type" :items="questionTypes" label="题目类型" required></v-select>
                   <template v-if="isMultipleChoice(currentProblem.type)">
                     <v-text-field v-for="(option, index) in currentProblem.choices" :key="index"
-                      :label="'选项 ' + (index + 1)" v-model="currentProblem.choices[index]">
+                      :label="'选项 ' + (index + 1)" v-model="currentProblem.choices[index].text">
                       <template v-slot:append>
                         <v-btn icon @click="removeCurOption(index)">
                           <v-icon>mdi-close</v-icon>
@@ -218,15 +222,15 @@
                     </v-text-field>
                     <v-select v-if="currentProblem.type === 'SINGLE_CHOICE'" 
                       v-model="currentProblem.answers" 
-                      :items="parsedChoices" 
+                      :items="currentProblem.choices" 
                       item-text="text" 
                       item-value="value" 
                       label="选择正确答案" 
                       required>
                     </v-select>
                     <v-select v-if="currentProblem.type === 'MULTI_CHOICE'" 
-                      v-model="currentProblem.answers" 
-                      :items="parsedChoices" 
+                      v-model="currentProblem.answerss" 
+                      :items="currentProblem.choices" 
                       item-text="text" 
                       item-value="value" 
                       label="选择正确答案" 
@@ -238,7 +242,7 @@
                   <template v-if="currentProblem.type === 'BLANK_FILLING'">
                     <v-text-field v-for="(blank, index) in currentProblem.fillBlanks" :key="index"
                       :label="'填空答案 ' + (index + 1)" v-model="currentProblem.fillBlanks[index]"></v-text-field>
-                    <v-btn @click="addFillBlank">添加答案</v-btn>
+                    <v-btn @click="addCurFillBlank">添加答案</v-btn>
                   </template>
                 </v-stepper-content>
                 <v-stepper-content step="2">
@@ -248,22 +252,22 @@
                   <v-select v-model="currentProblem.type" :items="questionTypes" label="题目类型" required
                     disabled></v-select>
                   <template v-if="isMultipleChoice(currentProblem.type)">
-                    <v-text-field v-for="(option, index) in currentProblem.options" :key="index"
-                      :label="'选项 ' + (index + 1)" v-model="currentProblem.options[index]" disabled>
-                      <template v-slot:append>
+                    <v-text-field v-for="(option, index) in currentProblem.choices" :key="index"
+                      :label="'选项 ' + (index + 1)" v-model="currentProblem.choices[index].text" disabled>
+                      <!-- <template v-slot:append>
                         <v-btn icon @click="removeCurOption(index)" disabled>
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
-                      </template>
+                      </template> -->
                     </v-text-field>
-                    <v-select disabled v-if="currentProblem.type === 'SINGLE_CHOICE'"
+                    <!-- <v-select disabled v-if="currentProblem.type === 'SINGLE_CHOICE'"
                       v-model="currentProblem.correctAnswer"
                       :items="parsedOptions"
                       label="选择正确答案" required></v-select>
                     <v-select disabled v-if="currentProblem.type === 'MULTI_CHOICE'"
                       v-model="currentProblem.correctAnswers"
                       :items="parsedOptions"
-                      label="选择正确答案" multiple required></v-select>
+                      label="选择正确答案" multiple required></v-select> -->
                   </template>
                   <template v-if="currentProblem.type === 'BLANK_FILLING'">
                     <v-text-field disabled v-for="(blank, index) in currentProblem.fillBlanks" :key="index"
@@ -364,22 +368,7 @@ export default {
     this.fetchQuestionLists();
   },
   computed: {  
-  parsedChoices() {
-    let choices = [];
-    console.log("Raw choices:", this.currentProblem.choices);
-    try {
-      let choicesObj = JSON.parse(this.currentProblem.choices);
-      console.log("Parsed choices object:", choicesObj);
-      choices = Object.keys(choicesObj).map((key) => ({
-        text: choicesObj[key],
-        value: key
-      }));
-      console.log("Formatted choices array:", choices);
-    } catch (error) {
-      console.error('Failed to parse choices:', error);
-    }
-    return choices;
-  },
+  
     parsedOptions() {
       let options = [];
       try {
@@ -431,6 +420,22 @@ export default {
     VMdPreview,
   },
   methods: {
+    parsedChoices(yourchoices) {
+    let choices = [];
+    console.log("Raw choices:",yourchoices);
+    try {
+      let choicesObj = JSON.parse(yourchoices);
+      console.log("Parsed choices object:", choicesObj);
+      choices = Object.keys(choicesObj).map((key) => ({
+        text: choicesObj[key],
+        value: key
+      }));
+      console.log("Formatted choices array:", choices);
+    } catch (error) {
+      console.error('Failed to parse choices:', error);
+    }
+    return choices;
+  },
     openCreateDialog() {
       this.e1 = 1;
       this.newProblem = { name: '', content: '', tag: '', type: '', options: [''], fillBlanks: [''] };
@@ -486,21 +491,35 @@ export default {
     isMultipleChoice(type) {
       return ['SINGLE_CHOICE', 'MULTI_CHOICE'].includes(type);
     },
-    addOption() {
+    addOptionNew() {
       this.newProblem.options.push('');
     },
+    addOption() {
+      this.currentProblem.choices.push('');
+    },
+    
     removeOption(index) {
       if (this.newProblem.options.length > 1) {
         this.newProblem.options.splice(index, 1);
       }
     },
     removeCurOption(index) {
-      if (this.currentProblem.options.length > 1) {
-        this.currentProblem.options.splice(index, 1);
+      if (this.currentProblem.choices.length > 1) {
+        this.currentProblem.choices.splice(index, 1);
       }
     },
     addFillBlank() {
       this.newProblem.fillBlanks.push('');
+    },
+    addCurFillBlank() {
+
+       if (!this.currentProblem.fillBlanks) {
+    // 如果没有，初始化 fillBlanks 为一个包含空字符串的数组
+    this.$set(this.currentProblem, 'fillBlanks', ['']);
+    } else {
+    // 如果已经有 fillBlanks 键，直接添加一个空字符串
+      this.currentProblem.fillBlanks.push('');
+    }
     },
     addToList(item) {
       this.currentProblem = item;
@@ -509,6 +528,7 @@ export default {
     changeProblem(item) {
       this.e2 = 1;
       this.currentProblem = item;
+      this.currentProblem.choices = this.parsedChoices(this.currentProblem.choices);
       console.log("cur",this.currentProblem);
       this.dialogEdit = true;
     },
@@ -676,8 +696,73 @@ export default {
         this.e2++;
         return;
       }
+      console.log('start!:',this.currentProblem);
+      let choices = {};
+      let answer = {};
+      if (this.currentProblem.type === 'SINGLE_CHOICE' || this.currentProblem.type === 'MULTI_CHOICE') {
+        // 构造 choices 对象
+        choices = this.currentProblem.choices.reduce((acc, choice, index) => {
+          const key = String.fromCharCode(65 + index); // 生成键名，如 'A', 'B', 'C' 等
+          if (choice.text.trim()) {
+            acc[key] = choice.text;
+          }
+          return acc;
+        }, {});
+        if (this.currentProblem.type === 'MULTI_CHOICE') {
+          const sortedCorrectAnswers = this.currentProblem.answerss.slice().sort(); // 排序
+          answer = sortedCorrectAnswers.reduce((acc, key) => {
+            if (choices[key]) {
+              acc[key] = choices[key];
+            }
+            return acc;
+          }, {});
+        } else if (this.currentProblem.type === 'SINGLE_CHOICE') {
+          const correctAnswerKey = this.currentProblem.answers;
+          console.log('corrrr:',correctAnswerKey);
+          if (correctAnswerKey && choices[correctAnswerKey]) {
+            answer[correctAnswerKey] = choices[correctAnswerKey];
+          }
+        }
+      } else if (this.currentProblem.type === 'BLANK_FILLING') {
+        // 构造填空题答案对象
+        answer = this.currentProblem.fillBlanks.reduce((acc, blank, index) => {
+          acc[`${index + 1}`] = blank;
+          return acc;
+        }, {});
+      }
+      console.log('beforechoices:',choices);
+      console.log('beforeanswers:',answer);
+      const choicesJson = JSON.stringify(choices);
+      const answerJson = JSON.stringify(answer);
+      console.log('afterchoices:',choicesJson);
+      console.log('afteranswers:',answerJson);
+
+      const newProblemDataChoice = {
+        title: this.currentProblem.title,
+        type: this.currentProblem.type,
+        content: this.currentProblem.content,
+        choices: choicesJson,
+        answer: answerJson,
+        tag: this.currentProblem.tag,
+      };
+      console.log('tar:',newProblemDataChoice);
+      const newProblemDataBlankFilling = {
+        title: this.currentProblem.title,
+        type: this.currentProblem.type,
+        content: this.currentProblem.content,
+        answer: answerJson,
+        tag: this.currentProblem.tag,
+      };
+      let newProblemData = {};
+      if (this.currentProblem.type === 'BLANK_FILLING') {
+        newProblemData = newProblemDataBlankFilling;
+      } else {
+        newProblemData = newProblemDataChoice;
+      }
+      console.log('here:',newProblemData);
+     
       this.$store
-        .dispatch('updateProblem', this.currentProblem)
+        .dispatch('updateProblem', {pid: this.currentProblem.pid,problem: newProblemData})
         .then(() => {
           this.$store.commit('setAlert', {
             type: 'success',

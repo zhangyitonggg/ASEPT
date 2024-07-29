@@ -194,6 +194,19 @@ export default new Vuex.Store({
           })
       })
     },
+    updateProblem(context,data) {
+      
+      return new Promise((resolve, reject) => {
+        api.updateproblem(data)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+            console.log(error);
+          })
+      })
+    },
     getProblemsRecommended(context) {
       return new Promise((resolve, reject) => {
         api.getProblemsRecommended()

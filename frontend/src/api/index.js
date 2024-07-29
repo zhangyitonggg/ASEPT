@@ -26,6 +26,12 @@ const api = {
       console.log('create: ',problemData);
       return await router.post(path.baseUrl + path.createProblem,problemData);
     },
+    updateproblem: async(problemData) => {
+      console.log("updateProblem");
+      console.log('update: ',problemData.problem);
+      console.log('pid:', problemData.pid);
+      return await router.post(path.baseUrl + path.updateproblem,problemData.problem,{params:{pid: problemData.pid}});
+    },
     getMyProblem: async() => {
       console.log("getMyProblem");
       return await router.get(path.baseUrl + path.getMyProblem);
