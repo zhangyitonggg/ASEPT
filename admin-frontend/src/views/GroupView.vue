@@ -1,9 +1,25 @@
 <template>
   <v-container>
     <div>
-      <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-      </v-container>
+      <template v-if="loading">
+        <v-container fluid class="d-flex align-center justify-center">
+          <v-row class="text-center">
+            <v-col>
+              <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-container fluid class="d-flex align-center justify-center">
+          <v-row class="text-center">
+            <v-col>
+              <h3>
+                海内存知己，天涯若比邻。
+              </h3>
+              <span>正在获取你所管理的团队。</span>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
       <v-container fluid v-else>
         <template v-if="items.length == 0">
           <v-btn color="success" @click="openCreateDialog">创建团队</v-btn>
