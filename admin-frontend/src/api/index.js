@@ -151,7 +151,10 @@ const api = {
   },
   setPermission: async (username, permission, cancel) => {
     return await router.post(path.baseUrl + path.setPermission, { target_user_name: username, permission: permission, cancel: cancel });
-  }
+  },
+  getTime: async() => {
+    return await router.get(path.baseUrl + path.getTime);
+  },
 };
 
 export default api;

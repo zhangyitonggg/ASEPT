@@ -10,6 +10,7 @@ from fuzzywuzzy import process
 from backend.data.User import User, PermissionType
 from backend.data.Announcement import Announcement
 from backend.data.Problem import *
+from backend.routers.news import Feedback
 
 MYSQL_CONFIG_FILE = 'backend/db.yml'
 MYSQL_PASSWORD = ''
@@ -1349,3 +1350,9 @@ def fuzzy_match(problems, key, threshold=50):
             scores.append((overall_score, problem))
     scores.sort(reverse=True, key=lambda x: x[0])
     return [item[1] for item in scores]
+
+
+def receive_feedback(db, user: User, feedback: Feedback):
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO Feedback (fid, username, name, email, advice, complaint) VALUES (UUID(), %s, %s, %s, %s, %s)", (user.name, feedback.name, feedback.email, feedback.advice, feedback.complaint))
+    db.commit()

@@ -35,7 +35,8 @@
                 <v-subheader v-if="item.header" :key="item.header" v-text="item.header"></v-subheader>
                 <v-list-item v-else-if="item.name" :key="item.uid">
                   <v-list-item-avatar>
-                    <v-icon> {{ item.is_admin === "True" ? "mdi-head-flash" : "mdi-head" }}</v-icon>
+                    <v-icon v-if="item.blocked === 'True'">mdi-account-off</v-icon>
+                    <v-icon v-else> {{ item.is_admin === "True" ? "mdi-account-tie-hat" : "mdi-head" }}</v-icon>
                   </v-list-item-avatar>
                   <v-list-item-content>
                     <v-list-item-title>

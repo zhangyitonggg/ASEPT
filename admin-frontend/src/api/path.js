@@ -36,6 +36,7 @@ const base = {
   setPermission: '/admin/set_permission',
   publishAnnouncement: '/admin/open_announcement',
   modifyAnnouncement: '/admin/modify_announcement',
+  getTime: '/news/current_time',
 }
 
 export default base;

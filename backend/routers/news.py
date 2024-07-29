@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Header
 import pymysql
+from pydantic import BaseModel
 
 from backend.utils import database, redis
 from backend.data.User import Permissions, User
@@ -76,3 +77,20 @@ async def get_current_time(db: pymysql.connections.Connection = Depends(database
     return {
         "current_time": str(database.get_current_time(db)).replace('T', ' ')
     }
+
+
+class Feedback(BaseModel):
+    name: str
+    email: str
+    advice: str | None = None
+    complaint: str | None = None
+
+
+@router.post("/receive_feedback")
+async def receive_feedback(
+    feedback: Feedback,
+    user: User = Depends(security.get_user),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    database.receive_feedback(db, user.uid, feedback)
+    return { "status": "success" }
