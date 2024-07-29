@@ -77,8 +77,8 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/arrange/solve/:pid',
-    name: 'solves',
-    component: () => import('../components/exercises/Solve.vue'),
+    name: 'arrangeSolves',
+    component: () => import('../components/exercises/ArrangeSolve.vue'),
     props: true,
     meta: {
       requireAuth: true,
