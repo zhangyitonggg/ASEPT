@@ -92,5 +92,5 @@ async def receive_feedback(
     user: User = Depends(security.get_user),
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
-    database.receive_feedback(db, user.uid, feedback)
+    database.receive_feedback(db, user, feedback)
     return { "status": "success" }

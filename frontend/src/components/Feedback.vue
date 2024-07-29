@@ -3,7 +3,7 @@
     <v-form v-model="valid" ref="form">
       <v-text-field v-model="name" :rules="[rules.required]" label="您的称呼*" required></v-text-field>
       <v-text-field v-model="email" :rules="[rules.required, rules.email]" label="您的邮箱地址*"></v-text-field>
-      <v-textarea v-model="advice" label="您的建议吗(可选)"></v-textarea>
+      <v-textarea v-model="advice" label="您的建议(可选)"></v-textarea>
       <v-textarea v-model="complaint" label="投诉(可选)"></v-textarea>
       <v-btn :disabled="!valid" @click="submit" color="primary" :loading="loading">
         提交
