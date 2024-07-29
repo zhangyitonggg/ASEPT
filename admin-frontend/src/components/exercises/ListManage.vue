@@ -1,8 +1,24 @@
 <template>
   <div>
-    <v-container fluid class="d-flex justify-center align-center" v-if="loading">
-      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
-    </v-container>
+    <template v-if="loading">
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container fluid class="d-flex align-center justify-center">
+        <v-row class="text-center">
+          <v-col>
+            <h3>
+              万事俱备，只欠东风。
+            </h3>
+            <span>正在获取你管理的题单。</span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </template>
     <v-container fluid v-else>
       <v-layout>
         <!-- 创建题单按钮 -->
@@ -22,20 +38,21 @@
             <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
             <v-list-item v-else-if="item.pgid" :key="item.pgid">
               <v-list-item-avatar>
-                <v-icon>{{ item.locked ? 'mdi-link-lock' : 'mdi-link' }}</v-icon>
+                <v-icon>mdi-invoice-list-outline</v-icon>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>
                   <h4>{{ item.name }}</h4>
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                  Tag: {{ item.tag }}
+                  Description: {{ item.description }}
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
                 <v-btn color="primary" @click="openShareDialog(item)"> 分享题单 </v-btn>
               </v-list-item-action>
             </v-list-item>
+            <v-divider v-if="index < currentPageItems.length - 1"></v-divider>
           </template>
           <v-pagination v-model="currentPage" :length="numberOfPages"></v-pagination>
         </v-list>
@@ -158,7 +175,6 @@ export default {
         .dispatch('getMyProblemGroup')
         .then((res) => {
           this.items = res.problem_groups;
-          console.log(res);
         })
         .catch((error) => {
           this.$store.commit('setAlert', {

@@ -15,6 +15,9 @@ const api = {
     const response = await router.get(path.baseUrl + path.news_getannouncements);
     return response;
   },
+  getProblemTag:  async() => {
+    return await router.get(path.baseUrl + path.getProblemTags);
+  },
   register: async (username, password) => {
     return await router.post(path.baseUrl + path.logon, {}, { params: { username: username, password: password } });
   },
@@ -96,7 +99,7 @@ const api = {
   },
   add_problem_tag: async (pid, tag) => {
     console.log("add_problem_tag");
-    return await router.post(path.baseUrl + path.add_problem_tag, {}, { params: { pid: pid, tag: tag } });
+    return await router.post(path.baseUrl + path.add_problem_tag, {}, { params: { pid: pid, tag_name: tag } });
   },
   search_problem_by_tag: async (tag) => {
     console.log("search_problem_by_tag");;
