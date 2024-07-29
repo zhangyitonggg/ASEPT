@@ -296,8 +296,7 @@
             <v-text-field v-model="newTag" label="输入 Tag" required></v-text-field>
             <!-- 可选 Tag 显示区域 -->
             <v-chip-group column v-model="selectedTags" multiple active-class="primary--text">
-              <v-chip v-for="tag in availableTags" :key="tag.tid" @click="newTag = tag.tag_name" color="yellow"
-                text-color="white">
+              <v-chip v-for="tag in availableTags" :key="tag.tid" @click="newTag = tag.tag_name" text-color='dark cyan'  color="#d6f8f1b0">
                 {{ tag.tag_name }}
               </v-chip>
             </v-chip-group>
@@ -671,6 +670,7 @@ export default {
         correctAnswers: [],
       };
     },
+    
     confirmChangeProblem() {
       if (this.e2 != 2) {
         this.e2++;
@@ -702,4 +702,4 @@ export default {
   margin-right: 18px;
   /* 或其他适当的间距 */
 }
-</style>
+</style>  
