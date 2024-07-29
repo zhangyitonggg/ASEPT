@@ -106,6 +106,17 @@ export default new Vuex.Store({
           })
       })
     },
+    getFeedbacks(context) {
+      return new Promise((resolve, reject) => {
+        api.getFeedbacks()
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    },
     register(context, { username, password }) {
       return new Promise((resolve, reject) => {
         api.register(username, password)

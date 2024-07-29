@@ -15,6 +15,10 @@ const api = {
     const response = await router.get(path.baseUrl + path.news_getannouncements);
     return response;
   },
+  getFeedbacks: async () => {
+    const response = await router.get(path.baseUrl + path.get_feedbacks);
+    return response;
+  },
   getProblemTag:  async() => {
     return await router.get(path.baseUrl + path.getProblemTags);
   },
