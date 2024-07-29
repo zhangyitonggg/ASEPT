@@ -7,7 +7,8 @@ import vuetify from './plugins/vuetify'
 import VuetifyDialog from 'vuetify-dialog'
 
 Vue.config.productionTip = false
-
+import VueParticles from 'vue-particles'
+Vue.use(VueParticles)
 new Vue({
   router,
   store,

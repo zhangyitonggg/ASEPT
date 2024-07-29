@@ -1,4 +1,24 @@
 <template>
+<div>
+  <vue-particles
+  color="#8EB5C9"
+  :particleOpacity="0.9"
+  :particlesNumber="80"
+  shapeType="circle"
+  :particleSize="6"
+  linesColor="#8EB5C9"
+  :linesWidth="1"
+  :lineLinked="true"
+  :lineOpacity="0.6"
+  :linesDistance="150"
+  :moveSpeed="3"
+  :hoverEffect="true"
+  hoverMode="grab"
+  :clickEffect="true"
+  clickMode="push"
+  class="lizi"
+>
+</vue-particles>
   <v-card flat>
     <v-progress-linear :indeterminate="true" v-show="loading" id="loginPanelProgressBar" color="success" />
     <div class="ma-6">
@@ -55,11 +75,12 @@
           登录
         </v-btn>
       </v-form>
-      <v-btn block depressed @click.stop="switchRegisterPage" :disabled="loading" class="mt-2">
+      <v-btn block depressed @click.stop="switchRegisterPage" :disabled="loading" class="mt-2 buttonyt">
         {{ this.showRegister ? '已有账号？登录' : '没有账号？注册' }}
       </v-btn>
     </div>
   </v-card>
+</div>
 </template>
 
 <script>
@@ -178,11 +199,29 @@ export default {
 
 .loginPanelForm {
   width: 100%;
+  z-index: 2;
+  position: relative;
+}
+.buttonyt {
+  z-index: 2;
+  position: relative;
 }
 
 #loginPanelSubheader {
   clear: both;
   padding-bottom: 20px;
   padding-left: 0;
+}
+
+
+.lizi {
+  background-size: cover;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 </style>
