@@ -330,3 +330,37 @@ async def get_all_admin(
             detail="Permission denied. You are not an admin."
         )
     return database.get_all_admin(db)
+
+
+@router.get('/get_feedbacks')
+async def get_feedbacks(
+    user: User = Depends(security.get_admin),
+    db: pymysql.connections.Connection = Depends(database.connect)
+):
+    '''
+    获取所有反馈信息，只有管理员可以获取。
+    
+    返回格式：
+
+    ```
+    {
+        "feedbacks": [
+            {
+                "username": "xxx",
+                "name": "xxx",
+                "email": "xxx",
+                "advice": "xxx",
+                "complaint": "xxx",
+                "update_time": "2021-10-01 12:00:00"
+            },
+            ...
+        ]
+    }
+    ```
+    '''
+    if user.permissions.get("IS_ADMIN") == False:
+        raise HTTPException(
+            status_code=401,
+            detail="Permission denied. You are not an admin."
+        )
+    return database.get_feedbacks(db)
