@@ -77,7 +77,6 @@ const App = Vue.extend({
         ['mdi-book-open-variant-outline', '管理题库', '/exercises'],
         ['mdi-account-group', '管理团队', '/groups'],
         ['mdi-account-wrench', '管理用户', '/users'],
-        ['mdi-chart-box-multiple', '管理平台', '/platform'],
         ['mdi-account', '个人中心', '/me'],
       ],
     };
