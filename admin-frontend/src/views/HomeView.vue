@@ -6,10 +6,6 @@
         <span>公告</span>
         <v-icon>mdi-message-alert-outline</v-icon>
       </v-btn>
-      <v-btn value="waterbar">
-        <span>水吧</span>
-        <v-icon>mdi-hand-clap</v-icon>
-      </v-btn>
       <v-btn value="money">
         <span>支持我们</span>
         <v-icon>mdi-hand-coin</v-icon>

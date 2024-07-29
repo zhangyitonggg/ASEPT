@@ -15,6 +15,7 @@ const base = {
     createProblemGroup: '/problems/create_problem_group',
     change_problem_group_info: '/problems/change_problem_group_info',
     add_problem_to_group: '/problems/add_problem_to_group',
+    getProblemTags: '/problems/get_all_tags',
     share_problem_group_to_user_group: '/problems/share_problem_group_to_user_group',
     add_problem_tag: '/problems/add_problem_tag',
     search_problem_by_tag: '/problems/search_problem_by_tag',

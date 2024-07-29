@@ -516,6 +516,12 @@ def admin_get_all_problems(db):
     problems = cursor.fetchall()
     res = []
     for problem in problems:
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM ProblemTags WHERE pid = %s", (problem[0]))
+        tags = cursor.fetchall()
+        _tags_ = []
+        for tag in tags:
+            _tags_.append(get_tag_by_tid(db, tag[1])[1])
         res.append({
             "pid": problem[0],
             "title": problem[1],
@@ -526,6 +532,7 @@ def admin_get_all_problems(db):
             "choices": problem[6],
             "answers": problem[7],
             "is_public": problem[8],
+            "tags": _tags_,
         })
     return {"problems": res}
 
