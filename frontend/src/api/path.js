@@ -1,5 +1,5 @@
 const base = {
-    baseUrl: 'http://localhost:8000',
+    baseUrl: 'http://45.78.56.122:8000',
     login: '/security/token',
     logon: '/create_user',
     userModify: '/user/modify',
