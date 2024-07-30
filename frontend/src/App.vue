@@ -1,5 +1,23 @@
 <template>
   <v-app id="inspire">
+    <vue-particles
+    color="#575454"
+    :particleOpacity="0.95"
+    :particlesNumber="50"
+    shapeType="circle"
+    :particleSize="4"
+    linesColor="#575454"
+    :linesWidth="1"
+    :lineLinked="true"
+    :lineOpacity="0.7"
+    :linesDistance="150"
+    :moveSpeed="3"
+    :hoverEffect="true"
+    hoverMode="grab"
+    :clickEffect="false"
+    clickMode="push"
+  >
+  </vue-particles>
     <v-app-bar app v-if="$store.state._show_platform_frame_">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
@@ -152,5 +170,11 @@ export default App;
 .slide-y-leave-to {
   transform: translateY(100%);
   opacity: 0;
+}
+
+#particles-js {
+  width: 100%;
+  height: calc(100vh - 64px);
+  position: absolute;
 }
 </style>
