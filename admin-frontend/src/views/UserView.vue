@@ -136,7 +136,6 @@ export default {
       this.$store.dispatch("showAllUsers")
         .then((res) => {
           this.items.splice(0, this.items.length, ...res.users); // 清空当前数组并插入新数据
-          console.log(this.items);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {

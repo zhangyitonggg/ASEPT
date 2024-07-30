@@ -191,7 +191,6 @@ export default {
       this.dialog_modifyannouncement = true;
     },
     modifyAnnouncement(item) {
-      console.log(item);
       this.loading = true;
       this.$store.dispatch("modifyAnnouncement", {
         aid: item.aid,

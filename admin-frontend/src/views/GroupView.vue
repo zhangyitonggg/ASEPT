@@ -220,7 +220,6 @@ export default {
             group.name = group.group_name;
           });
           this.items.splice(0, this.items.length, ...res.groups); // 清空当前数组并插入新数据
-          console.log(this.items);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {
@@ -247,7 +246,6 @@ export default {
       this.dialog = true;
     },
     delete_group(item) {
-      console.log(item);
       this.$store.dispatch('deleteGroup', { gid: item.gid })
         .then(() => {
           this.$store.commit("setAlert", { type: "success", message: `解散团队 ${item.group_name} 成功。` });

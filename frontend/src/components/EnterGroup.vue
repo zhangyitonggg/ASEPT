@@ -123,7 +123,6 @@ export default {
       this.$store.dispatch("showUnGroups")
         .then((res) => {
           this.items.splice(0, this.items.length, ...res.groups);
-          console.log('@', this.items);
         })
         .catch((e) => {
           this.$store.commit("setAlert", {

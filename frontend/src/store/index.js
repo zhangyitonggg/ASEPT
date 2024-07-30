@@ -142,7 +142,6 @@ export default new Vuex.Store({
           })
           .catch(error => {
             reject(error);
-            console.log(error);
           })
       })
     },
@@ -154,7 +153,6 @@ export default new Vuex.Store({
           })
           .catch(error => {
             reject(error);
-            console.log(error);
           })
       })
     },
@@ -210,7 +208,6 @@ export default new Vuex.Store({
           })
           .catch(error => {
             reject(error);
-            console.log(error);
           })
       })
     },
@@ -221,7 +218,6 @@ export default new Vuex.Store({
             resolve(response.data);
           })
           .catch(error => {
-            console.log(error);
             reject(error);
           })
       })

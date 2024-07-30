@@ -421,15 +421,12 @@ export default {
   methods: {
     parsedChoices(yourchoices) {
     let choices = [];
-    console.log("Raw choices:",yourchoices);
     try {
       let choicesObj = JSON.parse(yourchoices);
-      console.log("Parsed choices object:", choicesObj);
       choices = Object.keys(choicesObj).map((key) => ({
         text: choicesObj[key],
         value: key
       }));
-      console.log("Formatted choices array:", choices);
     } catch (error) {
       console.error('Failed to parse choices:', error);
     }
@@ -530,7 +527,6 @@ export default {
       this.e2 = 1;
       this.currentProblem = item;
       this.currentProblem.choices = this.parsedChoices(this.currentProblem.choices);
-      console.log("cur",this.currentProblem);
       this.dialogEdit = true;
     },
     openAddTagDialog(item) {
@@ -698,7 +694,6 @@ export default {
         this.e2++;
         return;
       }
-      console.log('start!:',this.currentProblem);
       let choices = {};
       let answer = {};
       if (this.currentProblem.type === 'SINGLE_CHOICE' || this.currentProblem.type === 'MULTI_CHOICE') {
@@ -720,7 +715,6 @@ export default {
           }, {});
         } else if (this.currentProblem.type === 'SINGLE_CHOICE') {
           const correctAnswerKey = this.currentProblem.answers;
-          console.log('corrrr:',correctAnswerKey);
           if (correctAnswerKey && choices[correctAnswerKey]) {
             answer[correctAnswerKey] = choices[correctAnswerKey];
           }
@@ -732,12 +726,8 @@ export default {
           return acc;
         }, {});
       }
-      console.log('beforechoices:',choices);
-      console.log('beforeanswers:',answer);
       const choicesJson = JSON.stringify(choices);
       const answerJson = JSON.stringify(answer);
-      console.log('afterchoices:',choicesJson);
-      console.log('afteranswers:',answerJson);
 
       const newProblemDataChoice = {
         title: this.currentProblem.title,
@@ -747,7 +737,6 @@ export default {
         answer: answerJson,
         tag: this.currentProblem.tag,
       };
-      console.log('tar:',newProblemDataChoice);
       const newProblemDataBlankFilling = {
         title: this.currentProblem.title,
         type: this.currentProblem.type,
@@ -761,8 +750,6 @@ export default {
       } else {
         newProblemData = newProblemDataChoice;
       }
-      console.log('here:',newProblemData);
-     
       this.$store
         .dispatch('updateProblem', {pid: this.currentProblem.pid,problem: newProblemData})
         .then(() => {

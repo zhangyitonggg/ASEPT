@@ -69,7 +69,6 @@ router.interceptors.request.use(
         authorized_user_name: store.getters.username
       };
     }
-    console.log(config);
     return config;
   },
   error => {

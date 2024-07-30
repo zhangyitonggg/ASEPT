@@ -103,7 +103,6 @@ export default {
     },
     handleRegister() {
       this.loading = true;
-      console.log(this.username, this.password);
       this.$store
         .dispatch("register", {
           username: this.username,

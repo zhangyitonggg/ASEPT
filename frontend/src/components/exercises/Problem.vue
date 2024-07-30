@@ -163,7 +163,6 @@ export default {
         .dispatch('getAllProblems')
         .then(res => {
           this.items = [{ header: '我创建的题目' }, ...res.problems];
-          console.log("hhh", this.items);
         })
         .catch(error => {
           this.$store.commit('setAlert', {
@@ -189,7 +188,6 @@ export default {
     searchProblems() {
       let mytag = this.searchTag;
       let mykeyword = this.searchKeyword || '';
-      console.log(mytag);
       this.$store
         .dispatch('searchProblemByTag', { tag: mytag, keyword: mykeyword })
         .then(res => {
@@ -221,7 +219,6 @@ export default {
     },
     selectTag(tag) {
       this.searchTag = tag;
-      console.log(this.searchTag.tag_name);
     },
   },
   components: {

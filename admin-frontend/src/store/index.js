@@ -144,7 +144,6 @@ export default new Vuex.Store({
           })
           .catch(error => {
             reject(error);
-            console.log(error);
           })
       })
     },
@@ -303,7 +302,6 @@ export default new Vuex.Store({
       })
     },
     deleteGroup(context, { gid }) {
-      console.log(gid);
       return new Promise((resolve, reject) => {
         api.deleteGroup(gid)
           .then(response => {
@@ -330,7 +328,6 @@ export default new Vuex.Store({
         api.showAllGroups()
           .then(response => {
             resolve(response.data);
-            console.log(response.data);
           })
           .catch(error => {
             reject(error);

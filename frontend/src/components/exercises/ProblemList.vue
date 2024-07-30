@@ -164,7 +164,6 @@ export default {
         .dispatch('getProblemGroup')
         .then((res) => {
           this.items = res.problem_groups;
-          console.log('groups: ', this.items);
         })
         .catch((error) => {
           this.$store.commit('setAlert', {

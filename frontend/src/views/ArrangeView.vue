@@ -110,7 +110,6 @@ export default {
         .dispatch('getProblemsRecommended')
         .then(res => {
           this.items.splice(0, this.items.length, { header: '推荐题目' }, ...res.problems); // 清空当前数组并插入新数据
-          console.log("推荐题目：", this.items);
         })
         .catch(error => {
           this.$store.commit("setAlert", {
