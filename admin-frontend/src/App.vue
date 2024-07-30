@@ -1,10 +1,40 @@
 <template>
   <v-app id="inspire">
+    <vue-particles
+    :particlesNumber="30"
+    :particleSize="4"
+    :linesWidth="1"
+    :moveSpeed="1"
+    hoverMode="grab"
+    :clickEffect="false"
+  />
     <v-app-bar app v-if="$store.state._show_platform_frame_">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <div>{{ getCurrentTimeGreetings() }}，{{ $store.getters.username }}</div>
+      <clock class="pr-3" />
+      <div class="pr-3">{{ getCurrentTimeGreetings() }}，{{ $store.getters.username }}</div>
+      <v-menu bottom min-width="130px" rounded offset-y> <template v-slot:activator="{ on }">
+          <v-btn icon v-on="on">
+            <v-avatar size="36">
+              <img src="https://cravatar.cn/avatar/5ed20f2960c5e87468dee55bfd3ec4ab?d=mp">
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-list-item-content class="justify-center">
+            <div class="mx-auto text-center">
+              <v-btn depressed rounded text @click="navigateTo('/me')">
+                个人中心
+              </v-btn>
+              <v-divider class="my-3"></v-divider>
+              <v-btn rounded text color="error" @click="logout">
+                注销
+              </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-card>
+      </v-menu>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" fixed temporary>
       <div class="d-flex flex-column" style="height: 100%;">
@@ -42,6 +72,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import clock from './components/TimeClock.vue';
 
 const App = Vue.extend({
   name: 'App',
@@ -53,7 +84,7 @@ const App = Vue.extend({
         ['mdi-home', '管理首页', '/'],
         ['mdi-book-open-variant-outline', '管理题库', '/exercises'],
         ['mdi-account-group', '管理团队', '/groups'],
-        ['mdi-head-lightbulb-outline', '管理用户', '/users'],
+        ['mdi-account-wrench', '管理用户', '/users'],
         ['mdi-account', '个人中心', '/me'],
       ],
     };
@@ -83,8 +114,13 @@ const App = Vue.extend({
       if (h < 23) return '晚上好'
       return '夜深了'
     },
+    logout() {
+      this.$store.commit("clearPersonalInfo");
+      this.$router.push({ name: 'login' });
+    }
   },
   components: {
+    clock,
   },
   created() {
     if (localStorage.getItem('__token__') && localStorage.getItem('__user_name__')) {
@@ -124,5 +160,11 @@ export default App;
 .slide-y-leave-to {
   transform: translateY(100%);
   opacity: 0;
+}
+
+#particles-js {
+  width: 100%;
+  height: calc(100vh - 64px);
+  position: absolute;
 }
 </style>

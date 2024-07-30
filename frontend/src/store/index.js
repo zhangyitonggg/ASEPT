@@ -195,7 +195,6 @@ export default new Vuex.Store({
       })
     },
     updateProblem(context,data) {
-      
       return new Promise((resolve, reject) => {
         api.updateproblem(data)
           .then(response => {
@@ -439,6 +438,17 @@ export default new Vuex.Store({
           })
       })
     },
+    submitFeedback(context, { name, email, advice, complaint }) {
+      return new Promise((resolve, reject) => {
+        api.submitFeedback(name, email, advice, complaint)
+          .then(response => {
+            resolve(response.data);
+          })
+          .catch(error => {
+            reject(error);
+          })
+      })
+    }
   },
   modules: {
   }

@@ -152,6 +152,9 @@ const api = {
     getProblemTag:  async() => {
       return await router.get(path.baseUrl + path.getProblemTags);
     },
+    submitFeedback: async(name, email, advice, complaint) => {
+      return await router.post(path.baseUrl + path.submitFeedback, {name: name, email: email, advice: advice, complaint: complaint});
+    }
 };
 
 export default api;

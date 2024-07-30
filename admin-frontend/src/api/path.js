@@ -5,6 +5,7 @@ const base = {
   userModify: '/user/modify',
   deleteGroup: '/user_group/delete_group',
   news_getannouncements: '/news/get_announcements?max_announcements=20',
+  get_feedbacks: '/admin/get_feedbacks',
   showJoinedGroups: '/user_group/show_joined_groups',
   leaveGroup: '/user_group/leave_group',
   showAllGroups: '/admin/get_all_groups',
@@ -36,6 +37,7 @@ const base = {
   setPermission: '/admin/set_permission',
   publishAnnouncement: '/admin/open_announcement',
   modifyAnnouncement: '/admin/modify_announcement',
+  getTime: '/news/current_time',
 }
 
 export default base;

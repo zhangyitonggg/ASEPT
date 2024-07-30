@@ -15,6 +15,10 @@ const api = {
     const response = await router.get(path.baseUrl + path.news_getannouncements);
     return response;
   },
+  getFeedbacks: async () => {
+    const response = await router.get(path.baseUrl + path.get_feedbacks);
+    return response;
+  },
   getProblemTag:  async() => {
     return await router.get(path.baseUrl + path.getProblemTags);
   },
@@ -151,7 +155,10 @@ const api = {
   },
   setPermission: async (username, permission, cancel) => {
     return await router.post(path.baseUrl + path.setPermission, { target_user_name: username, permission: permission, cancel: cancel });
-  }
+  },
+  getTime: async() => {
+    return await router.get(path.baseUrl + path.getTime);
+  },
 };
 
 export default api;

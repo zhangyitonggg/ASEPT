@@ -37,6 +37,7 @@ const base = {
     get_all_problems: '/problems/get_all_problems',
     getProblemTags: '/problems/get_all_tags',
     updateproblem: '/problems/modify_problem',
+    submitFeedback: '/news/receive_feedback',
 }
 
 export default base;

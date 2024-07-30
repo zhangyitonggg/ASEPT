@@ -9,7 +9,7 @@ const errorHandle = (status, info) => {
     case 401:
       return "对不起。看起来你没有对应的权限。";
     case 403:
-      return "对不起。看起来你的访问被拒绝了。";
+      return "对不起。看起来你的令牌已经过期。请重新登录。";
     case 404:
       return "对不起。看起来你迷路了。";
     case 408:
@@ -23,7 +23,7 @@ const errorHandle = (status, info) => {
     case 502:
       return "对不起。看起来你的网络配置出了一些问题。";
     case 503:
-      return "对不起。看起来这个服务暂时不可用。";
+      return "对不起。看起来这个服务暂时不可用。我们正在紧急维护，请稍等。";
     default:
       return "对不起。看起来你遇到了一些问题。这可能是我们导致的问题。请检查你的网络配置，或者与管理员联系。";
   }
@@ -31,7 +31,7 @@ const errorHandle = (status, info) => {
 
 
 const router = axios.create({
-  timeout: 5000,
+  timeout: 6000,
 });
 
 
@@ -41,6 +41,9 @@ router.interceptors.request.use(
       if (config.useQs) {
         config.data = qs.stringify(config.data);
         config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+      } else if (config.useMultipart) {
+        config.headers['Content-Type'] = 'multipart/form-data';
+        config.timeout = 120000;
       } else {
         config.headers['Content-Type'] = 'application/json';
       }
@@ -53,6 +56,7 @@ router.interceptors.request.use(
         authorized_user_name: store.getters.username
       };
     }
+
     return config;
   },
   error => {
@@ -70,7 +74,11 @@ router.interceptors.response.use(
   },
   error => {
     const { response } = error;
-    return Promise.reject(errorHandle(response.status, response.info));
+    try {
+      return Promise.reject(errorHandle(response.status, response.data));
+    } catch (e) {
+      return Promise.reject("对不起。我们遇到了一些未知的问题。");
+    }
   }
 )
 

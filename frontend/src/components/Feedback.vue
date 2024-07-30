@@ -2,24 +2,13 @@
   <v-container>
     <v-form v-model="valid" ref="form">
       <v-text-field v-model="name" :rules="[rules.required]" label="您的称呼*" required></v-text-field>
-
       <v-text-field v-model="email" :rules="[rules.required, rules.email]" label="您的邮箱地址*"></v-text-field>
-
-      <v-textarea v-model="advice" label="您对我们的产品有什么建议吗？(可选)"></v-textarea>
-
+      <v-textarea v-model="advice" label="您的建议(可选)"></v-textarea>
       <v-textarea v-model="complaint" label="投诉(可选)"></v-textarea>
-
-      <span>
-        请给我们的产品打分
-      </span>
-      <v-rating v-model="rating" background-color="yellow" color="yellow darken-3" large></v-rating>
-
-      <v-btn :disabled="!valid" @click="submit">
-        Submit
+      <v-btn :disabled="!valid" @click="submit" color="primary" :loading="loading">
+        提交
       </v-btn>
     </v-form>
-
-    <!-- 感谢图片对话框 -->
     <v-dialog v-model="showThankYouDialog" persistent max-width="400px">
       <v-card>
         <v-card-title class="headline">感谢您的反馈！</v-card-title>
@@ -39,13 +28,13 @@
 export default {
   data() {
     return {
+      loading: false,
       valid: false,
       name: '',
       email: '',
       advice: '',
       complaint: '',
-      rating: null,
-      showThankYouDialog: false, // 控制感谢图片对话框的显示
+      showThankYouDialog: false,
       rules: {
         required: value => !!value || 'Required.',
         email: value => {
@@ -58,11 +47,29 @@ export default {
   methods: {
     submit() {
       if (this.$refs.form.validate()) {
-        this.showThankYouDialog = true // 提交后显示感谢图片对话框
+        this.loading = true;
+        this.$store.dispatch('submitFeedback', {
+          name: this.name,
+          email: this.email,
+          advice: this.advice,
+          complaint: this.complaint,
+        })
+        .then((res) => {
+          this.showThankYouDialog = true;
+        })
+        .catch((e) => {
+          this.$store.commit('setAlert', {
+            message: e,
+            type: 'error'
+          });
+        })
+        .finally(() => {
+          this.loading = false;
+        });
       }
     },
     closeDialog() {
-      this.showThankYouDialog = false
+      this.showThankYouDialog = false;
     }
   }
 }

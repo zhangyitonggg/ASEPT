@@ -1349,3 +1349,26 @@ def fuzzy_match(problems, key, threshold=50):
             scores.append((overall_score, problem))
     scores.sort(reverse=True, key=lambda x: x[0])
     return [item[1] for item in scores]
+
+
+def receive_feedback(db, user: User, feedback):
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO Feedback (fid, username, name, email, advice, complaint) VALUES (UUID(), %s, %s, %s, %s, %s)", (user.name, feedback.name, feedback.email, feedback.advice, feedback.complaint))
+    db.commit()
+
+
+def get_feedbacks(db):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM Feedback")
+    feedbacks = cursor.fetchall()
+    res = []
+    for feedback in feedbacks:
+        res.append({
+            "username": feedback[1],
+            "name": feedback[2],
+            "email": feedback[3],
+            "advice": feedback[4],
+            "complaint": feedback[5],
+            "update_time": feedback[6],
+        })
+    return {"feedbacks": res}

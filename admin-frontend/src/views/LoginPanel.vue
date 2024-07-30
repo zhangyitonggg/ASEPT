@@ -106,6 +106,8 @@ export default {
 
 .loginPanelForm {
   width: 100%;
+  z-index: 2;
+  position: relative;
 }
 
 #loginPanelSubheader {

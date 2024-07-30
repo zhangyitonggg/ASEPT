@@ -47,7 +47,7 @@
                   </h4>
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                  Tag: {{ item.tag }}
+                  Tag: {{ item.tagsString }}
                 </v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
@@ -89,7 +89,12 @@ export default {
         (item.tag && item.tag.toLowerCase().includes(this.search.toLowerCase())) ||
         (item.content && item.content.toLowerCase().includes(this.search.toLowerCase())))
       );
-      return filtered;
+      return filtered.map(item => {
+        return {
+          ...item,
+          tagsString: item.tags.join(' '),
+        };
+      });
     },
   },
   mounted() {
