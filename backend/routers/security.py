@@ -19,6 +19,12 @@ async def login(
     db: pymysql.connections.Connection = Depends(database.connect)
 ):
     user = database.varify_user(db, message.username, message.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     if user.permissions.get('BLOCKED'):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

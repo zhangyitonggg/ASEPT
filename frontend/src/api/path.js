@@ -1,7 +1,7 @@
 const base = {
     baseUrl: 'https://api.asept.aostl.ink',
     login: '/security/token',
-    logon: '/create_user',
+    logon: '/create_user/',
     userModify: '/user/modify',
     deleteGroup: '/user_group/delete_group',
     news_getannouncements: '/news/get_announcements?max_announcements=20',
