@@ -1,5 +1,5 @@
 const base = {
-    baseUrl: 'http://45.78.56.122:8000',
+    baseUrl: 'https://api.asept.aostl.ink',
     login: '/security/token',
     logon: '/create_user',
     userModify: '/user/modify',

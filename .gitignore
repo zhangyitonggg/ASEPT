@@ -11,3 +11,6 @@ uploads
 .VSCodeCounter/2024-07-26_20-07-02/results.json
 .VSCodeCounter/2024-07-26_20-07-02/results.md
 .VSCodeCounter/2024-07-26_20-07-02/results.txt
+*.bat
+*.sh
+*/dist
