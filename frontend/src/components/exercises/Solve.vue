@@ -210,6 +210,7 @@ export default {
         this.selectedAnswers = [];
         this.showAnswers = false;
         this.resultType = '';
+        this.correctAnswers = null;
         this.$router.push({ path: '' + previousProblem.pid });
       } else {
         this.$store.commit('setAlert', {
@@ -227,6 +228,7 @@ export default {
         this.selectedAnswers = [];
         this.showAnswers = false;
         this.resultType = '';
+        this.correctAnswers = null;
         this.$router.push({ path: '' + nextProblem.pid });
       } else {
         this.$store.commit('setAlert', {

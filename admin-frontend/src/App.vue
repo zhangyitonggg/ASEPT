@@ -1,13 +1,31 @@
 <template>
   <v-app id="inspire">
-    <vue-particles
+    <!-- <vue-particles
     :particlesNumber="30"
     :particleSize="4"
     :linesWidth="1"
     :moveSpeed="1"
     hoverMode="grab"
     :clickEffect="false"
-  />
+  /> -->
+  <vue-particles
+  color="#575454"
+  :particleOpacity="0.95"
+  :particlesNumber="50"
+  shapeType="circle"
+  :particleSize="4"
+  linesColor="#575454"
+  :linesWidth="1"
+  :lineLinked="true"
+  :lineOpacity="0.7"
+  :linesDistance="150"
+  :moveSpeed="3"
+  :hoverEffect="true"
+  hoverMode="grab"
+  :clickEffect="false"
+  clickMode="push"
+>
+</vue-particles>
     <v-app-bar app v-if="$store.state._show_platform_frame_">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>{{ $store.state._app_title_ }}</v-toolbar-title>
