@@ -494,7 +494,9 @@ export default {
       this.newProblem.options.push('');
     },
     addOption() {
-      this.currentProblem.choices.push('');
+      const index = this.currentProblem.choices.length;
+      const letter = String.fromCharCode(65 + index);
+      this.currentProblem.choices.push({text:'',value:letter});
     },
     
     removeOption(index) {
