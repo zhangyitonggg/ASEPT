@@ -10,14 +10,14 @@
   /> -->
   <vue-particles
   color="#575454"
-  :particleOpacity="0.95"
-  :particlesNumber="50"
+  :particleOpacity="0.99999999"
+  :particlesNumber="30"
   shapeType="circle"
   :particleSize="4"
   linesColor="#575454"
   :linesWidth="1"
   :lineLinked="true"
-  :lineOpacity="0.7"
+  :lineOpacity="0.9999"
   :linesDistance="150"
   :moveSpeed="3"
   :hoverEffect="true"
