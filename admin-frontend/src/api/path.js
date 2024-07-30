@@ -1,10 +1,10 @@
 const base = {
   baseUrl: 'https://api.asept.aostl.ink',
-  login: '/security/token',
+  login: '/security/admin',
   logon: '/create_user',
   userModify: '/user/modify',
   deleteGroup: '/user_group/delete_group',
-  news_getannouncements: '/news/get_announcements?max_announcements=20',
+  news_getannouncements: '/news/get_all_announcements?max_announcements=20',
   get_feedbacks: '/admin/get_feedbacks',
   showJoinedGroups: '/user_group/show_joined_groups',
   leaveGroup: '/user_group/leave_group',

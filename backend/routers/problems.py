@@ -89,7 +89,7 @@ async def add_problem(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
     check_problem_format(problem)
     if detect_sensetive(problem):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Contains sensetive words')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Contains sensetive words')
     pid = database.add_problem(db, problem, user)
     return {'status': 'success', 'pid': pid}
 
@@ -134,7 +134,7 @@ async def modify_problem(
     #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Permission denied')
     check_problem_format(problem)
     if detect_sensetive(problem):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Contains sensetive words')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Contains sensetive words')
     pid = database.modify_problem(db, pid, problem, user)
     return {'status': 'success', 'pid': pid}
 
