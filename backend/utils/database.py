@@ -1200,8 +1200,9 @@ def get_problem_recommend(db, user: User):
             "is_public": problem[8],
             "tags": _tags_,
         })
+    random.shuffle(ret)
     return {"problems": ret}
-    
+
 
 def problem_accessible(db, user: User, pid: str):
     cursor = db.cursor()
