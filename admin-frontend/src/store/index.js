@@ -16,16 +16,21 @@ export default new Vuex.Store({
     _token_: null,
     _app_title_: "Test",
     _problem_id_: 0,
+    particles: true,
   },
   getters: {
     username: state => state._user_name_ == null ? "UnauthorizedUser" : state._user_name_,
     problemid: state => state._problem_id_,
+    particles: state => state.particles,
   },
   mutations: {
     checkToken(state) {
       if (!state._user_name_ || state._user_name_ === "UnauthorizedUser") {
         state._show_platform_frame_ = false;
       }
+    },
+    setParticles(state, payload) {
+      state.particles = payload;
     },
     cancelAlert(state) {
       state._alert_.show = false;
@@ -94,6 +99,9 @@ export default new Vuex.Store({
       } catch (error) {
         throw "用户名或密码错误。";
       }
+    },
+    updateParticles({ commit }, payload) {
+      commit('setParticles', payload);
     },
     getNews(context) {
       return new Promise((resolve, reject) => {

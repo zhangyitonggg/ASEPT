@@ -1,6 +1,6 @@
 <template>
   <v-app id="inspire">
-    <vue-particles
+    <vue-particles  v-if="$store.state.particles"
     color="#575454"
     :particleOpacity="0.99999999"
     :particlesNumber="30"
