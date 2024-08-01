@@ -1125,18 +1125,22 @@ def get_user_statistics(db, user):
         if correct and pid not in problem_pass_counts:
             problem_pass_counts[pid] = last_submit_time
     total_passes = len(problem_pass_counts)
-    # # Calculate passes over regular intervals
-    start_time = min(submits, key=lambda x: x[5])[5] if submits else None
-    end_time = max(submits, key=lambda x: x[5])[5] if submits else None
-    interval_count = {}
-    label = {}
-    if start_time and end_time:
-        interval_duration = (end_time - start_time) / 7  # For example, 5 intervals
-        for i in range(8):
-            current_time = start_time + i * interval_duration
-            label[i] = str(current_time).replace('T', ' ')
-            interval_count[label[i]] = sum(1 for submit in submits if submit[4] and submit[5] <= current_time)
-
+    try:
+      start_time = min(submits, key=lambda x: x[5])[5] if submits else None
+      end_time = max(submits, key=lambda x: x[5])[5] if submits else None
+      interval_count = {}
+      label = {}
+      if start_time and end_time:
+          interval_duration = (end_time - start_time) / 7  # For example, 5 intervals
+          for i in range(8):
+              current_time = start_time + i * interval_duration
+              label[i] = str(current_time).replace('T', ' ')
+              interval_count[label[i]] = sum(1 for submit in submits if submit[4] and submit[5] <= current_time)
+      labels = [label[i][0:19] for i in range(8)]
+      interval_count = [interval_count[label[i]] for i in range(8)]
+    except:
+      labels = []
+      interval_count = []
     return {
         "choice_submit": choice_submit,
         "choice_correct": choice_correct,
@@ -1144,8 +1148,8 @@ def get_user_statistics(db, user):
         "blank_correct": blank_correct,
         "total_passes": total_passes,
         "last_submit_time": str(last_submit_time).replace('T', ' ') if last_submit_time else None,
-        "labels": [label[i][0:19] for i in range(8)],
-        "values": [interval_count[label[i]] for i in range(8)]
+        "labels": labels,
+        "values": interval_count
     }
 
 

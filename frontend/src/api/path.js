@@ -32,7 +32,7 @@ const base = {
     getProblemsRecommended: '/problems/get_problem_recommend',
     get_my_problem_groups: '/problems/my_problem_groups',
     get_problem_ans_by_id: '/problems/get_problem_answer',
-    uploadFile: '/problem_file_upload',
+    uploadFile: '/problem_file_upload/',
     getTime: '/news/current_time',
     get_all_problems: '/problems/get_all_problems',
     getProblemTags: '/problems/get_all_tags',

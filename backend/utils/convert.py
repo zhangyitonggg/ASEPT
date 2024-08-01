@@ -19,19 +19,20 @@ def pdf2text(pdf_path: str):
     pdf_file = Path(pdf_path)
     with TemporaryDirectory() as tempdir:
         if platform.system() == "Windows":
-            pdf_pages = convert_from_path(pdf_file, 500, poppler_path=path_to_poppler_exe)
+            pdf_pages = convert_from_path(pdf_file, 100, poppler_path=path_to_poppler_exe)
         else:
-            pdf_pages = convert_from_path(pdf_file, 500)
+            pdf_pages = convert_from_path(pdf_file, 100)
 
         # Iterate through all the pages stored above, enumerate() counts the pages.
         for page_enumeration, page in enumerate(pdf_pages, start=1):
             filename = f"{tempdir}\\page_{page_enumeration:03}.png"
-            page.save(filename, "PNG")
+            page.save(filename, "PNG", color_mode="L")
             image_file_list.append(filename)
 
         res = ""
         for image_file in image_file_list:
-            text = str(((pytesseract.image_to_string(Image.open(image_file), lang="chi_sim"))))
+            custom_config = r'--oem 3 --psm 6 -l chi_sim+eng+digits'
+            text = str(((pytesseract.image_to_string(Image.open(image_file), config=custom_config))))
             text = text.replace("-\n", "")
             res += text
 
@@ -39,7 +40,8 @@ def pdf2text(pdf_path: str):
 
 def img2text(img_path: str):
     img_file = Path(img_path)
-    text = str(((pytesseract.image_to_string(Image.open(img_file), lang="chi_sim"))))
+    custom_config = r'--oem 3 --psm 6 -l chi_sim+eng+digits'
+    text = str(((pytesseract.image_to_string(Image.open(img_file), config=custom_config))))
     return text
 
 def is_img(file_path: str):
