@@ -1,47 +1,24 @@
-# 后端说明
+# BUAA 2024 Python大作业
+## ASEPT
 
-开发版本：
+## **后端：** 
 
-- python 3.12.2
+Python版本：3.12.2
 
-运行前，先执行 `pip install fastapi uvicorn` （fastapi 开发用）
+在项目目录下打开终端，执行：pip install -r requirements.txt
 
-依赖项目：
+此外，对于运行Windows系统的电脑，需要从 https://github.com/UB-Mannheim/tesseract/wiki/Downloading-Tesseract-OCR-Engine 下载 tesseract 并确保安装有chi_sim.traineddata，从 https://github.com/oschwartz10612/poppler-windows/releases 下载 poppler，并把路径填写在/backend/utils/convert.py里；对于运行Linux系统的电脑，需要安装tesseract-ocr和poppler-utils（对于使用apt包管理器的系统，对应的命令为sudo apt install tesseract-ocr poppler-utils），并从https://github.com/tesseract-ocr/tessdata/blob/main/chi_sim.traineddata 下载chi_sim.traineddata到/usr/share/tesseract-ocr/5/tessdata下。
 
-- MariaDB
+安装好以上依赖后，执行：python run_backend.py启动后端。如果后端监听的端口不 8000，则可能需要重置网络以正常运行。
 
-```
-pip install pymysql
-pip install pyyaml
-pip install hashlib
-```
+## **前端：**
 
-- Redis
+打开终端执行：npm install vue-cli -g
 
-```
-pip install redis
-pip install pyyaml
-pip install jwt
-pip install datetime
-```
+在admin_frontend和frontend目录下打开终端，分别执行npm install安装所需的依赖包。
 
-- PDF/image 转文字
+如果在安装过程中出现网络问题，请设置代理。
 
-```
-pip install pytesseract
-pip install hashlib
-pip install PIL
-pip install pdf2image
-pip install tempfile
-pip install shutil
-```
+在安装完依赖包之后，在admin_frontend和frontend目录下打开终端，分别执行npm run serve运行前端，根据提示在浏览器里打开页面即可。
 
-通过 `py run_backend.py` 运行后端。
-
-运行后端后，可以通过访问 `http://0.0.0.0:8000/docs` 查看 API 说明文档。
-
-连接服务器后，使用`mysql -u pysummer_test -p`打开数据库。
-
-# 前端说明
-
-<font color="red">前端要是先写了 API 接口在 README 里写一下。</font>
+ 
